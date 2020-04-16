@@ -25,7 +25,7 @@ const reportStatus = message => {
 const blobSasUrl = "<placeholder>";
 // </snippet_StorageAcctInfo>
 
-// <snippet_CreatClientObjects>
+// <snippet_CreateClientObjects>
 // Create a new BlobServiceClient
 const blobServiceClient = new BlobServiceClient(blobSasUrl);
 
