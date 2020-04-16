@@ -40,7 +40,7 @@ bld/
 Generated\ Files/
 
 # Visual Studio Code auto generated files
-.vscode
+# .vscode
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

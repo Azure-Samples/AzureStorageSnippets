@@ -1,7 +1,10 @@
+// <snippet_ImportLibrary>
 // index.js
 const { BlobServiceClient } = require("@azure/storage-blob");
 // Now do something interesting with BlobServiceClient
+// </snippet_ImportLibrary>
 
+// <snippet_DeclareVariables>
 const createContainerButton = document.getElementById("create-container-button");
 const deleteContainerButton = document.getElementById("delete-container-button");
 const selectButton = document.getElementById("select-button");
@@ -15,10 +18,14 @@ const reportStatus = message => {
     status.innerHTML += `${message}<br/>`;
     status.scrollTop = status.scrollHeight;
 }
+// </snippet_DeclareVariables>
 
-// Update with your Blob service SAS URL string
-const blobSasUrl = "https://browserqsacct.blob.core.windows.net/?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2020-04-14T05:03:56Z&st=2020-04-13T21:03:56Z&spr=https&sig=HsWq6uL%2B%2BNgqmWahc15AjH%2FK0TiGtwsb6uJ9tIgX2po%3D";
+// <snippet_StorageAcctInfo>
+// Update <placeholder> with your Blob service SAS URL string
+const blobSasUrl = "<placeholder>";
+// </snippet_StorageAcctInfo>
 
+// <snippet_CreatClientObjects>
 // Create a new BlobServiceClient
 const blobServiceClient = new BlobServiceClient(blobSasUrl);
 
@@ -28,7 +35,9 @@ const containerName = "container" + new Date().getTime();
 
 // Get a container client from the BlobServiceClient
 const containerClient = blobServiceClient.getContainerClient(containerName);
+// </snippet_CreateClientObjects>
 
+// <snippet_CreateDeleteContainer>
 const createContainer = async () => {
     try {
         reportStatus(`Creating container "${containerName}"...`);
@@ -51,7 +60,9 @@ const deleteContainer = async () => {
 
 createContainerButton.addEventListener("click", createContainer);
 deleteContainerButton.addEventListener("click", deleteContainer);
+// </snippet_CreateDeleteContainer>
 
+// <snippet_ListBlobs>
 const listFiles = async () => {
     fileList.size = 0;
     fileList.innerHTML = "";
@@ -75,7 +86,9 @@ const listFiles = async () => {
 };
 
 listButton.addEventListener("click", listFiles);
+// </snippet_ListBlobs>
 
+// <snippet_UploadBlobs>
 const uploadFiles = async () => {
     try {
         reportStatus("Uploading files...");
@@ -95,7 +108,9 @@ const uploadFiles = async () => {
 
 selectButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", uploadFiles);
+// </snippet_UploadBlobs>
 
+// <snippet_DeleteBlobs>
 const deleteFiles = async () => {
     try {
         if (fileList.selectedOptions.length > 0) {
@@ -114,3 +129,4 @@ const deleteFiles = async () => {
 };
 
 deleteButton.addEventListener("click", deleteFiles);
+// </snippet_DeleteBlobs>
