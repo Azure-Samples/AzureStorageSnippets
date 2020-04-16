@@ -15,7 +15,7 @@ This project framework provides the following features:
 
 ### Prerequisites
 
-(ideally very short, if any)
+Client library packages.
 
 - OS
 - Library version
