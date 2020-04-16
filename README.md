@@ -1,6 +1,6 @@
 # Project Name
 
-(short, 1-3 sentenced, description of the project)
+Snippets for Azure Storage content
 
 ## Features
 
