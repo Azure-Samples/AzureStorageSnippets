@@ -1,14 +1,15 @@
 # Project Name
 
-Snippets for Azure Storage content
+Snippets for Azure Storage content.
 
 ## Features
 
 This project framework provides the following features:
 
-* Feature 1
-* Feature 2
-* ...
+* .NET samples for v11 and v12 client libraries
+* Java samples for v8 and v12 client libraries
+* Python samples
+* JavaScript samples
 
 ## Getting Started
 
