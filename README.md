@@ -1,20 +1,21 @@
 # Project Name
 
-(short, 1-3 sentenced, description of the project)
+Snippets for Azure Storage content.
 
 ## Features
 
 This project framework provides the following features:
 
-* Feature 1
-* Feature 2
-* ...
+* .NET samples for v11 and v12 client libraries
+* Java samples for v8 and v12 client libraries
+* Python samples
+* JavaScript samples
 
 ## Getting Started
 
 ### Prerequisites
 
-(ideally very short, if any)
+Client library packages.
 
 - OS
 - Library version
