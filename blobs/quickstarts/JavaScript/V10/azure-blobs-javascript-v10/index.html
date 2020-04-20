@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <button id="create-container-button">Create container</button>
+    <button id="delete-container-button">Delete container</button>
+    <button id="select-button">Select and upload files</button>
+    <input type="file" id="file-input" multiple style="display: none;" />
+    <button id="list-button">List files</button>
+    <button id="delete-button">Delete selected files</button>
+    <p><b>Status:</b></p>
+    <p id="status" style="height:160px; width: 593px; overflow: scroll;" />
+    <p><b>Files:</b></p>
+    <select id="file-list" multiple style="height:222px; width: 593px; overflow: scroll;" />
+</body>
+
+<script src="azure-storage-blob.js" charset="utf-8"></script>
+
+<script>
+const createContainerButton = document.getElementById("create-container-button");
+const deleteContainerButton = document.getElementById("delete-container-button");
+const selectButton = document.getElementById("select-button");
+const fileInput = document.getElementById("file-input");
+const listButton = document.getElementById("list-button");
+const deleteButton = document.getElementById("delete-button");
+const status = document.getElementById("status");
+const fileList = document.getElementById("file-list");
+
+const reportStatus = message => {
+    status.innerHTML += `${message}<br/>`;
+    status.scrollTop = status.scrollHeight;
+}
+
+const accountName = "myragrsacct";
+const sasString = "se=2020-04-20&sp=rwdlac&sv=2018-03-28&ss=b&srt=sco&sig=OQDBmtc1286fY3K8hzOEsdHBxeKh3KCoMOfZ00F4bcg%3D";
+const containerName = "testcontainer";
+const containerURL = new azblob.ContainerURL(
+    `https://${accountName}.blob.core.windows.net/${containerName}?${sasString}`,
+    azblob.StorageURL.newPipeline(new azblob.AnonymousCredential));
+
+const createContainer = async () => {
+    try {
+        reportStatus(`Creating container "${containerName}"...`);
+        await containerURL.create(azblob.Aborter.none);
+        reportStatus(`Done.`);
+    } catch (error) {
+        reportStatus(error.body.message);
+    }
+};
+
+const deleteContainer = async () => {
+    try {
+        reportStatus(`Deleting container "${containerName}"...`);
+        await containerURL.delete(azblob.Aborter.none);
+        reportStatus(`Done.`);
+    } catch (error) {
+        reportStatus(error.body.message);
+    }
+};
+
+createContainerButton.addEventListener("click", createContainer);
+deleteContainerButton.addEventListener("click", deleteContainer);
+
+const listFiles = async () => {
+    fileList.size = 0;
+    fileList.innerHTML = "";
+    try {
+        reportStatus("Retrieving file list...");
+        let marker = undefined;
+        do {
+            const listBlobsResponse = await containerURL.listBlobFlatSegment(
+                azblob.Aborter.none, marker);
+            marker = listBlobsResponse.nextMarker;
+            const items = listBlobsResponse.segment.blobItems;
+            for (const blob of items) {
+                fileList.size += 1;
+                fileList.innerHTML += `<option>${blob.name}</option>`;
+            }
+        } while (marker);
+        if (fileList.size > 0) {
+            reportStatus("Done.");
+        } else {
+            reportStatus("The container does not contain any files.");
+        }
+    } catch (error) {
+        reportStatus(error.body.message);
+    }
+};
+
+listButton.addEventListener("click", listFiles);
+
+const uploadFiles = async () => {
+    try {
+        reportStatus("Uploading files...");
+        const promises = [];
+        for (const file of fileInput.files) {
+            const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, file.name);
+            promises.push(azblob.uploadBrowserDataToBlockBlob(
+                azblob.Aborter.none, file, blockBlobURL));
+        }
+        await Promise.all(promises);
+        reportStatus("Done.");
+        listFiles();
+    } catch (error) {
+        reportStatus(error.body.message);
+    }
+}
+
+selectButton.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", uploadFiles);
+
+const deleteFiles = async () => {
+    try {
+        if (fileList.selectedOptions.length > 0) {
+            reportStatus("Deleting files...");
+            for (const option of fileList.selectedOptions) {
+                const blobURL = azblob.BlobURL.fromContainerURL(containerURL, option.text);
+                await blobURL.delete(azblob.Aborter.none);
+            }
+            reportStatus("Done.");
+            listFiles();
+        } else {
+            reportStatus("No files selected.");
+        }
+    } catch (error) {
+        reportStatus(error.body.message);
+    }
+};
+
+deleteButton.addEventListener("click", deleteFiles);
+</script>
+
+</html>
