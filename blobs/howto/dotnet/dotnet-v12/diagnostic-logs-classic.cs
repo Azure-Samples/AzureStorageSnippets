@@ -24,10 +24,6 @@ namespace dotnet_v12
     {
 
         //-------------------------------------------------
-        // Diagnostic logs snippet 1
-        //-------------------------------------------------
-
-        //-------------------------------------------------
         // Enable diagnostic logs
         //-------------------------------------------------
 
@@ -50,7 +46,6 @@ namespace dotnet_v12
 
             Console.WriteLine("Diagnostic logs are now enabled");
         }
-
 
         //-------------------------------------------------
         // Diagnostic logs snippet 2

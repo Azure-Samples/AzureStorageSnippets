@@ -23,7 +23,7 @@ namespace dotnet_v12
     public static class Constants
     {
         public const string accountKey = "";
-        public const string connectionString = "DefaultEndpointsProtocol=https;AccountName=normestablobaccount;AccountKey=YMVWVY/7CdimaG4l2DzmLn6bvbNzy0BJCZ9zSP2N1bKcra5wg4gw5eE12xoIw5Jut6aMu96UAzHXHlPiP+WBpQ==;EndpointSuffix=core.windows.net";
+        public const string connectionString = "";
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";
