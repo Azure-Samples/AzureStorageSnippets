@@ -14,19 +14,16 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using System;
+using Azure.Storage;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 
 namespace dotnet_v12
 {
     public class DiagnosticLogs
     {
-
-        //-------------------------------------------------
-        // Diagnostic logs snippet 1
-        //-------------------------------------------------
-
+        
         //-------------------------------------------------
         // Enable diagnostic logs
         //-------------------------------------------------
@@ -35,22 +32,25 @@ namespace dotnet_v12
         {
             var connectionString = Constants.connectionString;
 
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            // <Snippet_EnableDiagnosticLogs>
+            QueueServiceClient queueServiceClient = new QueueServiceClient(connectionString);
 
-            BlobServiceProperties serviceProperties = blobServiceClient.GetProperties().Value;
+            QueueServiceProperties serviceProperties = queueServiceClient.GetProperties().Value;
 
             serviceProperties.Logging.Delete = true;
 
-            BlobRetentionPolicy retentionPolicy = new BlobRetentionPolicy();
+            QueueRetentionPolicy retentionPolicy = new QueueRetentionPolicy();
             retentionPolicy.Enabled = true;
             retentionPolicy.Days = 2;
             serviceProperties.Logging.RetentionPolicy = retentionPolicy;
 
-            blobServiceClient.SetProperties(serviceProperties);
+            queueServiceClient.SetProperties(serviceProperties);
+
+            // </Snippet_EnableDiagnosticLogs>
 
             Console.WriteLine("Diagnostic logs are now enabled");
-        }
 
+        }
 
         //-------------------------------------------------
         // Diagnostic logs snippet 2
@@ -69,11 +69,10 @@ namespace dotnet_v12
         {
             Console.Clear();
             Console.WriteLine("Choose a diagnostic log scenario:");
-            Console.WriteLine("1) Scenario 1");
+            Console.WriteLine("1) Enable diagnostic logging");
             Console.WriteLine("2) Scenario 2");
             Console.WriteLine("3) Return to main menu");
             Console.Write("\r\nSelect an option: ");
- 
             switch (Console.ReadLine())
             {
                 case "1":
