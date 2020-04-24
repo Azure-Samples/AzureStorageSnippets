@@ -44,6 +44,10 @@ namespace dotnet_v12
             retentionPolicy.Days = 2;
             serviceProperties.Logging.RetentionPolicy = retentionPolicy;
 
+            serviceProperties.HourMetrics = null;
+            serviceProperties.MinuteMetrics = null;
+            serviceProperties.Cors = null;
+
             queueServiceClient.SetProperties(serviceProperties);
 
             // </Snippet_EnableDiagnosticLogs>
