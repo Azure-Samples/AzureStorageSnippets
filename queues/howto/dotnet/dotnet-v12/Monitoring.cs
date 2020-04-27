@@ -21,7 +21,7 @@ using Azure.Storage.Queues.Models;
 
 namespace dotnet_v12
 {
-    public class DiagnosticLogs
+    public class Monitoring
     {
         
         //-------------------------------------------------
@@ -66,13 +66,13 @@ namespace dotnet_v12
         }
 
         //-------------------------------------------------
-        // Diagnostic log menu
+        // Monitoring log menu
         //-------------------------------------------------
         
         public bool Menu()
         {
             Console.Clear();
-            Console.WriteLine("Choose a diagnostic log scenario:");
+            Console.WriteLine("Choose a monitoring scenario:");
             Console.WriteLine("1) Enable diagnostic logging");
             Console.WriteLine("2) Scenario 2");
             Console.WriteLine("3) Return to main menu");

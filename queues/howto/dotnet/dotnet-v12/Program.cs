@@ -23,11 +23,11 @@ namespace dotnet_v12
         //-----------------------------------------------
         // Submenu for diagnostic log scenarios.
         //----------------------------------------------- 
-        static bool DiagnosticLogs()
+        static bool Monitoring()
         {
-            DiagnosticLogs diagnosticLogs = new DiagnosticLogs();
+            Monitoring monitoring = new Monitoring();
 
-            while (diagnosticLogs.Menu()){}
+            while (monitoring.Menu()){}
 
             return true;
         }        
@@ -47,7 +47,7 @@ namespace dotnet_v12
         {
             Console.Clear();
             Console.WriteLine("Choose a feature area:");
-            Console.WriteLine("1) Diagnostic logs (classic)");
+            Console.WriteLine("1) Monitoring");
             Console.WriteLine("2) Feature area 2");
             Console.WriteLine("3) Feature area 3");
             Console.WriteLine("4) Exit");
@@ -57,7 +57,7 @@ namespace dotnet_v12
             {
                 case "1":
                     
-                    return DiagnosticLogs();
+                    return Monitoring();
                 
                 case "2":
                    
