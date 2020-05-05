@@ -16,7 +16,10 @@
 
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace dotnet_v12
 {
@@ -48,18 +51,9 @@ namespace dotnet_v12
         }
 
         //-------------------------------------------------
-        // Diagnostic logs snippet 2
-        //-------------------------------------------------
-
-        public void ExampleSnippet2(){
-
-            Console.WriteLine("Snippet code goes for Example 2 goes in here");
-        }
-
-        //-------------------------------------------------
         // Monitoring menu
         //-------------------------------------------------
-        
+
         public bool Menu()
         {
             Console.Clear();
@@ -79,8 +73,9 @@ namespace dotnet_v12
                    return true;
                 
                 case "2":
-                
-                   ExampleSnippet2();
+
+                   // call method here.
+
                    Console.WriteLine("Press enter to continue"); 
                    Console.ReadLine();              
                    return true;
