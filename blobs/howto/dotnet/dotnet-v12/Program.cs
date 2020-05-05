@@ -19,7 +19,20 @@ using System;
 namespace dotnet_v12
 {
     class Program
-    {      
+    {
+
+        //-----------------------------------------------
+        // Submenu for security scenarios.
+        //----------------------------------------------- 
+        static bool Security()
+        {
+            Security security = new Security();
+
+            while (security.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //-----------------------------------------------
         // Submenu for diagnostic log scenarios.
         //----------------------------------------------- 
@@ -47,27 +60,22 @@ namespace dotnet_v12
         {
             Console.Clear();
             Console.WriteLine("Choose a feature area:");
-            Console.WriteLine("1) Monitoring");
-            Console.WriteLine("2) Feature area 2");
-            Console.WriteLine("3) Feature area 3");
-            Console.WriteLine("4) Exit");
+            Console.WriteLine("1) Security");
+            Console.WriteLine("2) Monitoring");
+            Console.WriteLine("3) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
             {
                 case "1":
-                    
-                    return Monitoring();
-                
+
+                    return Security();
+
                 case "2":
-                   
-                   return true;               
-                
+
+                    return Monitoring();          
+                              
                 case "3":
-                   
-                   return true;
-                
-                case "4":
                    
                    return false;                
                 

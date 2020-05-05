@@ -18,15 +18,23 @@ using System;
 
 namespace dotnet_v12
 {
-    // All files in this project can access these values. 
+    // All files in this project can access these values. You won't have to modify the code in your methods to test them. Just update this file with the relevant values.
 
     public static class Constants
     {
+        // ---------------------------------------------------------------------------------------------
+        // IMPORTANT! Be sure to remove sensitive account information from this file before checking it in.
+        //----------------------------------------------------------------------------------------------
+
+        // Credential constants.
         public const string accountKey = "";
         public const string connectionString = "";
+        
+        // Account constants.
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";
+        public const string containerName = "";
     }
     
 }
