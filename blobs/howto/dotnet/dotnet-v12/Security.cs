@@ -46,7 +46,7 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_CreateAnonymousBlobClient>
-        private static void CreateAnonymousBlobClient()
+        public static void CreateAnonymousBlobClient()
         {
             // Create the client object using the Blob storage endpoint for your account.
             BlobServiceClient blobServiceClient = new BlobServiceClient
@@ -67,7 +67,7 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_ListBlobsAnonymously>
-        private static void ListBlobsAnonymously()
+        public static void ListBlobsAnonymously()
         {
             // Get a reference to a container that's available for anonymous access.
             BlobContainerClient container = new BlobContainerClient
@@ -87,7 +87,7 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_DownloadBlobAnonymously>
-        private static void DownloadBlobAnonymously()
+        public static void DownloadBlobAnonymously()
         {
             BlockBlobClient blob = new BlockBlobClient
                 (new Uri(@"https://storagesamples.blob.core.windows.net/sample-container/logfile.txt"));
