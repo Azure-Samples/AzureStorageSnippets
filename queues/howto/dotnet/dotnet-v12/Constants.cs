@@ -14,16 +14,15 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-using System;
+//using System;
 
 namespace dotnet_v12
 {
     // All files in this project can access these values. 
-
     public static class Constants
     {
         public const string accountKey = "";
-        public const string connectionString = "";
+        public const string connectionString = "UseDevelopmentStorage=true"; // Use Azurite
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";

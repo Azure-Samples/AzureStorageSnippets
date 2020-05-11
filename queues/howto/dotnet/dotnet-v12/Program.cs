@@ -30,8 +30,21 @@ namespace dotnet_v12
             while (monitoring.Menu()){}
 
             return true;
-        }        
-        
+        }
+
+        //-----------------------------------------------
+        // Submenu for basic queue scenarios.
+        //----------------------------------------------- 
+        static bool QueueBasics()
+        {
+            QueueBasics queueBasics = new QueueBasics();
+
+            while (queueBasics.Menu()){}
+
+            return true;
+        }
+
+
        //------------------------------------------------
        // Main function
        //------------------------------------------------
@@ -48,31 +61,23 @@ namespace dotnet_v12
             Console.Clear();
             Console.WriteLine("Choose a feature area:");
             Console.WriteLine("1) Monitoring");
-            Console.WriteLine("2) Feature area 2");
-            Console.WriteLine("3) Feature area 3");
-            Console.WriteLine("4) Exit");
+            Console.WriteLine("2) Queue basics");
+            Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
             {
                 case "1":
-                    
                     return Monitoring();
-                
+
                 case "2":
-                   
-                   return true;               
-                
-                case "3":
-                   
-                   return true;
-                
-                case "4":
-                   
-                   return false;                
+                   return QueueBasics();
+
+                case "X":
+                case "x":
+                   return false;
                 
                 default:
-                   
                    return true;
             }
         }
