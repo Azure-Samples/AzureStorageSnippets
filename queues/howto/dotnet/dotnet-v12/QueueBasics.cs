@@ -14,16 +14,32 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
+// <snippet_UsingStatements>
 using System; // Namespace for Console output
 using System.Configuration; // Namespace for ConfigurationManager
 using System.Threading.Tasks; // Namespace for Task
 using Azure.Storage.Queues; // Namespace for Queue storage types
 using Azure.Storage.Queues.Models; // Namespace for PeekedMessage
+// </snippet_UsingStatements>
 
 namespace dotnet_v12
 {
     public class QueueBasics
     {
+        //-------------------------------------------------
+        // Create the queue service client
+        //-------------------------------------------------
+        public void CreateQueueClient()
+        {
+            // <snippet_CreateClient>
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["storageConnectionString"];
+
+            // Instantiate a QueueClient which will be used to create and manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // </snippet_CreateClient>
+        }
+
         //-------------------------------------------------
         // Create a message queue
         //-------------------------------------------------
@@ -45,6 +61,7 @@ namespace dotnet_v12
         {
             // CreateQueue() must be called before this method
 
+            // <snippet_InsertMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -56,10 +73,12 @@ namespace dotnet_v12
                 // Send a message to the queue
                 queueClient.SendMessage(message);
             }
+            // </snippet_InsertMessage>
         }
 
         public void PeekMessage()
         {
+            // <snippet_PeekMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -74,10 +93,12 @@ namespace dotnet_v12
                 // Display the message
                 Console.WriteLine(peekedMessage[0].MessageText);
             }
+            // </snippet_PeekMessage>
         }
 
         public void UpdateMessage()
         {
+            // <snippet_UpdateMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -96,10 +117,12 @@ namespace dotnet_v12
                         TimeSpan.FromSeconds(60.0)  // Make it invisible for another 60 seconds
                     );
             }
+            // </snippet_UpdateMessage>
         }
 
         public void DequeueMessage()
         {
+            // <snippet_DequeueMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -116,10 +139,12 @@ namespace dotnet_v12
                 // Delete the message
                 queueClient.DeleteMessage(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
             }
+            // </snippet_DequeueMessage>
         }
 
         public void GetQueueLength()
         {
+            // <snippet_GetQueueLength>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -136,10 +161,12 @@ namespace dotnet_v12
                 // Display number of messages.
                 Console.WriteLine("Number of messages in queue: " + cachedMessagesCount);
             }
+            // </snippet_GetQueueLength>
         }
 
         public void DequeueMessages()
         {
+            // <snippet_DequeueMessages>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -162,10 +189,12 @@ namespace dotnet_v12
                     queueClient.DeleteMessage(message.MessageId, message.PopReceipt);
                 }
             }
+            // </snippet_DequeueMessages>
         }
 
         public void DeleteQueue()
         {
+            // <snippet_DeleteQueue>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -177,10 +206,12 @@ namespace dotnet_v12
                 // Delete the queue
                 queueClient.Delete();
             }
+            // </snippet_DeleteQueue>
         }
 
         public async Task<bool> QueueAsync()
         {
+            // <snippet_AsyncQueue>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -214,6 +245,7 @@ namespace dotnet_v12
             // Async delete the queue
             await queueClient.DeleteAsync();
             Console.WriteLine("Deleted queue");
+            // </snippet_AsyncQueue>
 
             return true;
         }
@@ -249,11 +281,11 @@ namespace dotnet_v12
                 // Add messages to the queue
                 case "2":
                     // Insert 25 messages into the queue
-                    for (int i = 0; i < 25; i++)
+                    for (int i = 1; i <= 25; i++)
                     {
                         string message = "Message number: " + i.ToString();
                         InsertMessage(message);
-                        Console.WriteLine("Inserted: {message}");
+                        Console.WriteLine("Inserted: " + message);
                     }
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
