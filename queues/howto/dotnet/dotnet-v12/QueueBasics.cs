@@ -60,20 +60,19 @@ namespace dotnet_v12
 
                 if (queueClient.Exists())
                 {
+                    Console.WriteLine($"Queue created: '{queueClient.Name}'");
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine("Make sure the Azurite storage emulator running and try again.");
-                    Console.ReadLine();
+                    Console.WriteLine($"Make sure the Azurite storage emulator running and try again.");
                     return false;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}\n\n");
-                Console.WriteLine("Make sure the Azurite storage emulator running and try again.");
-                Console.ReadLine();
+                Console.WriteLine($"Make sure the Azurite storage emulator running and try again.");
                 return false;
             }
         }
@@ -95,6 +94,8 @@ namespace dotnet_v12
                 queueClient.SendMessage(message);
             }
             // </snippet_InsertMessage>
+
+            Console.WriteLine($"Inserted: {message}");
         }
 
         public void PeekMessage()
@@ -112,7 +113,7 @@ namespace dotnet_v12
                 PeekedMessage[] peekedMessage = queueClient.PeekMessages();
 
                 // Display the message
-                Console.WriteLine(peekedMessage[0].MessageText);
+                Console.WriteLine($"Peeked message: '{peekedMessage[0].MessageText}'");
             }
             // </snippet_PeekMessage>
         }
@@ -134,7 +135,7 @@ namespace dotnet_v12
                 // Update the message contents
                 queueClient.UpdateMessage(message[0].MessageId, 
                         message[0].PopReceipt, 
-                        "Updated contents.",
+                        "Updated contents",
                         TimeSpan.FromSeconds(60.0)  // Make it invisible for another 60 seconds
                     );
             }
@@ -155,7 +156,8 @@ namespace dotnet_v12
                 // Get the next message
                 QueueMessage[] retrievedMessage = queueClient.ReceiveMessages();
 
-                //Process the message in less than 30 seconds, and then...
+                // Process (i.e. print) the message in less than 30 seconds
+                Console.WriteLine($"De-queued message: '{retrievedMessage[0].MessageText}'");
 
                 // Delete the message
                 queueClient.DeleteMessage(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
@@ -180,7 +182,7 @@ namespace dotnet_v12
                 int cachedMessagesCount = properties.ApproximateMessagesCount;
 
                 // Display number of messages.
-                Console.WriteLine("Number of messages in queue: " + cachedMessagesCount);
+                Console.WriteLine($"Number of messages in queue: {cachedMessagesCount}");
             }
             // </snippet_GetQueueLength>
         }
@@ -201,10 +203,8 @@ namespace dotnet_v12
 
                 foreach (QueueMessage message in receivedMessages)
                 {
-                    // Display the message
-                    Console.WriteLine(message.MessageText);
-
-                    //Process the message in less than 30 seconds, and then...
+                    // Process (i.e. print) the messages in less than 5 minutes
+                    Console.WriteLine($"De-queued message: '{message.MessageText}'");
 
                     // Delete the message
                     queueClient.DeleteMessage(message.MessageId, message.PopReceipt);
@@ -228,6 +228,8 @@ namespace dotnet_v12
                 queueClient.Delete();
             }
             // </snippet_DeleteQueue>
+
+            Console.WriteLine($"Queue deleted: '{queueClient.Name}'");
         }
 
         public async Task<bool> QueueAsync()
@@ -244,28 +246,28 @@ namespace dotnet_v12
 
             if (await queueClient.ExistsAsync())
             {
-                Console.WriteLine("Queue '{0}' Created", queueClient.Name);
+                Console.WriteLine($"Queue '{queueClient.Name}' created");
             }
             else
             {
-                Console.WriteLine("Queue '{0}' Exists", queueClient.Name);
+                Console.WriteLine($"Queue '{queueClient.Name}' exists");
             }
 
             // Async enqueue the message
             await queueClient.SendMessageAsync("Hello, World");
-            Console.WriteLine("Message added");
+            Console.WriteLine($"Message added");
 
             // Async receive the message
             QueueMessage[] retrievedMessage = await queueClient.ReceiveMessagesAsync();
-            Console.WriteLine("Retrieved message with content '{0}'", retrievedMessage[0].MessageText);
+            Console.WriteLine($"Retrieved message with content '{retrievedMessage[0].MessageText}'");
 
             // Async delete the message
             await queueClient.DeleteMessageAsync(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
-            Console.WriteLine("Deleted message");
+            Console.WriteLine($"Deleted message: '{retrievedMessage[0].MessageText}'");
 
             // Async delete the queue
             await queueClient.DeleteAsync();
-            Console.WriteLine("Deleted queue");
+            Console.WriteLine($"Deleted queue: '{queueClient.Name}'");
             // </snippet_AsyncQueue>
 
             return true;
@@ -306,7 +308,6 @@ namespace dotnet_v12
                     {
                         string message = "Message number: " + i.ToString();
                         InsertMessage(message);
-                        Console.WriteLine($"Inserted: {message}");
                     }
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
