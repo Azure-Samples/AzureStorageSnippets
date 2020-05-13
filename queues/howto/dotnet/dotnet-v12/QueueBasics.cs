@@ -43,18 +43,39 @@ namespace dotnet_v12
         //-------------------------------------------------
         // Create a message queue
         //-------------------------------------------------
-        public void CreateQueue()
+        public bool CreateQueue()
         {
-            // <snippet_CreateQueue>
-            // Get the connection string from app settings
-            string connectionString = ConfigurationManager.AppSettings["storageConnectionString"];
+            try
+            {
+                // <snippet_CreateQueue>
+                // Get the connection string from app settings
+                string connectionString = ConfigurationManager.AppSettings["storageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+                // Instantiate a QueueClient which will be used to create and manipulate the queue
+                QueueClient queueClient = new QueueClient(connectionString, "myqueue");
 
-            // Create the queue
-            queueClient.CreateIfNotExists();
-            // </snippet_CreateQueue>
+                // Create the queue
+                queueClient.CreateIfNotExists();
+                // </snippet_CreateQueue>
+
+                if (queueClient.Exists())
+                {
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("Make sure the Azurite storage emulator running and try again.");
+                    Console.ReadLine();
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}\n\n");
+                Console.WriteLine("Make sure the Azurite storage emulator running and try again.");
+                Console.ReadLine();
+                return false;
+            }
         }
 
         public void InsertMessage(string message)
@@ -285,7 +306,7 @@ namespace dotnet_v12
                     {
                         string message = "Message number: " + i.ToString();
                         InsertMessage(message);
-                        Console.WriteLine("Inserted: " + message);
+                        Console.WriteLine($"Inserted: {message}");
                     }
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
