@@ -43,11 +43,23 @@ namespace dotnet_v12
             while (monitoring.Menu()){}
 
             return true;
-        }        
-        
-       //------------------------------------------------
-       // Main function
-       //------------------------------------------------
+        }
+
+        //-----------------------------------------------
+        // Submenu for data protection scenarios.
+        //----------------------------------------------- 
+        static bool DataProtection()
+        {
+            DataProtection dataProtection = new DataProtection();
+
+            while (dataProtection.MenuAsync().Result) { }
+
+            return true;
+        }
+
+        //------------------------------------------------
+        // Main function
+        //------------------------------------------------
         static void Main(string[] args)
         {
             while (MainMenu()){}
@@ -62,7 +74,8 @@ namespace dotnet_v12
             Console.WriteLine("Choose a feature area:");
             Console.WriteLine("1) Security");
             Console.WriteLine("2) Monitoring");
-            Console.WriteLine("3) Exit");
+            Console.WriteLine("3) Data protection");
+            Console.WriteLine("4) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -73,9 +86,13 @@ namespace dotnet_v12
 
                 case "2":
 
-                    return Monitoring();          
-                              
+                    return Monitoring();
+
                 case "3":
+
+                    return DataProtection();
+
+                case "4":
                    
                    return false;                
                 
