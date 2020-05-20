@@ -17,9 +17,11 @@
 // <snippet_UsingStatements>
 using System; // Namespace for Console output
 using System.Configuration; // Namespace for ConfigurationManager
+using System.IO;
 using System.Threading.Tasks; // Namespace for async support
 //using Azure.Storage.Files; // Namespace for Files storage types
 using Azure.Storage.Files.Shares; // Namespace for File shares
+using Azure.Storage.Files.Shares.Models;
 // </snippet_UsingStatements>
 
 namespace dotnet_v12
@@ -27,9 +29,9 @@ namespace dotnet_v12
     public class FileShare
     {
         //-------------------------------------------------
-        // Create the file share client
+        // Create file share client
         //-------------------------------------------------
-        public void CreateShareClient()
+        public async Task<bool> CreateShareClientAsync()
         {
             // <snippet_CreateShareClient>
             // Get the connection string from app settings
@@ -38,12 +40,19 @@ namespace dotnet_v12
             // Instantiate a ShareClient which will be used to create and manipulate the file share
             ShareClient share = new ShareClient(connectionString, "logs");
             // </snippet_CreateShareClient>
+
+            if (await share.ExistsAsync())
+            {
+                Console.WriteLine($"Created file share client: {share.Name}");
+            }
+
+            return true;
         }
 
         //-------------------------------------------------
-        // Create the file share programmatically
+        // Access the file share programmatically
         //-------------------------------------------------
-        public async Task<bool> CreateFileShareAsync()
+        public async Task<bool> AccessFileShareAsync()
         {
             // <snippet_CreateFileShare>
             // Get the connection string from app settings
@@ -52,47 +61,66 @@ namespace dotnet_v12
             // Instantiate a ShareClient which will be used to create and manipulate the file share
             ShareClient share = new ShareClient(connectionString, "logs");
 
-            await share.CreateIfNotExistsAsync();
-
-            // Ensure that the share exists.
+            // Ensure that the share exists
             if (await share.ExistsAsync())
             {
                 Console.WriteLine($"Share exists: {share.Name}");
-            }
-            else
-            {
-                Console.WriteLine($"CreateFileShare failed");
+
+                // Get a reference to the sample directory
+                ShareDirectoryClient sampleDir = share.GetDirectoryClient("CustomLogs");
+
+                // Ensure that the directory exists
+                if (await sampleDir.ExistsAsync())
+                {
+                    // Get a reference to a file object
+                    ShareFileClient file = sampleDir.GetFileClient("Log1.txt");
+
+                    // Ensure that the file exists
+                    if (await file.ExistsAsync())
+                    {
+                        // Write the download status to the console window
+                        Console.WriteLine($"Download result: {file.DownloadAsync().Result}");
+                    }
+
+                    return true;
+                }
             }
             // </snippet_CreateFileShare>
 
-            return true;
+            Console.WriteLine($"CreateFileShareAsync failed");
+            return false;
         }
 
         //-------------------------------------------------
-        // Create the file share programmatically
+        // Set the maximum size of a file share
         //-------------------------------------------------
         public async Task<bool> SetMaxFileShareSizeAsync()
         {
             // <snippet_SetMaxFileShareSize>
-            const int MAX_SHARE_SIZE = 128; // Maximum share size in GB
+            const long ONE_GIBIBYTE = 10737420000; // Number of bytes in 1 gibibyte
 
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["storageConnectionString"];
 
-            // Instantiate a ShareClient which will be used to create and manipulate the file share
+            // Instantiate a ShareClient which will be used to access the file share
             ShareClient share = new ShareClient(connectionString, "logs");
 
-            await share.CreateIfNotExistsAsync();
-
-            // Ensure that the share exists.
+            // Ensure that the share exists
             if (await share.ExistsAsync())
             {
-                await share.SetQuotaAsync(MAX_SHARE_SIZE);
-                Console.WriteLine($"Max share size set");
-            }
-            else
-            {
-                Console.WriteLine($"CreateFileShare failed");
+                // Get and display current usage stats for the share
+                ShareStatistics stats = await share.GetStatisticsAsync();
+                Console.WriteLine($"Current share usage: {stats.ShareUsageInBytes} bytes");
+
+                // Convert current usage from bytes into GiB
+                int currentGiB = (int)(stats.ShareUsageInBytes / ONE_GIBIBYTE);
+
+                // This line sets the quota to be 10 GB greater than the current usage of the share
+                await share.SetQuotaAsync(currentGiB + 10);
+
+                // Get the new quota and display it
+                ShareProperties props = await share.GetPropertiesAsync();
+                Console.WriteLine($"Current share quota: {props.QuotaInGB} GiB");
             }
             // </snippet_SetMaxFileShareSize>
 
@@ -105,6 +133,7 @@ namespace dotnet_v12
         public async Task<bool> CopyFilesAsync()
         {
             // <snippet_CopyFiles>
+
             // </snippet_CopyFiles>
 
             return true;
@@ -116,6 +145,7 @@ namespace dotnet_v12
         public async Task<bool> ShareSnapshotsAsync()
         {
             // <snippet_ShareSnapshots>
+
             // </snippet_ShareSnapshots>
 
             return true;
@@ -127,6 +157,7 @@ namespace dotnet_v12
         public async Task<bool> UseMetricsAsync()
         {
             // <snippet_UseMetrics>
+
             // </snippet_UseMetrics>
 
             return true;
@@ -152,14 +183,14 @@ namespace dotnet_v12
             {
                 // Create a file share client
                 case "1":
-                    CreateShareClient();
+                    await CreateShareClientAsync();
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
-                // Create a file share
+                // Access a file share programmatically
                 case "2":
-                    await CreateFileShareAsync();
+                    await AccessFileShareAsync();
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
