@@ -57,6 +57,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for REST scenarios.
+        //----------------------------------------------- 
+        static bool REST()
+        {
+            REST rest = new REST();
+
+            while (rest.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -75,7 +87,8 @@ namespace dotnet_v12
             Console.WriteLine("1) Security");
             Console.WriteLine("2) Monitoring");
             Console.WriteLine("3) Data protection");
-            Console.WriteLine("4) Exit");
+            Console.WriteLine("4) REST operations");
+            Console.WriteLine("5) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -93,6 +106,10 @@ namespace dotnet_v12
                     return DataProtection();
 
                 case "4":
+
+                    return REST();
+
+                case "5":
                    
                    return false;                
                 
