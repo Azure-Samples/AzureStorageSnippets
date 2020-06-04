@@ -69,6 +69,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for CRUD scenarios.
+        //----------------------------------------------- 
+        static bool CRUD()
+        {
+            CRUD crud = new CRUD();
+
+            while (crud.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -88,7 +100,8 @@ namespace dotnet_v12
             Console.WriteLine("2) Monitoring");
             Console.WriteLine("3) Data protection");
             Console.WriteLine("4) REST operations");
-            Console.WriteLine("5) Exit");
+            Console.WriteLine("5) CRUD operations");
+            Console.WriteLine("6) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -110,6 +123,10 @@ namespace dotnet_v12
                     return REST();
 
                 case "5":
+
+                    return CRUD();
+
+                case "6":
                    
                    return false;                
                 
