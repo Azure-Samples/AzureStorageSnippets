@@ -105,7 +105,8 @@ namespace dotnet_v12
                             {
                                 // Write out the prefix of the virtual directory.
                                 Console.WriteLine("Virtual directory prefix: {0}", blobhierarchyItem.Prefix);
-  
+
+                                // Call recursively with the prefix to traverse the virtual directory.
                                 ListBlobsHierarchicalListing(container, blobhierarchyItem.Prefix, null);
                             }
                             else
