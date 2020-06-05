@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using Azure;
 
 namespace dotnet_v12
 {
@@ -41,7 +42,7 @@ namespace dotnet_v12
             try
             {
                 // Call the listing operation and enumerate the result segment.
-                // When the continuation token is null, the last segment has been returned
+                // When the continuation token is empty, the last segment has been returned
                 // and execution can exit the loop.
                 do
                 {
@@ -50,7 +51,6 @@ namespace dotnet_v12
 
                     foreach (Azure.Page<BlobItem> blobPage in resultSegment)
                     {
-                        // A flat listing operation returns only blobs, not virtual directories.    
                         foreach (BlobItem blobItem in blobPage.Values)
                         {
                             Console.WriteLine("Blob name: {0}", blobItem.Name);
@@ -65,7 +65,7 @@ namespace dotnet_v12
                 } while (continuationToken != "");
 
             }
-            catch (Exception e)
+            catch (RequestFailedException e)
             {
                 Console.WriteLine(e.Message);
                 Console.ReadLine();
@@ -89,7 +89,7 @@ namespace dotnet_v12
             try
             {
                 // Call the listing operation and enumerate the result segment.
-                // When the continuation token is null, the last segment has been returned and
+                // When the continuation token is empty, the last segment has been returned and
                 // execution can exit the loop.
                 do
                 {
@@ -124,7 +124,7 @@ namespace dotnet_v12
 
                 } while (continuationToken != "");
             }
-            catch (Exception e)
+            catch (RequestFailedException e)
             {
                 Console.WriteLine(e.Message);
                 Console.ReadLine();
