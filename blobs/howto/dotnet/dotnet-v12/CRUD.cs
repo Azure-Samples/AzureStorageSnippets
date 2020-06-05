@@ -148,7 +148,7 @@ namespace dotnet_v12
 
             var connectionString = Constants.connectionString;
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-
+            
             switch (Console.ReadLine())
             {
                 case "1":
