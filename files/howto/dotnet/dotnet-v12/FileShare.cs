@@ -31,39 +31,19 @@ namespace dotnet_v12
 {
     public class FileShare
     {
+        // <snippet_CreateShare>
         //-------------------------------------------------
-        // Create file share client
+        // Create a file share
         //-------------------------------------------------
-        public async Task CreateShareClientAsync()
+        public async Task CreateShareAsync(string shareName)
         {
             // <snippet_CreateShareClient>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
             // Instantiate a ShareClient which will be used to create and manipulate the file share
-            ShareClient share = new ShareClient(connectionString, "logs");
+            ShareClient share = new ShareClient(connectionString, shareName);
             // </snippet_CreateShareClient>
-
-            // Create the share if it doesn't already exist
-            await share.CreateIfNotExistsAsync();
-
-            if (await share.ExistsAsync())
-            {
-                Console.WriteLine($"Created file share client: {share.Name}");
-            }
-        }
-
-        //-------------------------------------------------
-        // Create a file share
-        //-------------------------------------------------
-        public async Task CreateShareAsync()
-        {
-            // <snippet_CreateShare>
-            // Get the connection string from app settings
-            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
-
-            // Instantiate a ShareClient which will be used to create and manipulate the file share
-            ShareClient share = new ShareClient(connectionString, "logs");
 
             // Create the share if it doesn't already exist
             await share.CreateIfNotExistsAsync();
@@ -71,7 +51,7 @@ namespace dotnet_v12
             // Ensure that the share exists
             if (await share.ExistsAsync())
             {
-                Console.WriteLine($"Share exists: {share.Name}");
+                Console.WriteLine($"Share created: {share.Name}");
 
                 // Get a reference to the sample directory
                 ShareDirectoryClient directory = share.GetDirectoryClient("CustomLogs");
@@ -106,59 +86,57 @@ namespace dotnet_v12
                     }
                 }
             }
-            // </snippet_CreateShare>
             else
             {
-                Console.WriteLine($"CreateFileShareAsync failed");
+                Console.WriteLine($"CreateShareAsync failed");
             }
         }
+        // </snippet_CreateShare>
 
+        // <snippet_GetFileSasUri>
         //-------------------------------------------------
-        // Set the maximum size of a share
+        // Create a SAS URI for a file
         //-------------------------------------------------
-        public async Task SetMaxShareSizeAsync()
+        public Uri GetFileSasUri(string shareName, string filePath, DateTime expiration, ShareFileSasPermissions permissions)
         {
-            // <snippet_SetMaxShareSize>
-            const long ONE_GIBIBYTE = 10737420000; // Number of bytes in 1 gibibyte
+            // Get the account details from app settings
+            string accountName = ConfigurationManager.AppSettings["StorageAccountName"];
+            string accountKey = ConfigurationManager.AppSettings["StorageAccountKey"];
 
-            // Get the connection string from app settings
-            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
-
-            // Instantiate a ShareClient which will be used to access the file share
-            ShareClient share = new ShareClient(connectionString, "logs");
-
-            // Create the share if it doesn't already exist
-            await share.CreateIfNotExistsAsync();
-
-            // Ensure that the share exists
-            if (await share.ExistsAsync())
+            ShareSasBuilder fileSAS = new ShareSasBuilder()
             {
-                Console.WriteLine($"Share exists: {share.Uri}");
+                ShareName = shareName,
+                FilePath = filePath,
 
-                // Get and display current usage stats for the share
-                ShareStatistics stats = await share.GetStatisticsAsync();
-                Console.WriteLine($"Current share usage: {stats.ShareUsageInBytes} bytes");
+                // Specify an Azure file resource
+                Resource = "f",
 
-                // Convert current usage from bytes into GiB
-                int currentGiB = (int)(stats.ShareUsageInBytes / ONE_GIBIBYTE);
+                // Expires in 24 hours
+                ExpiresOn = expiration
+            };
 
-                // This line sets the quota to be 10 GB greater than the current usage of the share
-                await share.SetQuotaAsync(currentGiB + 10);
+            // Set the permissions for the SAS
+            fileSAS.SetPermissions(permissions);
 
-                // Get the new quota and display it
-                ShareProperties props = await share.GetPropertiesAsync();
-                Console.WriteLine($"Current share quota: {props.QuotaInGB} GiB");
-            }
-            // </snippet_SetMaxShareSize>
+            // Create a SharedKeyCredential that we can use to sign the SAS token
+            StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
+
+            // Build a SAS URI
+            UriBuilder fileSasUri = new UriBuilder($"https://{accountName}.file.core.windows.net/{fileSAS.ShareName}/{fileSAS.FilePath}");
+            fileSasUri.Query = fileSAS.ToSasQueryParameters(credential).ToString();
+
+            // Return the URI
+            return fileSasUri.Uri;
         }
+        // </snippet_GetFileSasUri>
 
+        // <snippet_UploadFileWithSas>
         //-------------------------------------------------
         // Upload a file using a SAS
         //-------------------------------------------------
-        // <snippet_UploadFileWithSas>
         public async Task UploadFileWithSasAsync()
         {
-            Uri fileSasUri = GetFileSasUri("logs", "CustomLogs/Log1.txt",
+            Uri fileSasUri = GetFileSasUri("logs", "CustomLogs/Log1.txt", DateTime.UtcNow.AddHours(24),
                 ShareFileSasPermissions.Read | ShareFileSasPermissions.Write
                 );
 
@@ -173,43 +151,47 @@ namespace dotnet_v12
         }
         // <snippet_UploadFileWithSas>
 
-        // <snippet_GetFileSasUri>
+        // <snippet_SetMaxShareSize>
         //-------------------------------------------------
-        // Create a SAS URI for a file
+        // Set the maximum size of a share
         //-------------------------------------------------
-        public Uri GetFileSasUri(string shareName, string filePath, ShareFileSasPermissions permissions)
+        public async Task SetMaxShareSizeAsync(string shareName, int increaseSizeInGiB)
         {
-            // Get the account details from app settings
-            string accountName = ConfigurationManager.AppSettings["StorageAccountName"];
-            string accountKey = ConfigurationManager.AppSettings["StorageAccountKey"];
+            const long ONE_GIBIBYTE = 10737420000; // Number of bytes in 1 gibibyte
 
-            ShareSasBuilder fileSAS = new ShareSasBuilder()
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+
+            // Instantiate a ShareClient which will be used to access the file share
+            ShareClient share = new ShareClient(connectionString, shareName);
+
+            // Create the share if it doesn't already exist
+            await share.CreateIfNotExistsAsync();
+
+            // Ensure that the share exists
+            if (await share.ExistsAsync())
             {
-                // Access the logs share
-                ShareName = shareName,
+                // Get and display current share quota
+                ShareProperties properties = await share.GetPropertiesAsync();
+                Console.WriteLine($"Current share quota: {properties.QuotaInGB} GiB");
 
-                FilePath = filePath,
+                // Get and display current usage stats for the share
+                ShareStatistics stats = await share.GetStatisticsAsync();
+                Console.WriteLine($"Current share usage: {stats.ShareUsageInBytes} bytes");
 
-                // Specify an Azure Storage share resource
-                Resource = "f",
+                // Convert current usage from bytes into GiB
+                int currentGiB = (int)(stats.ShareUsageInBytes / ONE_GIBIBYTE);
 
-                // Expires in 24 hours
-                ExpiresOn = DateTime.UtcNow.AddHours(24)
-            };
+                // This line sets the quota to be the current 
+                // usage of the share plus the increase amount
+                await share.SetQuotaAsync(currentGiB + increaseSizeInGiB);
 
-            fileSAS.SetPermissions(permissions);
-
-            // Create a SharedKeyCredential that we can use to sign the SAS token
-            StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
-
-            // Build a SAS URI
-            UriBuilder fileSasUri = new UriBuilder($"https://{accountName}.file.core.windows.net/{fileSAS.ShareName}/{fileSAS.FilePath}");
-            fileSasUri.Query = fileSAS.ToSasQueryParameters(credential).ToString();
-
-            // Return the account SAS URI
-            return fileSasUri.Uri;
+                // Get the new quota and display it
+                properties = await share.GetPropertiesAsync();
+                Console.WriteLine($"New share quota: {properties.QuotaInGB} GiB");
+            }
         }
-        // </snippet_GetFileSasUri>
+        // </snippet_SetMaxShareSize>
 
         // <snippet_CopyFile>
         //-------------------------------------------------
@@ -240,13 +222,13 @@ namespace dotnet_v12
         }
         // </snippet_CopyFile>
 
+        // <snippet_CopyFileToBlob>
         //-------------------------------------------------
         // Copy a file from a share to a blob
         //-------------------------------------------------
         public async Task CopyFileToBlobAsync(string shareName, string sourceFilePath, string containerName, string blobName)
         {
-            // <snippet_CopyFileToBlob>
-            Uri fileSasUri = GetFileSasUri(shareName, sourceFilePath, ShareFileSasPermissions.Read);
+            Uri fileSasUri = GetFileSasUri(shareName, sourceFilePath, DateTime.UtcNow.AddHours(24), ShareFileSasPermissions.Read);
 
             // Get a reference to the file we created previously
             ShareFileClient sourceFile = new ShareFileClient(fileSasUri);
@@ -272,15 +254,15 @@ namespace dotnet_v12
                     Console.WriteLine($"File {sourceFile.Name} copied to blob {destBlob.Name}");
                 }
             }
-            // </snippet_CopyFileToBlob>
         }
+        // </snippet_CopyFileToBlob>
 
+        // <snippet_CreateShareSnapshot>
         //-------------------------------------------------
-        // Share snapshots
+        // Create a share snapshot
         //-------------------------------------------------
         public async Task CreateShareSnapshotAsync(string shareName)
         {
-            // <snippet_ShareSnapshots>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -293,38 +275,126 @@ namespace dotnet_v12
             // Ensure that the share exists
             if (await share.ExistsAsync())
             {
-                Console.WriteLine($"Share exists: {share.Uri}");
-
                 // Create a snapshot
-                ShareSnapshotInfo snapshot = await share.CreateSnapshotAsync();
+                ShareSnapshotInfo snapshotInfo = await share.CreateSnapshotAsync();
+                Console.WriteLine($"Snapshot created: {snapshotInfo.Snapshot}");
+            }
+        }
+        // </snippet_CreateShareSnapshot>
 
-                // List snapshots
-                ShareClient mySnapshot = share.WithSnapshot(snapshot.Snapshot);
-                ShareDirectoryClient rootDirectory = mySnapshot.GetRootDirectoryClient();
+        // <snippet_ListShareSnapshots>
+        //-------------------------------------------------
+        // List the snapshots on a share
+        //-------------------------------------------------
+        public void ListShareSnapshots()
+        {
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-                foreach (ShareFileItem item in rootDirectory.GetFilesAndDirectories())
+            // Instatiate a ShareServiceClient
+            ShareServiceClient shareServiceClient = new ShareServiceClient(connectionString);
+
+            // Display each share and the snapshots on each share
+            foreach (ShareItem item in shareServiceClient.GetShares(ShareTraits.All, ShareStates.Snapshots))
+            {
+                if (null != item.Snapshot)
                 {
-                    if (item.IsDirectory)
-                    {
-                        Console.WriteLine($"Directory: {item.Name}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"File: {item.Name}");
-                    }
+                    Console.WriteLine($"Share: {item.Name}\tSnapshot: {item.Snapshot}");
                 }
             }
-            // </snippet_ShareSnapshots>
         }
+        // </snippet_ListShareSnapshots>
+
+        public ShareItem GetSnapshotItem()
+        {
+            ShareItem result = null;
+
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+
+            // Instatiate a ShareServiceClient
+            ShareServiceClient shareServiceClient = new ShareServiceClient(connectionString);
+
+            foreach (ShareItem item in shareServiceClient.GetShares(ShareTraits.All, ShareStates.Snapshots))
+            {
+                if (null != item.Snapshot)
+                {
+                    // Return the first share with a snapshot
+                    return item;
+                }
+            }
+
+            return result;
+        }
+
+        // <snippet_RestoreFileFromSnapshot>
+        //-------------------------------------------------
+        // Restore file from snapshot
+        //-------------------------------------------------
+        public async Task RestoreFileFromSnapshot(string shareName, string directoryName, string fileName, string snapshotTime)
+        {
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+
+            // Instatiate a ShareServiceClient
+            ShareServiceClient shareService = new ShareServiceClient(connectionString);
+
+            // Get a ShareClient
+            ShareClient share = shareService.GetShareClient(shareName);
+
+            // Get a ShareDirectoryClient, then a ShareFileClient to the live file
+            ShareDirectoryClient liveDir = share.GetDirectoryClient(directoryName);
+            ShareFileClient liveFile = liveDir.GetFileClient(fileName);
+
+            // Get as ShareClient that points to a snapshot
+            ShareClient snapshot = share.WithSnapshot(snapshotTime);
+
+            // Get a ShareDirectoryClient, then a ShareFileClient to the snapshot file
+            ShareDirectoryClient snapshotDir = snapshot.GetDirectoryClient(directoryName);
+            ShareFileClient snapshotFile = snapshotDir.GetFileClient(fileName);
+
+            // Restore the file from the snapshot
+            ShareFileCopyInfo copyInfo = await liveFile.StartCopyAsync(snapshotFile.Uri);
+
+            // Display the status of the operation
+            Console.WriteLine($"Restore status: {copyInfo.CopyStatus}");
+        }
+        // </snippet_RestoreFileFromSnapshot>
+        //Uri snapshotFileUri = GetFileSasUri(shareName, snapshotDir.Name + "/" + snapshotFile.Name, DateTime.UtcNow.AddHours(24), ShareFileSasPermissions.Read);
+
+        // <snippet_DeleteSnapshot>
+        //-------------------------------------------------
+        // Delete a snapshot
+        //-------------------------------------------------
+        public async Task DeleteSnapshotAsync(string shareName, string snapshotTime)
+        {
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+
+            // Instatiate a ShareServiceClient
+            ShareServiceClient shareService = new ShareServiceClient(connectionString);
+
+            await shareService.DeleteShareAsync(shareName + "?" + snapshotTime);
+
+            // Get a ShareClient
+            //ShareClient share = shareService.GetShareClient(shareName);
+
+            // Get as ShareClient that points to a snapshot
+            //ShareClient snapshot = share.WithSnapshot(snapshotTime);
+
+            //await snapshot.DeleteAsync(false);
+        }
+        // </snippet_DeleteSnapshot>
+
+        // <snippet_UseMetrics>
         //-------------------------------------------------
         // Use metrics
         //-------------------------------------------------
         public async Task UseMetricsAsync()
         {
-            // <snippet_UseMetrics>
 
-            // </snippet_UseMetrics>
         }
+        // </snippet_UseMetrics>
 
         //-------------------------------------------------
         // Basic file operations menu
@@ -333,70 +403,97 @@ namespace dotnet_v12
         {
             Console.Clear();
             Console.WriteLine("Choose a file share scenario:");
-            Console.WriteLine("1) Create share client");
-            Console.WriteLine("2) Create a share");
-            Console.WriteLine("3) Set the maximum size for a share");
-            Console.WriteLine("4) Upload file using SAS");
-            Console.WriteLine("5) Copy a file");
-            Console.WriteLine("6) Copy a file to a blob");
-            Console.WriteLine("7) Share snapshots");
-            Console.WriteLine("8) Use metrics");
-            Console.WriteLine("X) Exit to main menu");
+            Console.WriteLine("1) Create share");
+            Console.WriteLine("2) Upload file using SAS");
+            Console.WriteLine("3) Set maximum share size");
+            Console.WriteLine("4) Copy file");
+            Console.WriteLine("5) Copy file to a blob");
+            Console.WriteLine("6) Create snapshot");
+            Console.WriteLine("7) List snapshots");
+            Console.WriteLine("8) Restore file from snapshot");
+            Console.WriteLine("9) Delete snapshot");
+            Console.WriteLine("10) Use metrics");
+            Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
 
             switch (Console.ReadLine())
             {
-                // Create a share client
+                // Create a share
                 case "1":
-                    await CreateShareClientAsync();
+                    Console.WriteLine($"Calling: CreateShareAsync(\"logs\");");
+                    await CreateShareAsync("logs");
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
-                // Create a share
+                // Upload a file using a SAS
                 case "2":
-                    await CreateShareAsync();
+                    Console.WriteLine($"Calling: UploadFileWithSasAsync();");
+                    await UploadFileWithSasAsync();
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Set the maximum size on a share
                 case "3":
-                    await SetMaxShareSizeAsync();
-                    Console.WriteLine("Press enter to continue");
-                    Console.ReadLine();
-                    return true;
-
-                // Upload a file using a SAS
-                case "4":
-                    await UploadFileWithSasAsync();
+                    Console.WriteLine($"Calling: SetMaxShareSizeAsync(\"logs\", 10);");
+                    await SetMaxShareSizeAsync("logs", 10);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Copy a file
-                case "5":
+                case "4":
+                    Console.WriteLine($"Calling: CopyFileAsync(\"logs\", \"CustomLogs/Log1.txt\", \"CustomLogs/Log1Copy.txt\");");
                     await CopyFileAsync("logs", "CustomLogs/Log1.txt", "CustomLogs/Log1Copy.txt");
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Copy a file to a blob
-                case "6":
+                case "5":
+                    Console.WriteLine($"Calling: CopyFileToBlobAsync(\"logs\", \"CustomLogs/Log1.txt\", \"sample-container\", \"sample-blob.txt\");");
                     await CopyFileToBlobAsync("logs", "CustomLogs/Log1.txt", "sample-container", "sample-blob.txt");
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
-                // Share snapshots
-                case "7":
+                // Create snapshot
+                case "6":
+                    Console.WriteLine($"Calling: CreateShareSnapshotAsync(\"logs\");");
                     await CreateShareSnapshotAsync("logs");
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
-                // Use metrics
+                case "7":
+                    // List snapshots
+                    Console.WriteLine($"Calling: ListShareSnapshots();");
+                    ListShareSnapshots();
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
                 case "8":
+                    // Restore a file from a snapshot
+                    ShareItem snapshot = GetSnapshotItem();
+                    Console.WriteLine($"Calling RestoreFileFromSnapshot(\"{snapshot.Name}\", \"CustomLogs\", \"Log1.txt\", \"{snapshot.Snapshot}\");");
+                    await RestoreFileFromSnapshot(snapshot.Name, "CustomLogs", "Log1.txt", snapshot.Snapshot);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "9":
+                    // Delete a snapshot
+                    ShareItem shareItem = GetSnapshotItem();
+                    Console.WriteLine($"Calling DeleteSnapshotAsync(\"{shareItem.Name}\", \"{shareItem.Snapshot}\");");
+                    await DeleteSnapshotAsync(shareItem.Name, shareItem.Snapshot);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                // Use metrics
+                case "10":
                     await UseMetricsAsync();
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();

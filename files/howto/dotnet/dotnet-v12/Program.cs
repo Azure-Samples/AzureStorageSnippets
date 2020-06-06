@@ -39,7 +39,12 @@ namespace dotnet_v12
        //------------------------------------------------
         static async Task Main(string[] args)
         {
-            while (await MainMenu()){}
+            // Only one set of scenarios 
+            // for now, so just run it!
+            await FileShare();
+
+            // Uncomment when we have more scenarios
+            //while (await MainMenu()){}
         }
 
         //-----------------------------------------------
@@ -52,7 +57,7 @@ namespace dotnet_v12
             Console.WriteLine("1) Basic file share scenarios");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
- 
+
             switch (Console.ReadLine())
             {
                 case "1":
@@ -60,10 +65,10 @@ namespace dotnet_v12
 
                 case "X":
                 case "x":
-                   return false;
-                
+                    return false;
+
                 default:
-                   return true;
+                    return true;
             }
         }
     
