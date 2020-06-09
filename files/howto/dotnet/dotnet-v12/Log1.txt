@@ -1,0 +1,4 @@
+Example log file
+This is an entry in the log file
+Here's another log entry
+And one last log entry
