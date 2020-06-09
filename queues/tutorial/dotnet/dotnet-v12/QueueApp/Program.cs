@@ -14,6 +14,7 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
+// <snippet_AllCode>
 // <snippet_UsingStatements>
 using System;
 using System.Threading.Tasks;
@@ -103,3 +104,4 @@ namespace QueueApp
         // </snippet_ReceiveMessage>
     }
 }
+// </snippet_AllCode>
