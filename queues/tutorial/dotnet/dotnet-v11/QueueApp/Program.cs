@@ -14,22 +14,30 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
+// <snippet_AllCode>
+// <snippet_UsingStatements>
 using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
+// </snippet_UsingStatements>
 
 namespace QueueApp
 {
     class Program
     {
+        // <snippet_Main>
         static async Task Main(string[] args)
         {
+            // <snippet_DeclareConnectionString>
             string connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+            // </snippet_DeclareConnectionString>
 
+            // <snippet_CreateQueueClient>
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
             CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
             CloudQueue queue = queueClient.GetQueueReference("mystoragequeue");
+            // </snippet_CreateQueueClient>
 
             if (args.Length > 0)
             {
@@ -46,38 +54,24 @@ namespace QueueApp
             Console.Write("Press Enter...");
             Console.ReadLine();
         }
-            static async Task SendMessageAsync(CloudQueue theQueue, string newMessage)
+        // </snippet_Main>
+
+        // <snippet_SendMessage>
+        static async Task SendMessageAsync(CloudQueue theQueue, string newMessage)
+        {
+            bool createdQueue = await theQueue.CreateIfNotExistsAsync();
+
+            if (createdQueue)
             {
-                bool createdQueue = await theQueue.CreateIfNotExistsAsync();
-
-                if (createdQueue)
-                {
-                    Console.WriteLine("The queue was created.");
-                }
-
-                CloudQueueMessage message = new CloudQueueMessage(newMessage);
-                await theQueue.AddMessageAsync(message);
+                Console.WriteLine("The queue was created.");
             }
 
-        // static async Task<string> ReceiveMessageAsync(CloudQueue theQueue)
-        // {
-        //     bool exists = await theQueue.ExistsAsync();
+            CloudQueueMessage message = new CloudQueueMessage(newMessage);
+            await theQueue.AddMessageAsync(message);
+        }
+        // </snippet_SendMessage>
 
-        //     if (exists)
-        //     {
-        //         CloudQueueMessage retrievedMessage = await theQueue.GetMessageAsync();
-
-        //         if (retrievedMessage != null)
-        //         {
-        //             string theMessage = retrievedMessage.AsString;
-        //             await theQueue.DeleteMessageAsync(retrievedMessage);
-        //             return theMessage;
-        //         }
-        //     }
-
-        //     return null;
-        // }
-
+        // <snippet_ReceiveMessage>
         static async Task<string> ReceiveMessageAsync(CloudQueue theQueue)
         {
             bool exists = await theQueue.ExistsAsync();
@@ -112,7 +106,8 @@ namespace QueueApp
             {
                 return "The queue does not exist. Add a message to the command line to create the queue and store the message.";
             }
-
         }
+        // </snippet_ReceiveMessage>
     }
 }
+// </snippet_AllCode>
