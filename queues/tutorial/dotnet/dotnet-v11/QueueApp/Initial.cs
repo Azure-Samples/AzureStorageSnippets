@@ -16,32 +16,33 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Storage.Queues;
-using Azure.Storage.Queues.Models;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 
 namespace QueueApp
 {
     class Initial
     {
-        static async Task SendNonExpiringMessageAsync(QueueClient theQueue, string message)
+        static async Task SendNonExpiringMessageAsync(CloudQueue theQueue, string newMessage)
         {
+            CloudQueueMessage message = new CloudQueueMessage(newMessage);
+
             // <snippet_SendNonExpiringMessage>
-            await theQueue.SendMessageAsync(message, default, TimeSpan.FromSeconds(-1), default);
+            await theQueue.AddMessageAsync(message, TimeSpan.FromSeconds(-1), null, null, null);
             // </snippet_SendNonExpiringMessage>
         }
 
         // <snippet_InitialReceiveMessage>
-        static async Task<string> ReceiveMessageAsync(QueueClient theQueue)
+        static async Task<string> ReceiveMessageAsync(CloudQueue theQueue)
         {
             if (await theQueue.ExistsAsync())
             {
-                QueueProperties properties = await theQueue.GetPropertiesAsync();
+                CloudQueueMessage retrievedMessage = await theQueue.GetMessageAsync();
 
-                if (properties.ApproximateMessagesCount > 0)
+                if (retrievedMessage != null)
                 {
-                    QueueMessage[] retrievedMessage = await theQueue.ReceiveMessagesAsync(1);
-                    string theMessage = retrievedMessage[0].MessageText;
-                    await theQueue.DeleteMessageAsync(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
+                    string theMessage = retrievedMessage.AsString;
+                    await theQueue.DeleteMessageAsync(retrievedMessage);
                     return theMessage;
                 }
 
