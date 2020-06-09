@@ -51,7 +51,7 @@ namespace QueueApp
             Console.Write("Press Enter...");
             Console.ReadLine();
         }
-        // <snippet_Main>
+        // </snippet_Main>
 
         // <snippet_SendMessage>
         static async Task SendMessageAsync(QueueClient theQueue, string newMessage)
