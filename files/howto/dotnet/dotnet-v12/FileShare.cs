@@ -374,15 +374,14 @@ namespace dotnet_v12
             // Instatiate a ShareServiceClient
             ShareServiceClient shareService = new ShareServiceClient(connectionString);
 
-            await shareService.DeleteShareAsync(shareName + "?" + snapshotTime);
-
             // Get a ShareClient
-            //ShareClient share = shareService.GetShareClient(shareName);
+            ShareClient share = shareService.GetShareClient(shareName);
 
             // Get as ShareClient that points to a snapshot
-            //ShareClient snapshot = share.WithSnapshot(snapshotTime);
+            ShareClient snapshot = share.WithSnapshot(snapshotTime);
 
-            //await snapshot.DeleteAsync(false);
+            // This deletes the whole share, not just the snapshot
+            await snapshot.DeleteIfExistsAsync();
         }
         // </snippet_DeleteSnapshot>
 
@@ -477,8 +476,8 @@ namespace dotnet_v12
                 case "8":
                     // Restore a file from a snapshot
                     ShareItem snapshot = GetSnapshotItem();
-                    Console.WriteLine($"Calling RestoreFileFromSnapshot(\"{snapshot.Name}\", \"CustomLogs\", \"Log1.txt\", \"{snapshot.Snapshot}\");");
-                    await RestoreFileFromSnapshot(snapshot.Name, "CustomLogs", "Log1.txt", snapshot.Snapshot);
+                    Console.WriteLine($"Calling RestoreFileFromSnapshot(\"{snapshot.Name}\", \"CustomLogs\", \"Log1Copy.txt\", \"{snapshot.Snapshot}\");");
+                    await RestoreFileFromSnapshot(snapshot.Name, "CustomLogs", "Log1Copy.txt", snapshot.Snapshot);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
