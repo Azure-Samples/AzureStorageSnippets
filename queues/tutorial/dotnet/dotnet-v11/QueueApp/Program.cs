@@ -59,9 +59,7 @@ namespace QueueApp
         // <snippet_SendMessage>
         static async Task SendMessageAsync(CloudQueue theQueue, string newMessage)
         {
-            bool createdQueue = await theQueue.CreateIfNotExistsAsync();
-
-            if (createdQueue)
+            if (await theQueue.CreateIfNotExistsAsync())
             {
                 Console.WriteLine("The queue was created.");
             }
