@@ -23,10 +23,10 @@ namespace QueueApp
 {
     class Initial
     {
-        static async Task SendNonExpiringMessageAsync(QueueClient theQueue, string message)
+        static async Task SendNonExpiringMessageAsync(QueueClient theQueue, string newMessage)
         {
             // <snippet_SendNonExpiringMessage>
-            await theQueue.SendMessageAsync(message, default, TimeSpan.FromSeconds(-1), default);
+            await theQueue.SendMessageAsync(newMessage, default, TimeSpan.FromSeconds(-1), default);
             // </snippet_SendNonExpiringMessage>
         }
 

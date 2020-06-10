@@ -85,7 +85,7 @@ namespace QueueApp
                     Console.Write("The queue is empty. Attempt to delete it? (Y/N) ");
                     string response = Console.ReadLine();
 
-                    if (response == "Y" || response == "y")
+                    if (response.ToUpper() == "Y")
                     {
                         await theQueue.DeleteIfExistsAsync();
                         return "The queue was deleted.";
