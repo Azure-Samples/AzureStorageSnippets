@@ -15,8 +15,8 @@
 //----------------------------------------------------------------------------------
 
 // <snippet_AllCode>
-// <snippet_UsingStatements>
 using System;
+// <snippet_UsingStatements>
 using System.Threading.Tasks;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
