@@ -40,12 +40,12 @@ namespace QueueApp
             if (args.Length > 0)
             {
                 string value = String.Join(" ", args);
-                await SendMessageAsync(queue, value);
+                await AddMessageToQueueAsync(queue, value);
                 Console.WriteLine($"Sent: {value}");
             }
             else
             {
-                string value = await ReceiveMessageAsync(queue);
+                string value = await RetreiveNextMessageAsync(queue);
                 Console.WriteLine($"Received: {value}");
             }
 
@@ -55,7 +55,7 @@ namespace QueueApp
         // </snippet_Main>
 
         // <snippet_SendMessage>
-        static async Task SendMessageAsync(QueueClient theQueue, string newMessage)
+        static async Task AddMessageToQueueAsync(QueueClient theQueue, string newMessage)
         {
             if (null != await theQueue.CreateIfNotExistsAsync())
             {
@@ -67,7 +67,7 @@ namespace QueueApp
         // </snippet_SendMessage>
 
         // <snippet_ReceiveMessage>
-        static async Task<string> ReceiveMessageAsync(QueueClient theQueue)
+        static async Task<string> RetreiveNextMessageAsync(QueueClient theQueue)
         {
             if (await theQueue.ExistsAsync())
             {
