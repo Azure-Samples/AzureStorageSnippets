@@ -32,8 +32,8 @@ namespace QueueApp
             // </snippet_SendNonExpiringMessage>
         }
 
-        // <snippet_InitialReceiveMessage>
-        static async Task<string> ReceiveMessageAsync(CloudQueue theQueue)
+        // <snippet_InitialRetrieveMessage>
+        static async Task<string> RetrieveNextMessageAsync(CloudQueue theQueue)
         {
             if (await theQueue.ExistsAsync())
             {
@@ -51,7 +51,7 @@ namespace QueueApp
 
             return null;
         }
-        // </snippet_InitialReceiveMessage>
+        // </snippet_InitialRetrieveMessage>
     }
 
 }
