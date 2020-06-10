@@ -30,8 +30,8 @@ namespace QueueApp
             // </snippet_SendNonExpiringMessage>
         }
 
-        // <snippet_InitialReceiveMessage>
-        static async Task<string> ReceiveMessageAsync(QueueClient theQueue)
+        // <snippet_InitialRetrieveMessage>
+        static async Task<string> RetrieveNextMessageAsync(QueueClient theQueue)
         {
             if (await theQueue.ExistsAsync())
             {
@@ -50,7 +50,7 @@ namespace QueueApp
 
             return null;
         }
-        // </snippet_InitialReceiveMessage>
+        // </snippet_InitialRetrieveMessage>
     }
 
 }

@@ -42,12 +42,12 @@ namespace QueueApp
             if (args.Length > 0)
             {
                 string value = String.Join(" ", args);
-                await AddMessageToQueueAsync(queue, value);
+                await InsertMessageAsync(queue, value);
                 Console.WriteLine($"Sent: {value}");
             }
             else
             {
-                string value = await RetreiveNextMessageAsync(queue);
+                string value = await RetrieveNextMessageAsync(queue);
                 Console.WriteLine($"Received: {value}");
             }
 
@@ -56,8 +56,8 @@ namespace QueueApp
         }
         // </snippet_Main>
 
-        // <snippet_SendMessage>
-        static async Task AddMessageToQueueAsync(CloudQueue theQueue, string newMessage)
+        // <snippet_InsertMessage>
+        static async Task InsertMessageAsync(CloudQueue theQueue, string newMessage)
         {
             if (await theQueue.CreateIfNotExistsAsync())
             {
@@ -67,10 +67,10 @@ namespace QueueApp
             CloudQueueMessage message = new CloudQueueMessage(newMessage);
             await theQueue.AddMessageAsync(message);
         }
-        // </snippet_SendMessage>
+        // </snippet_InsertMessage>
 
-        // <snippet_ReceiveMessage>
-        static async Task<string> RetreiveNextMessageAsync(CloudQueue theQueue)
+        // <snippet_RetrieveMessage>
+        static async Task<string> RetrieveNextMessageAsync(CloudQueue theQueue)
         {
             bool exists = await theQueue.ExistsAsync();
 
@@ -105,7 +105,7 @@ namespace QueueApp
                 return "The queue does not exist. Add a message to the command line to create the queue and store the message.";
             }
         }
-        // </snippet_ReceiveMessage>
+        // </snippet_RetrieveMessage>
     }
 }
 // </snippet_AllCode>
