@@ -87,6 +87,9 @@ namespace dotnet_v12
 
             // Instantiate a QueueClient which will be used to create and manipulate the queue
             QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            
+             // Create the Base64 encoded UTF8 text message
+            string message = Convert.ToBase64String(Encoding.UTF8.GetBytes("On a dark desert highway"));
 
             if (queueClient.Exists())
             {
