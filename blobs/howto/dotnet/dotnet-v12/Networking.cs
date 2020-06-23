@@ -24,7 +24,7 @@ namespace dotnet_v12
             string connectionString = "";
 
             // Create a new container with Shared Key authorization.
-            BlobContainerClient containerClient = new BlobContainerClient(connectionString, "sample-container" + Guid.NewGuid());
+            BlobContainerClient containerClient = new BlobContainerClient(connectionString, "sample-container");
             await containerClient.CreateIfNotExistsAsync();
         }
         // </Snippet_ConfigureTls12>
