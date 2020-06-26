@@ -87,6 +87,9 @@ namespace dotnet_v12
 
             // Instantiate a QueueClient which will be used to create and manipulate the queue
             QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            
+             // Create the text message to add to the queue
+            string message = "First Message to azure Queue";
 
             if (queueClient.Exists())
             {
