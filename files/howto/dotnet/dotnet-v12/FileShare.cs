@@ -18,7 +18,6 @@
 using System;
 using System.Configuration;
 using System.IO;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Azure.Storage;
 using Azure.Storage.Blobs;
@@ -391,7 +390,60 @@ namespace dotnet_v12
         //-------------------------------------------------
         public async Task UseMetricsAsync()
         {
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
+            // Instatiate a ShareServiceClient
+            ShareServiceClient shareService = new ShareServiceClient(connectionString);
+
+            // Set metrics properties for File service.
+            // Note that the File service currently uses its own service properties type,
+            // available in the Microsoft.Azure.Storage.File.Protocol namespace.
+
+            await shareService.SetPropertiesAsync(new ShareServiceProperties()
+            {
+                // Set hour metrics
+                HourMetrics = new ShareMetrics()
+                {
+                    Enabled = true,
+                    IncludeApis = true,
+                    Version = "1.0",
+
+                    RetentionPolicy = new ShareRetentionPolicy()
+                    {
+                        Enabled = true,
+                        Days = 14
+                    }
+                },
+
+                // Set minute metrics
+                MinuteMetrics = new ShareMetrics()
+                {
+                    Enabled = true,
+                    IncludeApis = true,
+                    Version = "1.0",
+
+                    RetentionPolicy = new ShareRetentionPolicy()
+                    {
+                        Enabled = true,
+                        Days = 7
+                    }
+                }
+            });
+
+            // Read the metrics properties we just set.
+            ShareServiceProperties serviceProperties = await shareService.GetPropertiesAsync();
+
+            // Display the properties
+            Console.WriteLine();
+            Console.WriteLine($"HourMetrics.InludeApis: {serviceProperties.HourMetrics.IncludeApis}");
+            Console.WriteLine($"HourMetrics.RetentionPolicy.Days: {serviceProperties.HourMetrics.RetentionPolicy.Days}");
+            Console.WriteLine($"HourMetrics.Version: {serviceProperties.HourMetrics.Version}");
+            Console.WriteLine();
+            Console.WriteLine($"MinuteMetrics.InludeApis: {serviceProperties.MinuteMetrics.IncludeApis}");
+            Console.WriteLine($"MinuteMetrics.RetentionPolicy.Days: {serviceProperties.MinuteMetrics.RetentionPolicy.Days}");
+            Console.WriteLine($"MinuteMetrics.Version: {serviceProperties.MinuteMetrics.Version}");
+            Console.WriteLine();
         }
         // </snippet_UseMetrics>
 
@@ -411,7 +463,7 @@ namespace dotnet_v12
             Console.WriteLine("7) List snapshots");
             Console.WriteLine("8) Restore file from snapshot");
             Console.WriteLine("9) Delete snapshot");
-            Console.WriteLine("10) Use metrics");
+            Console.WriteLine("10) Metrics");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
 
