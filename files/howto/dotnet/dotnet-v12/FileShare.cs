@@ -227,6 +227,7 @@ namespace dotnet_v12
         //-------------------------------------------------
         public async Task CopyFileToBlobAsync(string shareName, string sourceFilePath, string containerName, string blobName)
         {
+            // Get a file SAS from the method created ealier
             Uri fileSasUri = GetFileSasUri(shareName, sourceFilePath, DateTime.UtcNow.AddHours(24), ShareFileSasPermissions.Read);
 
             // Get a reference to the file we created previously
