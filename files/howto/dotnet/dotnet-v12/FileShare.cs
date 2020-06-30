@@ -397,10 +397,7 @@ namespace dotnet_v12
             // Instatiate a ShareServiceClient
             ShareServiceClient shareService = new ShareServiceClient(connectionString);
 
-            // Set metrics properties for File service.
-            // Note that the File service currently uses its own service properties type,
-            // available in the Microsoft.Azure.Storage.File.Protocol namespace.
-
+            // Set metrics properties for File service
             await shareService.SetPropertiesAsync(new ShareServiceProperties()
             {
                 // Set hour metrics
@@ -432,7 +429,7 @@ namespace dotnet_v12
                 }
             });
 
-            // Read the metrics properties we just set.
+            // Read the metrics properties we just set
             ShareServiceProperties serviceProperties = await shareService.GetPropertiesAsync();
 
             // Display the properties
