@@ -327,6 +327,56 @@ namespace dotnet_v12
             return result;
         }
 
+
+        // <snippet_ListSnapshotContents>
+        //-------------------------------------------------
+        // List the snapshots on a share
+        //-------------------------------------------------
+        public void ListSnapshotContents(string shareName, string snapshotTime)
+        {
+            // Get the connection string from app settings
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+
+            // Instatiate a ShareServiceClient
+            ShareServiceClient shareService = new ShareServiceClient(connectionString);
+
+            // Get a ShareClient
+            ShareClient share = shareService.GetShareClient(shareName);
+
+            Console.WriteLine($"Share: {share.Name}");
+
+            // Get as ShareClient that points to a snapshot
+            ShareClient snapshot = share.WithSnapshot(snapshotTime);
+
+            // Get the root directory in the snapshot share
+            ShareDirectoryClient rootDir = snapshot.GetRootDirectoryClient();
+
+            // Recursively list the directory tree
+            ListDirTree(rootDir);
+        }
+
+        //-------------------------------------------------
+        // Recursively list a directory tree
+        //-------------------------------------------------
+        public void ListDirTree(ShareDirectoryClient dir)
+        {
+            // List the files and directories in the snapshot
+            foreach (ShareFileItem item in dir.GetFilesAndDirectories())
+            {
+                if (item.IsDirectory)
+                {
+                    Console.WriteLine($"Directory: {item.Name}");
+                    ShareDirectoryClient subDir = dir.GetSubdirectoryClient(item.Name);
+                    ListDirTree(subDir);
+                }
+                else
+                {
+                    Console.WriteLine($"File: {dir.Name}\\{item.Name}");
+                }
+            }
+        }
+        // </snippet_ListSnapshotContents>
+
         // <snippet_RestoreFileFromSnapshot>
         //-------------------------------------------------
         // Restore file from snapshot
@@ -360,7 +410,6 @@ namespace dotnet_v12
             Console.WriteLine($"Restore status: {copyInfo.CopyStatus}");
         }
         // </snippet_RestoreFileFromSnapshot>
-        //Uri snapshotFileUri = GetFileSasUri(shareName, snapshotDir.Name + "/" + snapshotFile.Name, DateTime.UtcNow.AddHours(24), ShareFileSasPermissions.Read);
 
         // <snippet_DeleteSnapshot>
         //-------------------------------------------------
@@ -459,9 +508,10 @@ namespace dotnet_v12
             Console.WriteLine("5) Copy file to a blob");
             Console.WriteLine("6) Create snapshot");
             Console.WriteLine("7) List snapshots");
-            Console.WriteLine("8) Restore file from snapshot");
-            Console.WriteLine("9) Delete snapshot");
-            Console.WriteLine("10) Metrics");
+            Console.WriteLine("8) List snapshot contents");
+            Console.WriteLine("9) Restore file from snapshot");
+            Console.WriteLine("10) Delete snapshot");
+            Console.WriteLine("11) Metrics");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
 
@@ -524,6 +574,15 @@ namespace dotnet_v12
                     return true;
 
                 case "8":
+                    // List snapshot contents
+                    ShareItem snapshotItem = GetSnapshotItem();
+                    Console.WriteLine($"Calling ListSnapshotContents(\"{snapshotItem.Name}\", \"{snapshotItem.Snapshot}\");");
+                    ListSnapshotContents(snapshotItem.Name, snapshotItem.Snapshot);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "9":
                     // Restore a file from a snapshot
                     ShareItem snapshot = GetSnapshotItem();
                     Console.WriteLine($"Calling RestoreFileFromSnapshot(\"{snapshot.Name}\", \"CustomLogs\", \"Log1Copy.txt\", \"{snapshot.Snapshot}\");");
@@ -532,7 +591,7 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "9":
+                case "10":
                     // Delete a snapshot
                     ShareItem shareItem = GetSnapshotItem();
                     Console.WriteLine($"Calling DeleteSnapshotAsync(\"{shareItem.Name}\", \"{shareItem.Snapshot}\");");
@@ -542,7 +601,7 @@ namespace dotnet_v12
                     return true;
 
                 // Use metrics
-                case "10":
+                case "11":
                     await UseMetricsAsync();
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
