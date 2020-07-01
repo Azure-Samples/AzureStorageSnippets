@@ -102,7 +102,8 @@ namespace dotnet_v12
                         .AsPages(continuationToken, segmentSize);
 
                     foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
-                    {  
+                    {
+                        // A hierarchical listing may return both virtual directories and blobs.
                         foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
                         {
                             if (blobhierarchyItem.IsPrefix)
