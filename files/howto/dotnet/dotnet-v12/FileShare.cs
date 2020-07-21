@@ -392,16 +392,16 @@ namespace dotnet_v12
             // Get a ShareClient
             ShareClient share = shareService.GetShareClient(shareName);
 
-            // Get a ShareDirectoryClient, then a ShareFileClient to the live file
-            ShareDirectoryClient liveDir = share.GetDirectoryClient(directoryName);
-            ShareFileClient liveFile = liveDir.GetFileClient(fileName);
-
             // Get as ShareClient that points to a snapshot
             ShareClient snapshot = share.WithSnapshot(snapshotTime);
 
             // Get a ShareDirectoryClient, then a ShareFileClient to the snapshot file
             ShareDirectoryClient snapshotDir = snapshot.GetDirectoryClient(directoryName);
             ShareFileClient snapshotFile = snapshotDir.GetFileClient(fileName);
+
+            // Get a ShareDirectoryClient, then a ShareFileClient to the live file
+            ShareDirectoryClient liveDir = share.GetDirectoryClient(directoryName);
+            ShareFileClient liveFile = liveDir.GetFileClient(fileName);
 
             // Restore the file from the snapshot
             ShareFileCopyInfo copyInfo = await liveFile.StartCopyAsync(snapshotFile.Uri);
@@ -427,10 +427,17 @@ namespace dotnet_v12
             ShareClient share = shareService.GetShareClient(shareName);
 
             // Get as ShareClient that points to a snapshot
-            ShareClient snapshot = share.WithSnapshot(snapshotTime);
+            ShareClient snapshotShare = share.WithSnapshot(snapshotTime);
 
-            // This deletes the whole share, not just the snapshot
-            await snapshot.DeleteIfExistsAsync();
+            try
+            {
+                // Delete the snapshot
+                await snapshotShare.DeleteIfExistsAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
         }
         // </snippet_DeleteSnapshot>
 
@@ -593,9 +600,9 @@ namespace dotnet_v12
 
                 case "10":
                     // Delete a snapshot
-                    ShareItem shareItem = GetSnapshotItem();
-                    Console.WriteLine($"Calling DeleteSnapshotAsync(\"{shareItem.Name}\", \"{shareItem.Snapshot}\");");
-                    await DeleteSnapshotAsync(shareItem.Name, shareItem.Snapshot);
+                    ShareItem shareSnapshotItem = GetSnapshotItem();
+                    Console.WriteLine($"Calling DeleteSnapshotAsync(\"{shareSnapshotItem.Name}\", \"{shareSnapshotItem.Snapshot}\");");
+                    await DeleteSnapshotAsync(shareSnapshotItem.Name, shareSnapshotItem.Snapshot);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
