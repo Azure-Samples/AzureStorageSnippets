@@ -81,6 +81,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Metadata scenarios.
+        //----------------------------------------------- 
+        static bool Metadata()
+        {
+            Metadata metadata = new Metadata();
+
+            while (metadata.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -101,7 +113,8 @@ namespace dotnet_v12
             Console.WriteLine("3) Data protection");
             Console.WriteLine("4) REST operations");
             Console.WriteLine("5) CRUD operations");
-            Console.WriteLine("6) Exit");
+            Console.WriteLine("6) Metadata operations");
+            Console.WriteLine("7) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -127,6 +140,10 @@ namespace dotnet_v12
                     return CRUD();
 
                 case "6":
+
+                    return Metadata();
+
+                case "7":
                    
                    return false;                
                 

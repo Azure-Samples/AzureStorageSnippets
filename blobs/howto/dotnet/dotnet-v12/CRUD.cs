@@ -103,7 +103,7 @@ namespace dotnet_v12
 
                     foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
                     {
-                        // A flat listing operation returns only blobs, not virtual directories.    
+                        // A hierarchical listing may return both virtual directories and blobs.
                         foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
                         {
                             if (blobhierarchyItem.IsPrefix)
