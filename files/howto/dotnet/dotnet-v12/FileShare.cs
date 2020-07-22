@@ -19,6 +19,7 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Files.Shares;
@@ -434,9 +435,10 @@ namespace dotnet_v12
                 // Delete the snapshot
                 await snapshotShare.DeleteIfExistsAsync();
             }
-            catch (Exception ex)
+            catch (RequestFailedException ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine($"Error code: {ex.Status}\t{ex.ErrorCode}");
             }
         }
         // </snippet_DeleteSnapshot>
