@@ -14,24 +14,18 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
 using System.Threading;
-using System.Globalization;
-using System.Net;
+using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 
 namespace dotnet_v12
@@ -215,7 +209,7 @@ namespace dotnet_v12
             Console.Clear();
             Console.WriteLine("Choose a REST scenario:");
             Console.WriteLine("1) List containers");
-            Console.WriteLine("3) Return to main menu");
+            Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
             switch (Console.ReadLine())
@@ -235,7 +229,8 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "3":
+                case "x":
+                case "X":
 
                     return false;
 

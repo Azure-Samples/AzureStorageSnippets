@@ -14,17 +14,15 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
-using Azure;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace dotnet_v12
 {
@@ -254,7 +252,7 @@ namespace dotnet_v12
             Console.WriteLine("5) Write pages to a page blob");
             Console.WriteLine("6) Read pages from a page blob");
             Console.WriteLine("7) Read valid page regions from a page blob");
-            Console.WriteLine("8) Return to main menu");
+            Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
             BlobServiceClient blobServiceClient = new BlobServiceClient(Constants.connectionString);
@@ -326,7 +324,8 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "8":
+                case "x":
+                case "X":
                 
                    return false;
                 

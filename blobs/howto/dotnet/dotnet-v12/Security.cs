@@ -18,9 +18,6 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -107,7 +104,7 @@ namespace dotnet_v12
             Console.WriteLine("2) Create an anonymous client object");
             Console.WriteLine("3) Reference a container anonymously");
             Console.WriteLine("4) Reference a blob anonymously");
-            Console.WriteLine("5) Return to main menu");
+            Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -147,7 +144,8 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "5":
+                case "x":
+                case "X":
                 
                    return false;
                 

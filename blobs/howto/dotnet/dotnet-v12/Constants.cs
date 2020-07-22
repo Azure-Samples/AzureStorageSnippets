@@ -14,8 +14,6 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-using System;
-
 namespace dotnet_v12
 {
     // All files in this project can access these values. You won't have to modify the code in your methods to test them. Just update this file with the relevant values.
