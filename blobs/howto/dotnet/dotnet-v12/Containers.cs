@@ -95,14 +95,15 @@ namespace dotnet_v12
         private static async Task DeleteContainersWithPrefixAsync(BlobServiceClient blobServiceClient, string prefix)
         {
             Console.WriteLine("Delete all containers beginning with the specified prefix");
+
             try
             {
-                foreach (BlobContainerItem containerItem in blobServiceClient.GetBlobContainers())
+                foreach (BlobContainerItem container in blobServiceClient.GetBlobContainers())
                 {
-                    if (containerItem.Name.StartsWith(prefix))
+                    if (container.Name.StartsWith(prefix))
                     { 
-                        Console.WriteLine("\tContainer:" + containerItem.Name);
-                        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerItem.Name);
+                        Console.WriteLine("\tContainer:" + container.Name);
+                        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(container.Name);
                         await containerClient.DeleteAsync();
                     }
                 }
