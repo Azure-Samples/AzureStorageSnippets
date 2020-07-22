@@ -19,9 +19,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -121,7 +119,7 @@ namespace dotnet_v12
             Console.WriteLine("1) Enable soft delete");
             Console.WriteLine("2) Recover deleted blobs");
             Console.WriteLine("3) Recover a specific blob version");
-            Console.WriteLine("4) Return to main menu");
+            Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -150,7 +148,8 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "4":
+                case "x":
+                case "X":
                 
                    return false;
                 

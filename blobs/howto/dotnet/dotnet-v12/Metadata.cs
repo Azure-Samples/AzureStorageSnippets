@@ -16,11 +16,8 @@
 
 using Azure;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -134,7 +131,7 @@ namespace dotnet_v12
             Console.WriteLine("1) Read container properties");
             Console.WriteLine("2) Set metadata on container");
             Console.WriteLine("3) Read metadata on container");
-            Console.WriteLine("4) Return to main menu");
+            Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -166,7 +163,8 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "4":
+                case "x":
+                case "X":
                 
                    return false;
                 

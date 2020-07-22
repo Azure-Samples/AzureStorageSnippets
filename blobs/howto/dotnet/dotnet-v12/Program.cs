@@ -93,6 +93,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Container scenarios.
+        //----------------------------------------------- 
+        static bool Containers()
+        {
+            Containers containers = new Containers();
+
+            while (containers.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -114,41 +126,38 @@ namespace dotnet_v12
             Console.WriteLine("4) REST operations");
             Console.WriteLine("5) CRUD operations");
             Console.WriteLine("6) Metadata operations");
-            Console.WriteLine("7) Exit");
+            Console.WriteLine("7) Container operations");
+            Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
             {
                 case "1":
-
                     return Security();
 
                 case "2":
-
                     return Monitoring();
 
                 case "3":
-
                     return DataProtection();
 
                 case "4":
-
                     return REST();
 
                 case "5":
-
                     return CRUD();
 
                 case "6":
-
                     return Metadata();
 
                 case "7":
-                   
+                    return Containers();
+
+                case "x":
+                case "X":
                    return false;                
                 
                 default:
-                   
                    return true;
             }
         }

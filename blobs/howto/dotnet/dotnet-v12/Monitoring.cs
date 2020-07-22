@@ -16,10 +16,7 @@
 
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace dotnet_v12
 {
@@ -60,7 +57,7 @@ namespace dotnet_v12
             Console.WriteLine("Choose a monitoring scenario:");
             Console.WriteLine("1) Enable diagnostic logs");
             Console.WriteLine("2) Scenario 2");
-            Console.WriteLine("3) Return to main menu");
+            Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
@@ -79,8 +76,9 @@ namespace dotnet_v12
                    Console.WriteLine("Press enter to continue"); 
                    Console.ReadLine();              
                    return true;
-                
-                case "3":
+
+                case "x":
+                case "X":
                 
                    return false;
                 
