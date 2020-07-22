@@ -9,7 +9,6 @@ namespace dotnet_v12
     class Containers
     {
         #region CreateSampleContainerAsync
-        //<snippet_CreateSampleContainerAsync>
         //-------------------------------------------------
         // Create a container
         //-------------------------------------------------
@@ -39,11 +38,9 @@ namespace dotnet_v12
 
             return null;
         }
-        //</snippet_CreateSampleContainerAsync>
         #endregion
 
-        #region CreateSampleContainerAsync
-        //<snippet_CreateRootContainer>
+        #region CreateRootContainer
         //-------------------------------------------------
         // Create root container
         //-------------------------------------------------
@@ -66,11 +63,9 @@ namespace dotnet_v12
                 Console.WriteLine(e.Message);
             }
         }
-        //</snippet_CreateRootContainer>
         #endregion
 
         #region DeleteSampleContainerAsync
-        //<snippet_DeleteSampleContainerAsync>
         //-------------------------------------------------
         // Delete a container
         //-------------------------------------------------
@@ -91,11 +86,9 @@ namespace dotnet_v12
                 Console.ReadLine();
             }
         }
-        //</snippet_DeleteSampleContainerAsync>
         #endregion
 
         #region DeleteContainersWithPrefixAsync
-        //<snippet_DeleteContainersWithPrefixAsync>
         //-------------------------------------------------
         // Delete all containers with the specified prefix
         //-------------------------------------------------
@@ -123,7 +116,6 @@ namespace dotnet_v12
                 throw;
             }
         }
-        //</snippet_DeleteContainersWithPrefixAsync>
         #endregion
 
         #region User menu
