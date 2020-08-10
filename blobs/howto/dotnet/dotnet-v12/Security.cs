@@ -14,9 +14,11 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 using System;
 using System.Threading.Tasks;
 
@@ -93,6 +95,79 @@ namespace dotnet_v12
         // </Snippet_DownloadBlobAnonymously>
 
         //-------------------------------------------------
+        // Create service SAS for blob container
+        //-------------------------------------------------
+
+        // <Snippet_GetContainerSasUri>
+        private static string GetContainerSasUri(BlobContainerClient container, 
+            StorageSharedKeyCredential key, string storedPolicyName = null)
+        {
+            // Create a SAS token that's valid for one hour.
+            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = container.Name,
+                Resource = "c",
+            };
+
+            if (storedPolicyName == null)
+            {
+                sasBuilder.StartsOn = DateTimeOffset.UtcNow;
+                sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+                sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+            }
+            else
+            {
+                sasBuilder.Identifier = storedPolicyName;
+            }
+
+            // Use the key to get the SAS token.
+            string sasToken = sasBuilder.ToSasQueryParameters(key).ToString();
+
+            Console.WriteLine("SAS for blob container is: {0}", sasToken);
+            Console.WriteLine();
+
+            return container.Uri + sasToken;
+        }
+        // </Snippet_GetContainerSasUri>
+
+        //-------------------------------------------------
+        // Create service SAS for blob
+        //-------------------------------------------------
+
+        // <Snippet_GetBlobSasUri>
+        private static string GetBlobSasUri(BlobContainerClient container,
+            string blobName, StorageSharedKeyCredential key, string storedPolicyName = null)
+        {
+            // Create a SAS token that's valid for one hour.
+            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = container.Name,
+                BlobName = blobName,
+                Resource = "b",
+            };
+
+            if (storedPolicyName == null)
+            {
+                sasBuilder.StartsOn = DateTimeOffset.UtcNow;
+                sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+                sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+            }
+            else
+            {
+                sasBuilder.Identifier = storedPolicyName;
+            }
+
+            // Use the key to get the SAS token.
+            string sasToken = sasBuilder.ToSasQueryParameters(key).ToString();
+
+            Console.WriteLine("SAS for blob is: {0}", sasToken);
+            Console.WriteLine();
+
+            return container.GetBlockBlobClient(blobName).Uri + sasToken;
+        }
+        // </Snippet_GetBlobSasUri>
+
+        //-------------------------------------------------
         // Security menu (Can call asynchronous and synchronous methods)
         //-------------------------------------------------
 
@@ -104,6 +179,8 @@ namespace dotnet_v12
             Console.WriteLine("2) Create an anonymous client object");
             Console.WriteLine("3) Reference a container anonymously");
             Console.WriteLine("4) Reference a blob anonymously");
+            Console.WriteLine("5) Create service SAS for a blob container");
+            Console.WriteLine("6) Create service SAS for a blob");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
@@ -139,6 +216,30 @@ namespace dotnet_v12
                 case "4":
 
                     DownloadBlobAnonymously();
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "5":
+
+                    var connectionString1 = Constants.connectionString;
+                    BlobServiceClient blobServiceClient1 = new BlobServiceClient(connectionString1);
+
+                    GetContainerSasUri(blobServiceClient1.GetBlobContainerClient(Constants.containerName),
+                        new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "6":
+
+                    var connectionString2 = Constants.connectionString;
+                    BlobServiceClient blobServiceClient2 = new BlobServiceClient(connectionString2);
+
+                    GetBlobSasUri(blobServiceClient2.GetBlobContainerClient(Constants.containerName), "logfile.txt",
+                        new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
