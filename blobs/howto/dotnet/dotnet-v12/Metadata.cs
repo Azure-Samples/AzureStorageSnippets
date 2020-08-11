@@ -166,9 +166,9 @@ namespace dotnet_v12
         // </Snippet_ReadBlobProperties>
 
         //-------------------------------------------------
-        // Set blob metadata
+        // Add blob metadata
         //-------------------------------------------------
-        // <Snippet_SetBlobMetadata>
+        // <Snippet_AddBlobMetadata>
         public static async Task AddBlobMetadataAsync(BlobClient blob)
         {
             try
@@ -192,7 +192,7 @@ namespace dotnet_v12
                 Console.ReadLine();
             }
         }
-        // </Snippet_SetBlobMetadata>
+        // </Snippet_AddBlobMetadata>
 
         //-------------------------------------------------
         // Read blob metadata
