@@ -16,6 +16,7 @@
 
 using Azure;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,11 +29,8 @@ namespace dotnet_v12
         //-------------------------------------------------
         // Read container properties
         //-------------------------------------------------
-
         // <Snippet_ReadContainerProperties>
-
-        private static async Task ReadContainerPropertiesAsync
-            (BlobContainerClient container)
+        private static async Task ReadContainerPropertiesAsync(BlobContainerClient container)
         {
             try
             {
@@ -51,17 +49,14 @@ namespace dotnet_v12
                 Console.ReadLine();
             }
         }
-
         // </Snippet_ReadContainerProperties>
 
 
         //-------------------------------------------------
         // Set metadata on container
         //-------------------------------------------------
-
         // <Snippet_AddContainerMetadata>
-        public static async Task AddContainerMetadataAsync
-            (BlobContainerClient container)
+        public static async Task AddContainerMetadataAsync(BlobContainerClient container)
         {
             try
             {
@@ -89,10 +84,8 @@ namespace dotnet_v12
         //-------------------------------------------------
         // Read metadata on container
         //-------------------------------------------------
-
         // <Snippet_ReadContainerMetadata>
-        public static async Task ReadContainerMetadataAsync
-            (BlobContainerClient container)
+        public static async Task ReadContainerMetadataAsync(BlobContainerClient container)
         {
             try
             {
@@ -118,58 +111,189 @@ namespace dotnet_v12
         // </Snippet_ReadContainerMetadata>
 
         //-------------------------------------------------
+        // Set blob properties
+        //-------------------------------------------------
+        // <Snippet_SetBlobProperties>
+        //public static async Task SetBlobPropertiesAsync(BlobClient blob)
+        //{
+        //    try
+        //    {
+        //        Console.WriteLine("Setting blob properties.");
+
+        //        BlobProperties properties = await blob.GetPropertiesAsync();
+
+        //        // You must explicitly set the MIME ContentType every time
+        //        // the properties are updated or the field will be cleared.
+        //        properties.ContentType = "text/plain";
+        //        properties.ContentLanguage = "en-us";
+
+        //        // Set the blob's properties.
+        //        await blob.SetPropertiesAsync();
+        //    }
+        //    catch (RequestFailedException e)
+        //    {
+        //        Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
+        //        Console.WriteLine(e.Message);
+        //        Console.ReadLine();
+        //    }
+        //}
+        // </Snippet_SetBlobProperties>
+
+        //-------------------------------------------------
+        // Read blob properties
+        //-------------------------------------------------
+        // <Snippet_ReadBlobProperties>
+        private static async Task GetBlobPropertiesAsync(BlobClient blob)
+        {
+            try
+            {
+                // Get the blob properties
+                BlobProperties properties = await blob.GetPropertiesAsync();
+
+                // Display some of the blob's property values
+                Console.WriteLine(" ContentLanguage: {0}", properties.ContentLanguage);
+                Console.WriteLine(" ContentType: {0}", properties.ContentType);
+                Console.WriteLine(" CreatedOn: {0}", properties.CreatedOn);
+                Console.WriteLine(" LastModified: {0}", properties.LastModified);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+            }
+        }
+        // </Snippet_ReadBlobProperties>
+
+        //-------------------------------------------------
+        // Set blob metadata
+        //-------------------------------------------------
+        // <Snippet_SetBlobMetadata>
+        public static async Task AddBlobMetadataAsync(BlobClient blob)
+        {
+            try
+            {
+                IDictionary<string, string> metadata =
+                   new Dictionary<string, string>();
+
+                // Add metadata to the dictionary by calling the Add method
+                metadata.Add("docType", "textDocuments");
+
+                // Add metadata to the dictionary by using key/value syntax
+                metadata["category"] = "guidance";
+
+                // Set the blob's metadata.
+                await blob.SetMetadataAsync(metadata);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+            }
+        }
+        // </Snippet_SetBlobMetadata>
+
+        //-------------------------------------------------
+        // Read blob metadata
+        //-------------------------------------------------
+        // <Snippet_ReadBlobMetadata>
+        public static async Task ReadBlobMetadataAsync(BlobClient blob)
+        {
+            try
+            {
+                // Get the blob's properties and metadata.
+                BlobProperties properties = await blob.GetPropertiesAsync();
+
+                Console.WriteLine("Blob metadata:");
+
+                // Enumerate the blob's metadata.
+                foreach (var metadataItem in properties.Metadata)
+                {
+                    Console.WriteLine("\tKey: {0}", metadataItem.Key);
+                    Console.WriteLine("\tValue: {0}", metadataItem.Value);
+                }
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+            }
+        }
+        // </Snippet_ReadBlobMetadata>
+
+        //-------------------------------------------------
         // Metadata menu
         //-------------------------------------------------
-
         public async Task<bool> MenuAsync()
         {
             var connectionString = Constants.connectionString;
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            BlobContainerClient container = blobServiceClient.GetBlobContainerClient(Constants.containerName);
+            BlobClient blob = container.GetBlobClient(Constants.blobName);
 
             Console.Clear();
-            Console.WriteLine("Choose a metadata scenario:");
+            Console.WriteLine("Choose a properties or metadata scenario:");
             Console.WriteLine("1) Read container properties");
             Console.WriteLine("2) Set metadata on container");
             Console.WriteLine("3) Read metadata on container");
+            //Console.WriteLine("4) Set blob properties");
+            Console.WriteLine("5) Read blob properties");
+            Console.WriteLine("6) Add metadata on blob");
+            Console.WriteLine("7) Read blob metadata");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
             {
                 case "1":
-
-                   await ReadContainerPropertiesAsync
-                        (blobServiceClient.GetBlobContainerClient(Constants.containerName));
-
+                   await ReadContainerPropertiesAsync(container);
                    Console.WriteLine("Press enter to continue");   
                    Console.ReadLine();          
                    return true;
                 
                 case "2":
-
-                    await AddContainerMetadataAsync
-                         (blobServiceClient.GetBlobContainerClient(Constants.containerName));
-
-                    Console.WriteLine("Press enter to continue"); 
+                   await AddContainerMetadataAsync(container);
+                   Console.WriteLine("Press enter to continue"); 
                    Console.ReadLine();              
                    return true;
 
                 case "3":
+                    await ReadContainerMetadataAsync(container);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
 
-                    await ReadContainerMetadataAsync
-                         (blobServiceClient.GetBlobContainerClient(Constants.containerName));
+                //case "4":
+                //    await SetBlobPropertiesAsync(blob);
+                //    Console.WriteLine("Press enter to continue");
+                //    Console.ReadLine();
+                //    return true;
 
+                case "5":
+                    await GetBlobPropertiesAsync(blob);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "6":
+                    await AddBlobMetadataAsync(blob);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "7":
+                    await ReadBlobMetadataAsync(blob);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 case "x":
                 case "X":
-                
                    return false;
                 
                 default:
-                
                    return true;
             }
         }

@@ -21,18 +21,21 @@ namespace dotnet_v12
     public static class Constants
     {
         // ---------------------------------------------------------------------------------------------
-        // IMPORTANT! Be sure to remove sensitive account information from this file before checking it in.
+        // IMPORTANT! Be sure to remove sensitive account information from this file before committing.
         //----------------------------------------------------------------------------------------------
 
-        // Credential constants.
+        // Credential constants
         public const string accountKey = "";
         public const string connectionString = "";
         
-        // Account constants.
+        // Account constants
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";
+
+        // Resource constants
         public const string containerName = "";
+        public const string blobName = "";
     }
     
 }
