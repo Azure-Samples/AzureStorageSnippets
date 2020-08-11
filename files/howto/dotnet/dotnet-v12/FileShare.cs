@@ -427,7 +427,7 @@ namespace dotnet_v12
             // Get a ShareClient
             ShareClient share = shareService.GetShareClient(shareName);
 
-            // Get as ShareClient that points to a snapshot
+            // Get a ShareClient that points to a snapshot
             ShareClient snapshotShare = share.WithSnapshot(snapshotTime);
 
             try

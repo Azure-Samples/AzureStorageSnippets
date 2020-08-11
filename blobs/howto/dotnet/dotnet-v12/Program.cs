@@ -125,7 +125,7 @@ namespace dotnet_v12
             Console.WriteLine("3) Data protection");
             Console.WriteLine("4) REST operations");
             Console.WriteLine("5) CRUD operations");
-            Console.WriteLine("6) Metadata operations");
+            Console.WriteLine("6) Properties and Metadata");
             Console.WriteLine("7) Container operations");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
