@@ -114,29 +114,40 @@ namespace dotnet_v12
         // Set blob properties
         //-------------------------------------------------
         // <Snippet_SetBlobProperties>
-        //public static async Task SetBlobPropertiesAsync(BlobClient blob)
-        //{
-        //    try
-        //    {
-        //        Console.WriteLine("Setting blob properties.");
+        public static async Task SetBlobPropertiesAsync(BlobClient blob)
+        {
+            Console.WriteLine("Setting blob properties...");
 
-        //        BlobProperties properties = await blob.GetPropertiesAsync();
+            try
+            {
+                // Get the existing properties
+                BlobProperties properties = await blob.GetPropertiesAsync();
 
-        //        // You must explicitly set the MIME ContentType every time
-        //        // the properties are updated or the field will be cleared.
-        //        properties.ContentType = "text/plain";
-        //        properties.ContentLanguage = "en-us";
+                BlobHttpHeaders headers = new BlobHttpHeaders
+                {
+                    // Set the MIME ContentType every time the properties 
+                    // are updated or the field will be cleared
+                    ContentType = "text/plain",
+                    ContentLanguage = "en-us",
 
-        //        // Set the blob's properties.
-        //        await blob.SetPropertiesAsync();
-        //    }
-        //    catch (RequestFailedException e)
-        //    {
-        //        Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
-        //        Console.WriteLine(e.Message);
-        //        Console.ReadLine();
-        //    }
-        //}
+                    // Populate remaining headers with 
+                    // the pre-existing properties
+                    CacheControl = properties.CacheControl,
+                    ContentDisposition = properties.ContentDisposition,
+                    ContentEncoding = properties.ContentEncoding,
+                    ContentHash = properties.ContentHash
+                };
+
+                // Set the blob's properties.
+                await blob.SetHttpHeadersAsync(headers);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+            }
+        }
         // </Snippet_SetBlobProperties>
 
         //-------------------------------------------------
@@ -151,10 +162,10 @@ namespace dotnet_v12
                 BlobProperties properties = await blob.GetPropertiesAsync();
 
                 // Display some of the blob's property values
-                Console.WriteLine(" ContentLanguage: {0}", properties.ContentLanguage);
-                Console.WriteLine(" ContentType: {0}", properties.ContentType);
-                Console.WriteLine(" CreatedOn: {0}", properties.CreatedOn);
-                Console.WriteLine(" LastModified: {0}", properties.LastModified);
+                Console.WriteLine($" ContentLanguage: {properties.ContentLanguage}");
+                Console.WriteLine($" ContentType: {properties.ContentType}");
+                Console.WriteLine($" CreatedOn: {properties.CreatedOn}");
+                Console.WriteLine($" LastModified: {properties.LastModified}");
             }
             catch (RequestFailedException e)
             {
@@ -171,6 +182,8 @@ namespace dotnet_v12
         // <Snippet_AddBlobMetadata>
         public static async Task AddBlobMetadataAsync(BlobClient blob)
         {
+            Console.WriteLine("Adding blob metadata...");
+
             try
             {
                 IDictionary<string, string> metadata =
@@ -238,26 +251,26 @@ namespace dotnet_v12
             Console.WriteLine("1) Read container properties");
             Console.WriteLine("2) Set metadata on container");
             Console.WriteLine("3) Read metadata on container");
-            //Console.WriteLine("4) Set blob properties");
+            Console.WriteLine("4) Set blob properties");
             Console.WriteLine("5) Read blob properties");
             Console.WriteLine("6) Add metadata on blob");
             Console.WriteLine("7) Read blob metadata");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
- 
+
             switch (Console.ReadLine())
             {
                 case "1":
-                   await ReadContainerPropertiesAsync(container);
-                   Console.WriteLine("Press enter to continue");   
-                   Console.ReadLine();          
-                   return true;
-                
+                    await ReadContainerPropertiesAsync(container);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
                 case "2":
-                   await AddContainerMetadataAsync(container);
-                   Console.WriteLine("Press enter to continue"); 
-                   Console.ReadLine();              
-                   return true;
+                    await AddContainerMetadataAsync(container);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
 
                 case "3":
                     await ReadContainerMetadataAsync(container);
@@ -265,11 +278,11 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                //case "4":
-                //    await SetBlobPropertiesAsync(blob);
-                //    Console.WriteLine("Press enter to continue");
-                //    Console.ReadLine();
-                //    return true;
+                case "4":
+                    await SetBlobPropertiesAsync(blob);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
 
                 case "5":
                     await GetBlobPropertiesAsync(blob);
@@ -291,17 +304,17 @@ namespace dotnet_v12
 
                 case "x":
                 case "X":
-                   return false;
-                
+                    return false;
+
                 default:
-                   return true;
+                    return true;
             }
         }
-        
+
     }
 
-    
 
 
-    
+
+
 }
