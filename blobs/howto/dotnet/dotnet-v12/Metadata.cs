@@ -36,15 +36,13 @@ namespace dotnet_v12
             {
                 // Fetch some container properties and write out their values.
                 var properties = await container.GetPropertiesAsync();
-                Console.WriteLine("Properties for container {0}", container.Uri);
-                Console.WriteLine("Public access level: {0}", properties.Value.PublicAccess);
-                Console.WriteLine("Last modified time in UTC: {0}", properties.Value.LastModified);
+                Console.WriteLine($"Properties for container {container.Uri}");
+                Console.WriteLine($"Public access level: {properties.Value.PublicAccess}");
+                Console.WriteLine($"Last modified time in UTC: {properties.Value.LastModified}");
             }
             catch (RequestFailedException e)
             {
-                Console.WriteLine("HTTP error code {0}: {1}",
-                                    e.Status,
-                                    e.ErrorCode);
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
                 Console.WriteLine(e.Message);
                 Console.ReadLine();
             }
@@ -72,9 +70,7 @@ namespace dotnet_v12
             }
             catch (RequestFailedException e)
             {
-                Console.WriteLine("HTTP error code {0}: {1}",
-                                    e.Status,
-                                    e.ErrorCode);
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
                 Console.WriteLine(e.Message);
                 Console.ReadLine();
             }
@@ -95,15 +91,13 @@ namespace dotnet_v12
                 Console.WriteLine("Container metadata:");
                 foreach (var metadataItem in properties.Value.Metadata)
                 {
-                    Console.WriteLine("\tKey: {0}", metadataItem.Key);
-                    Console.WriteLine("\tValue: {0}", metadataItem.Value);
+                    Console.WriteLine($"\tKey: {metadataItem.Key}");
+                    Console.WriteLine($"\tValue: {metadataItem.Value}");
                 }
             }
             catch (RequestFailedException e)
             {
-                Console.WriteLine("HTTP error code {0}: {1}",
-                                    e.Status,
-                                    e.ErrorCode);
+                Console.WriteLine($"HTTP error code {e.Status}: {e.ErrorCode}");
                 Console.WriteLine(e.Message);
                 Console.ReadLine();
             }
@@ -223,8 +217,8 @@ namespace dotnet_v12
                 // Enumerate the blob's metadata.
                 foreach (var metadataItem in properties.Metadata)
                 {
-                    Console.WriteLine("\tKey: {0}", metadataItem.Key);
-                    Console.WriteLine("\tValue: {0}", metadataItem.Value);
+                    Console.WriteLine($"\tKey: {metadataItem.Key}");
+                    Console.WriteLine($"\tValue: {metadataItem.Value}");
                 }
             }
             catch (RequestFailedException e)
