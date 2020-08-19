@@ -5,7 +5,9 @@ import java.time.Duration;
 /**
  * Azure queue storage v12 SDK how-to
  */
+
 // <Snippet_ImportStatements>
+// Include the following imports to use queue APIs
 import com.azure.core.util.*;
 import com.azure.storage.queue.*;
 import com.azure.storage.queue.models.*;
@@ -88,7 +90,8 @@ public class App {
     // </Snippet_CreateQueue>
 
     // <Snippet_AddMessage>
-    public static void addQueueMessage(String connectStr, String queueName, String messageText)
+    public static void addQueueMessage
+        (String connectStr, String queueName, String messageText)
     {
         try
         {
@@ -114,7 +117,8 @@ public class App {
     // </Snippet_AddMessage>
 
     // <Snippet_PeekMessage>
-    public static void peekQueueMessage(String connectStr, String queueName)
+    public static void peekQueueMessage
+        (String connectStr, String queueName)
     {
         try
         {
@@ -139,7 +143,9 @@ public class App {
     // </Snippet_PeekMessage>
 
     // <Snippet_UpdateSearchMessage>
-    public static void updateQueueMessage(String connectStr, String queueName, String searchString, String updatedContents)
+    public static void updateQueueMessage
+        (String connectStr, String queueName,
+        String searchString, String updatedContents)
     {
         try
         {
@@ -160,8 +166,15 @@ public class App {
                 if (message.getMessageText().equals(searchString))
                 {
                     // Update the message to be visible in 30 seconds
-                    queueClient.updateMessage(message.getMessageId(), message.getPopReceipt(), updatedContents, Duration.ofSeconds(30));
-                    System.out.println(String.format("Found message: \'%s\' and updated it to \'%s\'", searchString, updatedContents));
+                    queueClient.updateMessage(message.getMessageId(),
+                                              message.getPopReceipt(),
+                                              updatedContents,
+                                              Duration.ofSeconds(30));
+                    System.out.println(
+                        String.format("Found message: \'%s\' and updated it to \'%s\'",
+                                        searchString,
+                                        updatedContents)
+                                      );
                     break;
                 }
             }
@@ -176,7 +189,8 @@ public class App {
     // </Snippet_UpdateSearchMessage>
 
     // <Snippet_UpdateFirstMessage>
-    public static void updateFirstQueueMessage(String connectStr, String queueName, String updatedContents)
+    public static void updateFirstQueueMessage
+        (String connectStr, String queueName, String updatedContents)
     {
         try
         {
@@ -194,8 +208,12 @@ public class App {
             if (null != message)
             {
                 // Update the message to be visible in 30 seconds
-                UpdateMessageResult result = queueClient.updateMessage(message.getMessageId(), message.getPopReceipt(), updatedContents, Duration.ofSeconds(30));
-                System.out.println("Update the first message with the receipt: " + result.getPopReceipt());
+                UpdateMessageResult result = queueClient.updateMessage(message.getMessageId(),
+                                                                       message.getPopReceipt(),
+                                                                       updatedContents,
+                                                                       Duration.ofSeconds(30));
+                System.out.println("Updated the first message with the receipt: " +
+                        result.getPopReceipt());
             }
         }
         catch (QueueStorageException e)
@@ -285,9 +303,10 @@ public class App {
             // The maximum number of messages to retrieve is 20
             final int MAX_MESSAGES = 20;
 
-            // Retrieve 20 messages from the queue with a visibility timeout of 300 seconds
-            for (QueueMessageItem message : queueClient.receiveMessages(MAX_MESSAGES, Duration.ofSeconds(300),
-                                                        Duration.ofSeconds(1), new Context("key1", "value1")))
+            // Retrieve 20 messages from the queue with a
+            // visibility timeout of 300 seconds (5 minutes)
+            for (QueueMessageItem message : queueClient.receiveMessages(MAX_MESSAGES,
+                    Duration.ofSeconds(300), Duration.ofSeconds(1), new Context("key1", "value1")))
             {
                 // Do processing for all messages in less than 5 minutes,
                 // deleting each message after processing.
