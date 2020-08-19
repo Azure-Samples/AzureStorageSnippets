@@ -9,9 +9,6 @@ import java.time.Duration;
 import com.azure.core.util.*;
 import com.azure.storage.queue.*;
 import com.azure.storage.queue.models.*;
-// import java.util.*;
-// import java.io.*;
-// import java.time.*;
 // </Snippet_ImportStatements>
 
 public class App {
