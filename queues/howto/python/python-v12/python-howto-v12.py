@@ -1,10 +1,11 @@
 # <Snippet_ImportStatements>
-import os, uuid
 from azure.storage.queue import (
         QueueClient,
         BinaryBase64EncodePolicy,
         BinaryBase64DecodePolicy
 )
+
+import os, uuid
 # </Snippet_ImportStatements>
 
 def add_messages(num_messages=1):
@@ -16,7 +17,8 @@ def add_messages(num_messages=1):
 
 try:
     # <Snippet_CreateQueue>
-    # Retrieve the connection string from an environment variable
+    # Retrieve the connection string from an environment
+    # variable named AZURE_STORAGE_CONNECTION_STRING
     connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
     # Create a unique name for the queue
@@ -26,6 +28,8 @@ try:
     # be used to create and manipulate the queue
     print("Creating queue: " + queue_name)
     queue_client = QueueClient.from_connection_string(connect_str, queue_name)
+
+    # Create the queue
     queue_client.create_queue()
     # </Snippet_CreateQueue>
 
@@ -75,6 +79,17 @@ try:
         print("Dequeueing message: " + message.content)
         queue_client.delete_message(message.id, message.pop_receipt)
     # </Snippet_DequeueMessages>
+
+    add_messages(10)
+
+    # <Snippet_DequeueByPage>
+    messages = queue_client.receive_messages(messages_per_page=5, visibility_timeout=5*60)
+
+    for msg_batch in messages.by_page():
+       for msg in msg_batch:
+          print("Batch dequeue message: " + msg.content)
+          queue_client.delete_message(msg)
+    # </Snippet_DequeueByPage>
 
     # <Snippet_DeleteQueue>
     print("Deleting queue: " + queue_client.queue_name)
