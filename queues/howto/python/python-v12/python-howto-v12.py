@@ -1,9 +1,7 @@
 # <Snippet_ImportStatements>
 import os, uuid
 from azure.storage.queue import (
-        QueueServiceClient,
         QueueClient,
-        QueueMessage,
         BinaryBase64EncodePolicy,
         BinaryBase64DecodePolicy
 )
@@ -24,13 +22,11 @@ try:
     # Create a unique name for the queue
     queue_name = "queue-" + str(uuid.uuid4())
 
+    # Instantiate a QueueClient object which will
+    # be used to create and manipulate the queue
     print("Creating queue: " + queue_name)
-
-    # Instantiate a QueueServiceClient which will be used to create the queue
-    queue_service = QueueServiceClient.from_connection_string(connect_str)
-
-    # Instantiate a QueueClient which will be used to manipulate the queue
-    queue_client = queue_service.create_queue(queue_name)
+    queue_client = QueueClient.from_connection_string(connect_str, queue_name)
+    queue_client.create_queue()
     # </Snippet_CreateQueue>
 
     # <Snippet_EncodeMessage>
