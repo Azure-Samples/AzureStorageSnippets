@@ -21,7 +21,7 @@ try:
     # Retrieve the connection string from an environment variable
     connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
-# Create a unique name for the queue
+    # Create a unique name for the queue
     queue_name = "queue-" + str(uuid.uuid4())
 
     print("Creating queue: " + queue_name)
