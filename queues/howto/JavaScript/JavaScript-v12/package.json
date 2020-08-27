@@ -1,0 +1,16 @@
+{
+    "name": "javascript-queues-v12",
+    "version": "1.0.0",
+    "description": "Use the @azure/storage-queue SDK version 12 to interact with Azure Queue storage",
+    "main": "javascript-queues-v12.js",
+    "scripts": {
+        "start": "node javascript-queues-v12.js"
+    },
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "@azure/storage-queue": "^12.0.0",
+        "@types/dotenv": "^4.0.3",
+        "dotenv": "^6.0.0"
+    }
+}
