@@ -34,7 +34,7 @@ async function main() {
 
     // Create the queue
     await queueClient.create();
-    // <Snippet_CreateQueue>
+    // </Snippet_CreateQueue>
 
     // <Snippet_AddMessage>
     messageText = "Hello, World";
@@ -44,7 +44,7 @@ async function main() {
     await queueClient.sendMessage(messageText);
     // </Snippet_AddMessage>
 
-    // <Snippet_PeekMessages>
+    // <Snippet_PeekMessage>
     // Peek at messages in the queue
     const peekedMessages = await queueClient.peekMessages({ numberOfMessages: 5 });
 
@@ -52,7 +52,7 @@ async function main() {
         // Display the peeked message
         console.log("Peeked message: ", peekedMessages.peekedMessageItems[i].messageText);
     }
-    // </Snippet_PeekMessages>
+    // </Snippet_PeekMessage>
 
     // <Snippet_UpdateMessage>
     // Get the first message in the queue
