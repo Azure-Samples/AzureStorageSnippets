@@ -105,6 +105,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Copy scenarios.
+        //----------------------------------------------- 
+        static bool CopyBlob()
+        {
+            CopyBlob copyBlob = new CopyBlob();
+
+            while (copyBlob.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -127,6 +139,7 @@ namespace dotnet_v12
             Console.WriteLine("5) CRUD operations");
             Console.WriteLine("6) Properties and Metadata");
             Console.WriteLine("7) Container operations");
+            Console.WriteLine("8) Copy operations");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -152,6 +165,9 @@ namespace dotnet_v12
 
                 case "7":
                     return Containers();
+
+                case "8":
+                    return CopyBlob();
 
                 case "x":
                 case "X":
