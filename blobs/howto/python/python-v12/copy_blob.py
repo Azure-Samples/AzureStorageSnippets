@@ -102,8 +102,12 @@ class CopyBlob:
                 )
 
             # <Snippet_StopBlobCopy>
+            # Start the copy operation.
             copy_props = dest_blob.start_copy_from_url(source_blob.url)
 
+            # Do other stuff...
+
+            # Check the copy status. If the status is pending, abort the copy operation.
             if (copy_props["copy_status"] == "pending"):
                 dest_blob.abort_copy(copy_props["copy_id"])
                 print("Copy operation " + copy_props["copy_id"] + " has been aborted.")
