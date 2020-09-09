@@ -36,35 +36,48 @@ from constants import Constants
 class CopyBlob:
     def __init__(self):
         super().__init__()
-        # Retrieve the connection string from an environment
-        # variable named AZURE_STORAGE_CONNECTION_STRING
-        self.connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
         self.constants = Constants()
 
     # <Snippet_BlobCopy>
     def blob_copy(self, container_name, blob_name):
 
+        # Create a BlobClient from a connection string
+        # retrieved from an environment variable named
+        # AZURE_STORAGE_CONNECTION_STRING
         source_blob = BlobClient.from_connection_string(
             os.getenv("AZURE_STORAGE_CONNECTION_STRING"), 
             container_name, blob_name
             )
 
         try:
+            # Lease the source blob for the copy operation
+            # to prevent another client from modifying it.
             lease = BlobLeaseClient(source_blob)
             lease.acquire()
+
+            # Get the source blob's properties and display the lease state.
             source_props = source_blob.get_blob_properties()
             print("Lease state: " + source_props.lease.state)
 
+            # Create a BlobClient representing the
+            # destination blob with a unique name.
             dest_blob = BlobClient.from_connection_string(
                 os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
                 container_name, str(uuid.uuid4()) + "-" + blob_name
                 )
+
+            # Start the copy operation.
             copy_props = dest_blob.start_copy_from_url(source_blob.url)
+
+            # Display the copy status
             print("Copy status: " + copy_props["copy_status"])
             print("Last modified: " + str(copy_props["last_modified"]))
 
             if (source_props.lease.state == "leased"):
+                # Break the lease on the source blob.
                 lease.break_lease()
+
+                # Update the destination blob's properties to check the lease state.
                 source_props = source_blob.get_blob_properties()
                 print("Lease state: " + source_props.lease.state)
 

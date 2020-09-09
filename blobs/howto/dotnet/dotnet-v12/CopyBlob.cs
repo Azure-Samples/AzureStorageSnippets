@@ -34,17 +34,18 @@ namespace dotnet_v12
                     // Specifying -1 for the lease interval creates an infinite lease.
                     await lease.AcquireAsync(TimeSpan.FromSeconds(-1));
 
-                    // Get the source blob's properties and check the lease state.
+                    // Get the source blob's properties and display the lease state.
                     BlobProperties sourceProperties = await sourceBlob.GetPropertiesAsync();
                     Console.WriteLine($"Lease state: {sourceProperties.LeaseState}");
 
                     // Get a BlobClient representing the destination blob with a unique name.
-                    BlobClient destBlob = container.GetBlobClient(Guid.NewGuid() + "-" + sourceBlob.Name);
+                    BlobClient destBlob = 
+                        container.GetBlobClient(Guid.NewGuid() + "-" + sourceBlob.Name);
 
                     // Start the copy operation.
                     await destBlob.StartCopyFromUriAsync(sourceBlob.Uri);
 
-                    // Get the destination blob's properties to check the copy status.
+                    // Get the destination blob's properties and display the copy status.
                     BlobProperties destProperties = await destBlob.GetPropertiesAsync();
 
                     Console.WriteLine($"Copy status: {destProperties.CopyStatus}");
@@ -52,7 +53,7 @@ namespace dotnet_v12
                     Console.WriteLine($"Completion time: {destProperties.CopyCompletedOn}");
                     Console.WriteLine($"Total bytes: {destProperties.ContentLength}");
 
-                    // Update the destination blob's properties.
+                    // Update the source blob's properties.
                     sourceProperties = await sourceBlob.GetPropertiesAsync();
 
                     if (sourceProperties.LeaseState == LeaseState.Leased)
@@ -60,7 +61,7 @@ namespace dotnet_v12
                         // Break the lease on the source blob.
                         await lease.BreakAsync();
 
-                        // Update the destination blob's properties to check the lease state.
+                        // Update the source blob's properties to check the lease state.
                         sourceProperties = await sourceBlob.GetPropertiesAsync();
                         Console.WriteLine($"Lease state: {sourceProperties.LeaseState}");
                     }
@@ -91,8 +92,9 @@ namespace dotnet_v12
                 // Ensure that the source blob exists.
                 if (await sourceBlob.ExistsAsync())
                 {
-                    // Get a BlobClient representing the destination blob (in this case, a new blob).
-                    BlobClient destBlob = container.GetBlobClient(Guid.NewGuid() + "-" + sourceBlob.Name);
+                    // Get a BlobClient representing the destination blob with a unique name.
+                    BlobClient destBlob = 
+                        container.GetBlobClient(Guid.NewGuid() + "-" + sourceBlob.Name);
 
                     // Start the copy operation.
                     destBlob.StartCopyFromUri(sourceBlob.Uri);
@@ -101,7 +103,7 @@ namespace dotnet_v12
                     // Get the destination blob's properties to check the copy status.
                     BlobProperties destProperties = destBlob.GetProperties();
 
-                    // Check the copy status. If it is still pending, abort the copy operation.
+                    // Check the copy status. If the status is pending, abort the copy operation.
                     if (destProperties.CopyStatus == CopyStatus.Pending)
                     {
                         await destBlob.AbortCopyFromUriAsync(destProperties.CopyId);
