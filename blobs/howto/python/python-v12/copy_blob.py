@@ -67,11 +67,17 @@ class CopyBlob:
                 )
 
             # Start the copy operation.
-            copy_props = dest_blob.start_copy_from_url(source_blob.url)
+            dest_blob.start_copy_from_url(source_blob.url)
+
+            # Get the destination blob's properties to check the copy status.
+            properties = dest_blob.get_blob_properties()
+            copy_props = properties.copy
 
             # Display the copy status
-            print("Copy status: " + copy_props["copy_status"])
-            print("Last modified: " + str(copy_props["last_modified"]))
+            print("Copy status: " + copy_props["status"])
+            print("Copy progress: " + copy_props["progress"]);
+            print("Completion time: " + str(copy_props["completion_time"]));
+            print("Total bytes: " + str(properties.size));
 
             if (source_props.lease.state == "leased"):
                 # Break the lease on the source blob.
@@ -101,20 +107,25 @@ class CopyBlob:
                 container_name, str(uuid.uuid4()) + "-" + blob_name
                 )
 
-            # <Snippet_StopBlobCopy>
             # Start the copy operation.
-            copy_props = dest_blob.start_copy_from_url(source_blob.url)
+            dest_blob.start_copy_from_url(source_blob.url)
 
-            # Do other stuff...
+            # <Snippet_StopBlobCopy>
+            # Get the destination blob's properties to check the copy status.
+            properties = dest_blob.get_blob_properties()
+            copy_props = properties.copy
 
             # Check the copy status. If the status is pending, abort the copy operation.
-            if (copy_props["copy_status"] == "pending"):
-                dest_blob.abort_copy(copy_props["copy_id"])
-                print("Copy operation " + copy_props["copy_id"] + " has been aborted.")
+            if (copy_props["status"] == "pending"):
+                dest_blob.abort_copy(copy_props["id"])
+                print("Copy operation " + copy_props["id"] + " has been aborted.")
             # </Snippet_StopBlobCopy>
 
-            print("Copy status: " + copy_props["copy_status"])
-            print("Last modified: " + str(copy_props["last_modified"]))
+            # Display the copy status
+            print("Copy status: " + copy_props["status"])
+            print("Copy progress: " + copy_props["progress"]);
+            print("Completion time: " + str(copy_props["completion_time"]));
+            print("Total bytes: " + str(properties.size));
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError: ", ex.message)
