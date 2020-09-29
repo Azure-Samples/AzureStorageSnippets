@@ -124,8 +124,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>"C:\repos\azure-sdk-for-cpp\sdk\template\azure-template\Debug\azure-template.lib";"C:\repos\azure-sdk-for-cpp\sdk\core\azure-core\Debug\azure-core.lib";"C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-common\Debug\azure-storage-common.lib";"C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-blobs\Debug\azure-storage-blobs.lib";%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\repos\azure-sdk-for-cpp\sdk\template\azure-template\Debug;C:\repos\azure-sdk-for-cpp\sdk\core\azure-core\Debug;C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-common\Debug;C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-blobs\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);"C:\repos\vcpkg\installed\x64-windows\lib\libcurl.lib";"C:\repos\vcpkg\installed\x64-windows\lib\libxml2.lib";bcrypt.lib;Crypt32.Lib;WS2_32.Lib;"C:\repos\azure-sdk-for-cpp\sdk\core\azure-core\Debug\azure-core.lib";"C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-common\Debug\azure-storage-common.lib";"C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-blobs\Debug\azure-storage-blobs.lib"</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);"C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-common\Debug";"C:\repos\azure-sdk-for-cpp\sdk\storage\azure-storage-blobs\Debug"</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,6 +146,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BlobQuickstartV12.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\..\..\..\..\vcpkg\installed\x64-windows\lib\libcurl.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

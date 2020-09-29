@@ -7,8 +7,6 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include "azure\core\azure.hpp"
-#include "azure\storage\common\storage_common.hpp"
 #include "azure\storage\blobs\blob.hpp"
 //</Snippet_Includes>
 
@@ -19,10 +17,7 @@ int main()
     //<Snippet_ConnectionString>
     // Retrieve the connection string for use with the application. The storage
     // connection string is stored in an environment variable on the machine
-    // running the application called AZURE_STORAGE_CONNECTION_STRING. If the
-    // environment variable is created after the application is launched in a
-    // console or with Visual Studio, the shell or application needs to be closed
-    // and reloaded to take the environment variable into account.
+    // running the application called AZURE_STORAGE_CONNECTION_STRING.
     const char* connectionString = std::getenv("AZURE_STORAGE_CONNECTION_STRING");
     //</Snippet_ConnectionString>
 
