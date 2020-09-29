@@ -21,15 +21,15 @@ int main()
     const char* connectionString = std::getenv("AZURE_STORAGE_CONNECTION_STRING");
     //</Snippet_ConnectionString>
 
-    using namespace Azure::Storage::Blobs;
-
-    std::string containerName = "myblobcontainer";
-    std::string blobName = "blob.txt";
-    std::string blobContent = "Hello Azure!";
-
     try
     {
         //<Snippet_CreateContainer>
+        using namespace Azure::Storage::Blobs;
+
+        std::string containerName = "myblobcontainer";
+        std::string blobName = "blob.txt";
+        std::string blobContent = "Hello Azure!";
+
         // Initialize a new instance of BlobContainerClient
         BlobContainerClient containerClient =
             BlobContainerClient::CreateFromConnectionString(connectionString, containerName);
@@ -37,10 +37,12 @@ int main()
         try
         {
             // Create the container. This will throw an exception if the container already exists.
+            std::cout << "Creating container: " << containerName << std::endl;
             containerClient.Create();
         }
         catch (std::runtime_error& e)
         {
+            // The container already exists
             std::cout << "Error: " << e.what() << std::endl;
         }
         //</Snippet_CreateContainer>
@@ -69,15 +71,16 @@ int main()
 
         //<Snippet_DownloadBlob>
         blobClient.DownloadTo(reinterpret_cast<uint8_t*>(&blobContent[0]), blobContent.size());
-
         std::cout << blobContent << std::endl;
         //</Snippet_DownloadBlob>
 
         //<Snippet_DeleteBlob>
+        std::cout << "Deleting blob: " << blobName << std::endl;
         blobClient.Delete();
         //</Snippet_DeleteBlob>
 
         //<Snippet_DeleteContainer>
+        std::cout << "Deleting container: " << containerName << std::endl;
         containerClient.Delete();
         //</Snippet_DeleteContainer>
 
