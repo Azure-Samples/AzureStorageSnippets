@@ -1,6 +1,7 @@
 // BlobQuickstartV12.cpp
 
 //<Snippet_Includes>
+// Prevent warnings from using std library
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -27,8 +28,6 @@ int main()
         using namespace Azure::Storage::Blobs;
 
         std::string containerName = "myblobcontainer";
-        std::string blobName = "blob.txt";
-        std::string blobContent = "Hello Azure!";
 
         // Initialize a new instance of BlobContainerClient
         BlobContainerClient containerClient =
@@ -48,6 +47,9 @@ int main()
         //</Snippet_CreateContainer>
 
         //<Snippet_UploadBlob>
+        std::string blobName = "blob.txt";
+        std::string blobContent = "Hello Azure!";
+
         // Create the block blob client
         BlockBlobClient blobClient = containerClient.GetBlockBlobClient(blobName);
 
@@ -71,7 +73,7 @@ int main()
 
         //<Snippet_DownloadBlob>
         blobClient.DownloadTo(reinterpret_cast<uint8_t*>(&blobContent[0]), blobContent.size());
-        std::cout << blobContent << std::endl;
+        std::cout << "Blob contents: " << blobContent << std::endl;
         //</Snippet_DownloadBlob>
 
         //<Snippet_DeleteBlob>
