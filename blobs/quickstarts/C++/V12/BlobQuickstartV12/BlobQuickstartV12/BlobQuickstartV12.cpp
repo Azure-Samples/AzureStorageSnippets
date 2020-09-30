@@ -72,8 +72,11 @@ int main()
         //</Snippet_ListBlobs>
 
         //<Snippet_DownloadBlob>
-        blobClient.DownloadTo(reinterpret_cast<uint8_t*>(&blobContent[0]), blobContent.size());
-        std::cout << "Blob contents: " << blobContent << std::endl;
+        auto properties = *blobClient.GetProperties();
+        std::string downloadedBlob = "";
+        downloadedBlob.resize(static_cast<std::size_t>(properties.ContentLength));
+        blobClient.DownloadTo(reinterpret_cast<uint8_t*>(&downloadedBlob[0]), blobContent.size());
+        std::cout << "Downloaded blob contents: " << downloadedBlob << std::endl;
         //</Snippet_DownloadBlob>
 
         //<Snippet_DeleteBlob>
