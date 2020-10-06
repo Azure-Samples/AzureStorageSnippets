@@ -100,7 +100,7 @@ namespace dotnet_v12
 
         // <Snippet_GetContainerSasUri>
         private static string GetContainerSasUri(BlobContainerClient container, 
-            StorageSharedKeyCredential key, string storedPolicyName = null)
+            StorageSharedKeyCredential sharedKeyCredential, string storedPolicyName = null)
         {
             // Create a SAS token that's valid for one hour.
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
@@ -121,7 +121,7 @@ namespace dotnet_v12
             }
 
             // Use the key to get the SAS token.
-            string sasToken = sasBuilder.ToSasQueryParameters(key).ToString();
+            string sasToken = sasBuilder.ToSasQueryParameters(sharedKeyCredential).ToString();
 
             Console.WriteLine("SAS for blob container is: {0}", sasToken);
             Console.WriteLine();
