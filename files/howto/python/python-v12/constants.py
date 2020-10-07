@@ -23,7 +23,7 @@ class Constants:
 
         # Credential constants
         self.connection_string = ""
-        self.storage_account_name = ""
+        self.account_name = ""
         self.account_key = ""
 
         # Account constants

@@ -14,8 +14,9 @@
 # places, or events is intended or should be inferred.
 #----------------------------------------------------------------------------------
 
+import os # Provides system support to clear the screen
+
 from file_share_ops import FileShareOperations
-import os
 
 def file_operations():
     file_ops = FileShareOperations()
@@ -37,8 +38,6 @@ def main():
         print("X) Exit")
 
         option = input("\r\nSelect an option: ")
-        # print("You chose option: " + option)
-        # input("Press Enter to continue ")
 
         if option == "1":
             return file_operations()
