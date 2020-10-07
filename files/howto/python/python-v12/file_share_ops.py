@@ -99,7 +99,8 @@ class FileShareOperations:
                     print("File:", dir_name + "/" + item["name"])
 
         except ResourceNotFoundError as ex:
-            print("ResourceNotFoundError:", ex.message)    # </Snippet_ListFilesAndDirs>
+            print("ResourceNotFoundError:", ex.message)
+    # </Snippet_ListFilesAndDirs>
 
     # <Snippet_DownloadFile>
     def download_azure_file(self, connection_string, share_name, dir_name, file_name):
@@ -150,8 +151,10 @@ class FileShareOperations:
     # <Snippet_ListSharesAndSnapshots>
     def list_shares_snapshots(self, connection_string):
         try:
+            # <Snippet_CreateShareServiceClient>
             # Create a ShareServiceClient from a connection string
             service_client = ShareServiceClient.from_connection_string(connection_string)
+            # </Snippet_CreateShareServiceClient>
 
             # List the shares in the file service
             shares = list(service_client.list_shares(include_snapshots=True))
