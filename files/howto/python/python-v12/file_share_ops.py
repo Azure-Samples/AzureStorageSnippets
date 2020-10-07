@@ -14,13 +14,12 @@
 # places, or events is intended or should be inferred.
 #----------------------------------------------------------------------------------
 
-# <Snippet_Imports>
-import os, uuid
+import os # Provides system support to clear the screen
 
+# <Snippet_Imports>
 from azure.core.exceptions import (
     ResourceExistsError,
-    ResourceNotFoundError,
-    ServiceRequestError
+    ResourceNotFoundError
 )
 
 from azure.storage.fileshare import (
@@ -50,9 +49,6 @@ class FileShareOperations:
 
         except ResourceExistsError as ex:
             print("ResourceExistsError:", ex.message)
-            
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_CreateFileShare>
 
     # <Snippet_CreateDirectory>
@@ -67,9 +63,6 @@ class FileShareOperations:
 
         except ResourceExistsError as ex:
             print("ResourceExistsError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_CreateDirectory>
 
     # <Snippet_UploadFile>
@@ -88,8 +81,8 @@ class FileShareOperations:
         except ResourceExistsError as ex:
             print("ResourceExistsError:", ex.message)
 
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
+        except ResourceNotFoundError as ex:
+            print("ResourceNotFoundError:", ex.message)
     # </Snippet_UploadFile>
 
     # <Snippet_ListFilesAndDirs>
@@ -106,28 +99,7 @@ class FileShareOperations:
                     print("File:", dir_name + "/" + item["name"])
 
         except ResourceNotFoundError as ex:
-            print("ResourceNotFoundError:", ex.message)
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
-    # </Snippet_ListFilesAndDirs>
-
-    def list_dir_tree(self, share_client, dir_name):
-        try:
-            items = share_client.list_directories_and_files(dir_name)
-
-            # This (item) throws a ResourceNotFound exception on recursion
-            for item in items:
-                if item["is_directory"]:
-                    print("Directory:", item["name"])
-                    self.list_dir_tree(share_client, item["name"])
-                else:
-                    print("File:", dir_name + "/" + item["name"])
-
-        except ResourceNotFoundError as ex:
-            print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
+            print("ResourceNotFoundError:", ex.message)    # </Snippet_ListFilesAndDirs>
 
     # <Snippet_DownloadFile>
     def download_azure_file(self, connection_string, share_name, dir_name, file_name):
@@ -154,9 +126,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_DownloadFile>
 
     # <Snippet_CreateSnapshot>
@@ -176,9 +145,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_CreateSnapshot>
 
     # <Snippet_ListSharesAndSnapshots>
@@ -198,9 +164,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_ListSharesAndSnapshots>
 
     def get_first_snapshot(self, connection_string):
@@ -218,9 +181,6 @@ class FileShareOperations:
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
 
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
-
     # <Snippet_BrowseSnapshotDir>
     def browse_snapshot_dir(self, connection_string, share_name, snapshot_time, dir_name):
         try:
@@ -237,10 +197,7 @@ class FileShareOperations:
                     print("File:", dir_name + "/" + item["name"])
 
         except ResourceNotFoundError as ex:
-            print("ResourceNotFoundError:", ex.message)
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
-    # </Snippet_BrowseSnapshotDir>
+            print("ResourceNotFoundError:", ex.message)    # </Snippet_BrowseSnapshotDir>
 
     # <Snippet_DownloadSnapshotFile>
     def download_snapshot_file(self, connection_string, share_name, snapshot_time, dir_name, file_name):
@@ -268,9 +225,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_DownloadSnapshotFile>
 
     # <Snippet_DeleteSnapshot>
@@ -286,9 +240,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_DeleteSnapshot>
 
     # <Snippet_DeleteFile>
@@ -305,9 +256,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_DeleteFile>
 
     # <Snippet_DeleteShare>
@@ -324,9 +272,6 @@ class FileShareOperations:
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError:", ex.message)
-
-        except ServiceRequestError as ex:
-            print("ServiceRequestError:", ex.message)
     # </Snippet_DeleteShare>
 
     def menu(self):
@@ -344,7 +289,6 @@ class FileShareOperations:
         print("10) Delete a snapshot")
         print("11) Delete a file")
         print("12) Delete a share with snapshots")
-        #print("13) List directory tree recursively")
         print("X) Exit to main menu")
         option = input("\r\nSelect an option: ")
 
@@ -413,13 +357,6 @@ class FileShareOperations:
             self.delete_share(self.constants.connection_string, self.constants.share_name)
             input("Press Enter to continue ")
             return True
-        #elif option == "13":
-        #    # Create a ShareClient from a connection string
-        #    share_client = ShareClient.from_connection_string(
-        #        self.constants.connection_string, self.constants.share_name)
-        #    self.list_dir_tree(share_client, "")
-        #    input("Press Enter to continue ")
-        #    return True
         elif option == "x" or option == "X":
             return False
         else:
