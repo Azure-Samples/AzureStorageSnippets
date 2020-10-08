@@ -78,6 +78,9 @@ namespace dotnet_v12
         // </snippet_CreateQueue>
 
         // <snippet_InsertMessage>
+        //-------------------------------------------------
+        // Inset a message into a queue
+        //-------------------------------------------------
         public void InsertMessage(string message)
         {
             // CreateQueue() must be called before this method
@@ -99,6 +102,9 @@ namespace dotnet_v12
         // </snippet_InsertMessage>
 
         // <snippet_PeekMessage>
+        //-------------------------------------------------
+        // Peek at a message in the queue
+        //-------------------------------------------------
         public void PeekMessage()
         {
             // Get the connection string from app settings
@@ -119,6 +125,9 @@ namespace dotnet_v12
         // </snippet_PeekMessage>
 
         // <snippet_UpdateMessage>
+        //-------------------------------------------------
+        // Update an existing message in the queue
+        //-------------------------------------------------
         public void UpdateMessage()
         {
             // Get the connection string from app settings
@@ -143,6 +152,9 @@ namespace dotnet_v12
         // </snippet_UpdateMessage>
 
         // <snippet_DequeueMessage>
+        //-------------------------------------------------
+        // Process and remove a message from the queue
+        //-------------------------------------------------
         public void DequeueMessage()
         {
             // Get the connection string from app settings
@@ -166,6 +178,9 @@ namespace dotnet_v12
         // </snippet_DequeueMessage>
 
         // <snippet_GetQueueLength>
+        //-----------------------------------------------------
+        // Get the approximate number of messages in the queue
+        //-----------------------------------------------------
         public void GetQueueLength()
         {
             // Get the connection string from app settings
@@ -188,6 +203,9 @@ namespace dotnet_v12
         // </snippet_GetQueueLength>
 
         // <snippet_DequeueMessages>
+        //-----------------------------------------------------
+        // Process and remove multiple messages from the queue
+        //-----------------------------------------------------
         public void DequeueMessages()
         {
             // Get the connection string from app settings
@@ -214,6 +232,9 @@ namespace dotnet_v12
         // </snippet_DequeueMessages>
 
         // <snippet_DeleteQueue>
+        //-------------------------------------------------
+        // Delete the queue
+        //-------------------------------------------------
         public void DeleteQueue()
         {
             // Get the connection string from app settings
@@ -233,6 +254,9 @@ namespace dotnet_v12
         // </snippet_DeleteQueue>
 
         // <snippet_AsyncQueue>
+        //-------------------------------------------------
+        // Perform queue operations asynchronously
+        //-------------------------------------------------
         public async Task QueueAsync()
         {
             // Get the connection string from app settings
