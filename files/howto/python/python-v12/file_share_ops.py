@@ -68,7 +68,7 @@ class FileShareOperations:
     # <Snippet_UploadFile>
     def upload_local_file(self, connection_string, local_file_path, share_name, dest_file_path):
         try:
-            source_file = open(local_file_path, "r")
+            source_file = open(local_file_path, "rb")
             data = source_file.read()
 
             # Create a ShareFileClient from a connection string
