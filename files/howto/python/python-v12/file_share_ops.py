@@ -200,7 +200,8 @@ class FileShareOperations:
                     print("File:", dir_name + "/" + item["name"])
 
         except ResourceNotFoundError as ex:
-            print("ResourceNotFoundError:", ex.message)    # </Snippet_BrowseSnapshotDir>
+            print("ResourceNotFoundError:", ex.message)
+    # </Snippet_BrowseSnapshotDir>
 
     # <Snippet_DownloadSnapshotFile>
     def download_snapshot_file(self, connection_string, share_name, snapshot_time, dir_name, file_name):
