@@ -30,13 +30,13 @@ namespace dotnet_v12
         //-------------------------------------------------
         // Create the queue service client
         //-------------------------------------------------
-        public void CreateQueueClient()
+        public void CreateQueueClient(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
             // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
         }
         // </snippet_CreateClient>
 
@@ -44,7 +44,7 @@ namespace dotnet_v12
         //-------------------------------------------------
         // Create a message queue
         //-------------------------------------------------
-        public bool CreateQueue()
+        public bool CreateQueue(string queueName)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace dotnet_v12
                 string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
                 // Instantiate a QueueClient which will be used to create and manipulate the queue
-                QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+                QueueClient queueClient = new QueueClient(connectionString, queueName);
 
                 // Create the queue
                 queueClient.CreateIfNotExists();
@@ -78,16 +78,20 @@ namespace dotnet_v12
         // </snippet_CreateQueue>
 
         // <snippet_InsertMessage>
-        public void InsertMessage(string message)
+        //-------------------------------------------------
+        // Insert a message into a queue
+        //-------------------------------------------------
+        public void InsertMessage(string queueName, string message)
         {
-            // CreateQueue() must be called before this method
-
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
             // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
-            
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
+
+            // Create the queue if it doesn't already exist
+            queueClient.CreateIfNotExists();
+
             if (queueClient.Exists())
             {
                 // Send a message to the queue
@@ -99,13 +103,16 @@ namespace dotnet_v12
         // </snippet_InsertMessage>
 
         // <snippet_PeekMessage>
-        public void PeekMessage()
+        //-------------------------------------------------
+        // Peek at a message in the queue
+        //-------------------------------------------------
+        public void PeekMessage(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             if (queueClient.Exists())
             { 
@@ -119,13 +126,16 @@ namespace dotnet_v12
         // </snippet_PeekMessage>
 
         // <snippet_UpdateMessage>
-        public void UpdateMessage()
+        //-------------------------------------------------
+        // Update an existing message in the queue
+        //-------------------------------------------------
+        public void UpdateMessage(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             if (queueClient.Exists())
             {
@@ -143,13 +153,16 @@ namespace dotnet_v12
         // </snippet_UpdateMessage>
 
         // <snippet_DequeueMessage>
-        public void DequeueMessage()
+        //-------------------------------------------------
+        // Process and remove a message from the queue
+        //-------------------------------------------------
+        public void DequeueMessage(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             if (queueClient.Exists())
             {
@@ -157,7 +170,7 @@ namespace dotnet_v12
                 QueueMessage[] retrievedMessage = queueClient.ReceiveMessages();
 
                 // Process (i.e. print) the message in less than 30 seconds
-                Console.WriteLine($"De-queued message: '{retrievedMessage[0].MessageText}'");
+                Console.WriteLine($"Dequeued message: '{retrievedMessage[0].MessageText}'");
 
                 // Delete the message
                 queueClient.DeleteMessage(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
@@ -166,13 +179,16 @@ namespace dotnet_v12
         // </snippet_DequeueMessage>
 
         // <snippet_GetQueueLength>
-        public void GetQueueLength()
+        //-----------------------------------------------------
+        // Get the approximate number of messages in the queue
+        //-----------------------------------------------------
+        public void GetQueueLength(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             if (queueClient.Exists())
             {
@@ -188,13 +204,16 @@ namespace dotnet_v12
         // </snippet_GetQueueLength>
 
         // <snippet_DequeueMessages>
-        public void DequeueMessages()
+        //-----------------------------------------------------
+        // Process and remove multiple messages from the queue
+        //-----------------------------------------------------
+        public void DequeueMessages(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             if (queueClient.Exists())
             {
@@ -214,13 +233,16 @@ namespace dotnet_v12
         // </snippet_DequeueMessages>
 
         // <snippet_DeleteQueue>
-        public void DeleteQueue()
+        //-------------------------------------------------
+        // Delete the queue
+        //-------------------------------------------------
+        public void DeleteQueue(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             if (queueClient.Exists())
             {
@@ -233,13 +255,16 @@ namespace dotnet_v12
         // </snippet_DeleteQueue>
 
         // <snippet_AsyncQueue>
-        public async Task QueueAsync()
+        //-------------------------------------------------
+        // Perform queue operations asynchronously
+        //-------------------------------------------------
+        public async Task QueueAsync(string queueName)
         {
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instantiate a QueueClient which will be used to create and manipulate the queue
-            QueueClient queueClient = new QueueClient(connectionString, "myqueue");
+            // Instantiate a QueueClient which will be used to manipulate the queue
+            QueueClient queueClient = new QueueClient(connectionString, queueName);
 
             // Create the queue if it doesn't already exist
             await queueClient.CreateIfNotExistsAsync();
@@ -276,6 +301,8 @@ namespace dotnet_v12
         //-------------------------------------------------
         public bool Menu()
         {
+            string queueName = "myqueue";
+
             Console.Clear();
             Console.WriteLine("Choose a basic queue scenario:");
             Console.WriteLine("1) Create a queue");
@@ -294,7 +321,7 @@ namespace dotnet_v12
             {
                 // Create a queue
                 case "1":
-                    CreateQueue();
+                    CreateQueue(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
@@ -305,7 +332,7 @@ namespace dotnet_v12
                     for (int i = 1; i <= 25; i++)
                     {
                         string message = "Message number: " + i.ToString();
-                        InsertMessage(message);
+                        InsertMessage(queueName, message);
                     }
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -313,42 +340,42 @@ namespace dotnet_v12
 
                 // Peek at next message
                 case "3":
-                    PeekMessage();
+                    PeekMessage(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Update message
                 case "4":
-                    UpdateMessage();
+                    UpdateMessage(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Get queue length
                 case "5":
-                    GetQueueLength();
+                    GetQueueLength(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Dequeue one message
                 case "6":
-                    DequeueMessage();
+                    DequeueMessage(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Dequeue multiple messages
                 case "7":
-                    DequeueMessages();
+                    DequeueMessages(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 // Delete queue
                 case "8":
-                    DeleteQueue();
+                    DeleteQueue(queueName);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
