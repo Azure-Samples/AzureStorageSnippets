@@ -26,20 +26,21 @@ namespace dotnet_v12
 {
     public class QueueBasics
     {
+        // <snippet_CreateClient>
         //-------------------------------------------------
         // Create the queue service client
         //-------------------------------------------------
         public void CreateQueueClient()
         {
-            // <snippet_CreateClient>
             // Get the connection string from app settings
-            string connectionString = ConfigurationManager.AppSettings["storageConnectionString"];
+            string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
             // Instantiate a QueueClient which will be used to create and manipulate the queue
             QueueClient queueClient = new QueueClient(connectionString, "myqueue");
-            // </snippet_CreateClient>
         }
+        // </snippet_CreateClient>
 
+        // <snippet_CreateQueue>
         //-------------------------------------------------
         // Create a message queue
         //-------------------------------------------------
@@ -47,16 +48,14 @@ namespace dotnet_v12
         {
             try
             {
-                // <snippet_CreateQueue>
                 // Get the connection string from app settings
-                string connectionString = ConfigurationManager.AppSettings["storageConnectionString"];
+                string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
                 // Instantiate a QueueClient which will be used to create and manipulate the queue
                 QueueClient queueClient = new QueueClient(connectionString, "myqueue");
 
                 // Create the queue
                 queueClient.CreateIfNotExists();
-                // </snippet_CreateQueue>
 
                 if (queueClient.Exists())
                 {
@@ -76,34 +75,32 @@ namespace dotnet_v12
                 return false;
             }
         }
+        // </snippet_CreateQueue>
 
+        // <snippet_InsertMessage>
         public void InsertMessage(string message)
         {
             // CreateQueue() must be called before this method
 
-            // <snippet_InsertMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
             // Instantiate a QueueClient which will be used to create and manipulate the queue
             QueueClient queueClient = new QueueClient(connectionString, "myqueue");
             
-             // Create the text message to add to the queue
-            string message = "First Message to azure Queue";
-
             if (queueClient.Exists())
             {
                 // Send a message to the queue
                 queueClient.SendMessage(message);
             }
-            // </snippet_InsertMessage>
 
             Console.WriteLine($"Inserted: {message}");
         }
+        // </snippet_InsertMessage>
 
+        // <snippet_PeekMessage>
         public void PeekMessage()
         {
-            // <snippet_PeekMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -118,12 +115,12 @@ namespace dotnet_v12
                 // Display the message
                 Console.WriteLine($"Peeked message: '{peekedMessage[0].MessageText}'");
             }
-            // </snippet_PeekMessage>
         }
+        // </snippet_PeekMessage>
 
+        // <snippet_UpdateMessage>
         public void UpdateMessage()
         {
-            // <snippet_UpdateMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -142,12 +139,12 @@ namespace dotnet_v12
                         TimeSpan.FromSeconds(60.0)  // Make it invisible for another 60 seconds
                     );
             }
-            // </snippet_UpdateMessage>
         }
+        // </snippet_UpdateMessage>
 
+        // <snippet_DequeueMessage>
         public void DequeueMessage()
         {
-            // <snippet_DequeueMessage>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -165,12 +162,12 @@ namespace dotnet_v12
                 // Delete the message
                 queueClient.DeleteMessage(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
             }
-            // </snippet_DequeueMessage>
         }
+        // </snippet_DequeueMessage>
 
+        // <snippet_GetQueueLength>
         public void GetQueueLength()
         {
-            // <snippet_GetQueueLength>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -187,12 +184,12 @@ namespace dotnet_v12
                 // Display number of messages.
                 Console.WriteLine($"Number of messages in queue: {cachedMessagesCount}");
             }
-            // </snippet_GetQueueLength>
         }
+        // </snippet_GetQueueLength>
 
+        // <snippet_DequeueMessages>
         public void DequeueMessages()
         {
-            // <snippet_DequeueMessages>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -213,12 +210,12 @@ namespace dotnet_v12
                     queueClient.DeleteMessage(message.MessageId, message.PopReceipt);
                 }
             }
-            // </snippet_DequeueMessages>
         }
+        // </snippet_DequeueMessages>
 
+        // <snippet_DeleteQueue>
         public void DeleteQueue()
         {
-            // <snippet_DeleteQueue>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -230,14 +227,14 @@ namespace dotnet_v12
                 // Delete the queue
                 queueClient.Delete();
             }
-            // </snippet_DeleteQueue>
 
             Console.WriteLine($"Queue deleted: '{queueClient.Name}'");
         }
+        // </snippet_DeleteQueue>
 
-        public async Task<bool> QueueAsync()
+        // <snippet_AsyncQueue>
+        public async Task QueueAsync()
         {
-            // <snippet_AsyncQueue>
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
@@ -271,10 +268,8 @@ namespace dotnet_v12
             // Async delete the queue
             await queueClient.DeleteAsync();
             Console.WriteLine($"Deleted queue: '{queueClient.Name}'");
-            // </snippet_AsyncQueue>
-
-            return true;
         }
+        // </snippet_AsyncQueue>
 
         //-------------------------------------------------
         // Basic queue operations menu
