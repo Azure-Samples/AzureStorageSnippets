@@ -60,18 +60,18 @@ namespace dotnet_v12
         {
             Console.Clear();
             Console.WriteLine("Choose a feature area:");
-            Console.WriteLine("1) Monitoring");
-            Console.WriteLine("2) Queue basics");
+            Console.WriteLine("1) Queue basics");
+            Console.WriteLine("2) Monitoring");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
             switch (Console.ReadLine())
             {
                 case "1":
-                    return Monitoring();
+                    return QueueBasics();
 
                 case "2":
-                   return QueueBasics();
+                    return Monitoring();
 
                 case "X":
                 case "x":
