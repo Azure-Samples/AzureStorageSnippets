@@ -65,6 +65,52 @@ namespace dotnet_v12
         }
         #endregion
 
+        #region ListContainers
+
+        //-------------------------------------------------
+        // ListContainers
+        //-------------------------------------------------
+
+        // <Snippet_ListContainers>
+
+        async static Task ListContainers(BlobServiceClient blobServiceClient, string prefix, int? segmentSize)
+        {
+            string continuationToken = string.Empty;
+
+            try
+            {
+                do
+                {
+                    // Call the listing operation and enumerate the result segment.
+                    // When the continuation token is empty, the last segment has been returned
+                    // and execution can exit the loop.
+                    var resultSegment = blobServiceClient.GetBlobContainersAsync(BlobContainerTraits.Metadata, prefix, default)
+                        .AsPages(continuationToken, segmentSize);
+                    await foreach (Azure.Page<BlobContainerItem> containerPage in resultSegment)
+                    {
+                        foreach (BlobContainerItem containerItem in containerPage.Values)
+                        {
+                            Console.WriteLine("Container name: {0}", containerItem.Name);
+                        }
+
+                        // Get the continuation token and loop until it is empty.
+                        continuationToken = containerPage.ContinuationToken;
+
+                        Console.WriteLine();
+                    }
+
+                } while (continuationToken != string.Empty);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+                throw;
+            }
+        }
+        #endregion
+
+
         #region DeleteSampleContainerAsync
         //-------------------------------------------------
         // Delete a container
@@ -158,15 +204,20 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-
                 case "3":
+                    await ListContainers(blobServiceClient, string.Empty, 1000);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "4":
                     // Delete the container created in the call to CreateSampleContainerAsync()
                     await DeleteSampleContainerAsync(blobServiceClient, _containerName_);
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
-                case "4":
+                case "5":
                     await DeleteContainersWithPrefixAsync(blobServiceClient, "container-");
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
