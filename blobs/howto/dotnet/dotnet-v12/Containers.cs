@@ -66,14 +66,12 @@ namespace dotnet_v12
         #endregion
 
         #region ListContainers
-
         //-------------------------------------------------
-        // ListContainers
+        // List containers
         //-------------------------------------------------
-
-        // <Snippet_ListContainers>
-
-        async static Task ListContainers(BlobServiceClient blobServiceClient, string prefix, int? segmentSize)
+        async static Task ListContainers(BlobServiceClient blobServiceClient, 
+                                        string prefix, 
+                                        int? segmentSize)
         {
             string continuationToken = string.Empty;
 
@@ -84,7 +82,8 @@ namespace dotnet_v12
                     // Call the listing operation and enumerate the result segment.
                     // When the continuation token is empty, the last segment has been returned
                     // and execution can exit the loop.
-                    var resultSegment = blobServiceClient.GetBlobContainersAsync(BlobContainerTraits.Metadata, prefix, default)
+                    var resultSegment = 
+                        blobServiceClient.GetBlobContainersAsync(BlobContainerTraits.Metadata, prefix, default)
                         .AsPages(continuationToken, segmentSize);
                     await foreach (Azure.Page<BlobContainerItem> containerPage in resultSegment)
                     {
