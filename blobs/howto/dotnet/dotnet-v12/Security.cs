@@ -163,7 +163,7 @@ namespace dotnet_v12
             Console.WriteLine("SAS for blob is: {0}", sasToken);
             Console.WriteLine();
 
-            return container.GetBlockBlobClient(blobName).Uri + sasToken;
+            return $"{container.GetBlockBlobClient(blobName).Uri}?{sasToken}";
         }
         // </Snippet_GetBlobSasUri>
 
