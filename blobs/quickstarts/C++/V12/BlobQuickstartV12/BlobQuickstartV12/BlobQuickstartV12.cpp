@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include "azure\storage\blobs\blob.hpp"
+#include "azure\storage\blob.hpp"
 //</Snippet_Includes>
 
 int main()
