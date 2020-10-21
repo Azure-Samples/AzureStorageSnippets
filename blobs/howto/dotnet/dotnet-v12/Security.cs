@@ -123,10 +123,10 @@ namespace dotnet_v12
             // Use the key to get the SAS token.
             string sasToken = sasBuilder.ToSasQueryParameters(sharedKeyCredential).ToString();
 
-            Console.WriteLine("SAS for blob container is: {0}", sasToken);
+            Console.WriteLine("SAS token for blob container is: {0}", sasToken);
             Console.WriteLine();
 
-            return container.Uri + sasToken;
+            return $"{container.Uri}?{sasToken}";
         }
         // </Snippet_GetContainerSasUri>
 
@@ -163,7 +163,7 @@ namespace dotnet_v12
             Console.WriteLine("SAS for blob is: {0}", sasToken);
             Console.WriteLine();
 
-            return container.GetBlockBlobClient(blobName).Uri + sasToken;
+            return $"{container.GetBlockBlobClient(blobName).Uri}?{sasToken}";
         }
         // </Snippet_GetBlobSasUri>
 
