@@ -35,7 +35,7 @@ namespace dotnet_v12
         private static void SetPublicContainerPermissions(BlobContainerClient container)
         {
             container.SetAccessPolicy(PublicAccessType.BlobContainer);
-            Console.WriteLine("Container {0} - permissions set to {1}", 
+            Console.WriteLine("Container {0} - permissions set to {1}",
                 container.Name, container.GetAccessPolicy().Value);
         }
         // </Snippet_SetPublicContainerPermissions>
@@ -74,10 +74,10 @@ namespace dotnet_v12
 
             // List blobs in the container.
             // Note this is only possible when the container supports full public read access.
-               foreach (BlobItem blobItem in container.GetBlobs())
-                {
-                    Console.WriteLine(container.GetBlockBlobClient(blobItem.Name).Uri);
-                }
+            foreach (BlobItem blobItem in container.GetBlobs())
+            {
+                Console.WriteLine(container.GetBlockBlobClient(blobItem.Name).Uri);
+            }
         }
         // </Snippet_ListBlobsAnonymously>
 
@@ -99,7 +99,7 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_GetContainerSasUri>
-        private static string GetContainerSasUri(BlobContainerClient container, 
+        private static string GetContainerSasUri(BlobContainerClient container,
             StorageSharedKeyCredential sharedKeyCredential, string storedPolicyName = null)
         {
             // Create a SAS token that's valid for one hour.
@@ -168,6 +168,83 @@ namespace dotnet_v12
         // </Snippet_GetBlobSasUri>
 
         //-------------------------------------------------
+        // Get Account SAS Token
+        //-------------------------------------------------
+
+        // <Snippet_GetAccountSASToken>
+
+        private static string GetAccountSASToken(StorageSharedKeyCredential key)
+        {
+            // Create a SAS token that's valid for one hour.
+            AccountSasBuilder sasBuilder = new AccountSasBuilder()
+            {
+                Services = AccountSasServices.Blobs | AccountSasServices.Files,
+                ResourceTypes = AccountSasResourceTypes.Service,
+                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
+                Protocol = SasProtocol.Https
+            };
+
+            sasBuilder.SetPermissions(AccountSasPermissions.Read |
+                AccountSasPermissions.Write);
+
+            // Use the key to get the SAS token.
+            string sasToken = sasBuilder.ToSasQueryParameters(key).ToString();
+
+            Console.WriteLine("SAS token for the storage account is: {0}", sasToken);
+            Console.WriteLine();
+
+            return sasToken;
+        }
+
+        // </Snippet_GetAccountSASToken>
+
+        //-------------------------------------------------
+        // Use Account SAS Token
+        //-------------------------------------------------
+
+        // <Snippet_UseAccountSAS>
+
+        private static void UseAccountSAS(Uri blobServiceUri, string sasToken)
+        {  
+            var blobServiceClient = new BlobServiceClient
+                (new Uri($"{blobServiceUri}?{sasToken}"), null);
+
+            BlobRetentionPolicy retentionPolicy = new BlobRetentionPolicy();
+            retentionPolicy.Enabled = true;
+            retentionPolicy.Days = 7;
+
+            blobServiceClient.SetProperties(new BlobServiceProperties()
+            {
+                HourMetrics = new BlobMetrics()
+                {
+                    RetentionPolicy = retentionPolicy,
+                    Version = "1.0"
+                },
+                MinuteMetrics = new BlobMetrics()
+                {
+                    RetentionPolicy = retentionPolicy,
+                    Version = "1.0"
+                },
+                Logging = new BlobAnalyticsLogging()
+                {
+                    Write = true,
+                    Read = true,
+                    Delete = true,
+                    RetentionPolicy = retentionPolicy,
+                    Version = "1.0"
+                }
+            });
+
+            // The permissions granted by the account SAS also permit you to retrieve service properties.
+
+            BlobServiceProperties serviceProperties = blobServiceClient.GetProperties().Value;
+            Console.WriteLine(serviceProperties.HourMetrics.RetentionPolicy);
+            Console.WriteLine(serviceProperties.HourMetrics.Version);
+        }
+
+        // </Snippet_UseAccountSAS>
+
+        //-------------------------------------------------
         // Security menu (Can call asynchronous and synchronous methods)
         //-------------------------------------------------
 
@@ -181,29 +258,31 @@ namespace dotnet_v12
             Console.WriteLine("4) Reference a blob anonymously");
             Console.WriteLine("5) Create service SAS for a blob container");
             Console.WriteLine("6) Create service SAS for a blob");
+            Console.WriteLine("7) Create service SAS for the storage account");
+            Console.WriteLine("8) Create a storage account by using a SAS token");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
- 
+
             switch (Console.ReadLine())
             {
                 case "1":
 
                     var connectionString = Constants.connectionString;
                     BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-                    
+
                     SetPublicContainerPermissions(blobServiceClient.GetBlobContainerClient(Constants.containerName));
 
-                   Console.WriteLine("Press enter to continue");   
-                   Console.ReadLine();          
-                   return true;
-                
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
                 case "2":
 
-                   CreateAnonymousBlobClient();
+                    CreateAnonymousBlobClient();
 
-                   Console.WriteLine("Press enter to continue"); 
-                   Console.ReadLine();              
-                   return true;
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
 
                 case "3":
 
@@ -245,21 +324,41 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
+                case "7":
+                    var connectionString3 = Constants.connectionString;
+                    BlobServiceClient blobServiceClient3 = new BlobServiceClient(connectionString3);
+
+                    GetAccountSASToken(new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "8":
+                    var connectionString4 = Constants.connectionString;
+                        BlobServiceClient blobServiceClient4 = new BlobServiceClient(connectionString4);
+
+                    string token = GetAccountSASToken(new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
+
+                    UseAccountSAS(blobServiceClient4.Uri, token);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
                 case "x":
                 case "X":
-                
-                   return false;
-                
+
+                    return false;
+
                 default:
-                
-                   return true;
+
+                    return true;
             }
         }
+    }
         
     }
 
-    
 
 
-    
-}
