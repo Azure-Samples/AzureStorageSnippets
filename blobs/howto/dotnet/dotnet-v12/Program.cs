@@ -117,6 +117,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Account scenarios.
+        //----------------------------------------------- 
+        static bool Account()
+        {
+            Account acct = new Account();
+
+            while (acct.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -140,6 +152,7 @@ namespace dotnet_v12
             Console.WriteLine("6) Properties and Metadata");
             Console.WriteLine("7) Container operations");
             Console.WriteLine("8) Copy operations");
+            Console.WriteLine("9) Account info");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -168,6 +181,9 @@ namespace dotnet_v12
 
                 case "8":
                     return CopyBlob();
+
+                case "9":
+                    return Account();
 
                 case "x":
                 case "X":
