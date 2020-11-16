@@ -73,32 +73,22 @@ namespace dotnet_v12
                                         string prefix, 
                                         int? segmentSize)
         {
-            string continuationToken = string.Empty;
-
             try
             {
-                do
+                // Call the listing operation and enumerate the result segment.
+                var resultSegment = 
+                    blobServiceClient.GetBlobContainersAsync(BlobContainerTraits.Metadata, prefix, default)
+                    .AsPages(default, segmentSize);
+
+                await foreach (Azure.Page<BlobContainerItem> containerPage in resultSegment)
                 {
-                    // Call the listing operation and enumerate the result segment.
-                    // When the continuation token is empty, the last segment has been returned
-                    // and execution can exit the loop.
-                    var resultSegment = 
-                        blobServiceClient.GetBlobContainersAsync(BlobContainerTraits.Metadata, prefix, default)
-                        .AsPages(continuationToken, segmentSize);
-                    await foreach (Azure.Page<BlobContainerItem> containerPage in resultSegment)
+                    foreach (BlobContainerItem containerItem in containerPage.Values)
                     {
-                        foreach (BlobContainerItem containerItem in containerPage.Values)
-                        {
-                            Console.WriteLine("Container name: {0}", containerItem.Name);
-                        }
-
-                        // Get the continuation token and loop until it is empty.
-                        continuationToken = containerPage.ContinuationToken;
-
-                        Console.WriteLine();
+                        Console.WriteLine("Container name: {0}", containerItem.Name);
                     }
 
-                } while (continuationToken != string.Empty);
+                    Console.WriteLine();
+                }
             }
             catch (RequestFailedException e)
             {
