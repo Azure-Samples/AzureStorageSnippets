@@ -36,35 +36,24 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_ListBlobsFlatListing>
-        private static void ListBlobsFlatListing(BlobContainerClient container, int? segmentSize)
+        private static async Task ListBlobsFlatListing(BlobContainerClient blobContainerClient, int? segmentSize)
         {
-            string continuationToken = null;
-
             try
             {
                 // Call the listing operation and enumerate the result segment.
-                // When the continuation token is empty, the last segment has been returned
-                // and execution can exit the loop.
-                do
+                var resultSegment = blobContainerClient.GetBlobsAsync()
+                    .AsPages(default, segmentSize);
+
+                // Loop through the blobs returned for each page.
+                await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
                 {
-                    var resultSegment = container.GetBlobs(prefix:"TestFolder")
-                        .AsPages(continuationToken, segmentSize);
-
-                    foreach (Azure.Page<BlobItem> blobPage in resultSegment)
+                    foreach (BlobItem blobItem in blobPage.Values)
                     {
-                        foreach (BlobItem blobItem in blobPage.Values)
-                        {
-                            Console.WriteLine("Blob name: {0}", blobItem.Name);
-                        }
-
-                        // Get the continuation token and loop until it is empty.
-                        continuationToken = blobPage.ContinuationToken;
-
-                        Console.WriteLine();
+                        Console.WriteLine("Blob name: {0}", blobItem.Name);
                     }
 
-                } while (continuationToken != "");
-
+                    Console.WriteLine();
+                }
             }
             catch (RequestFailedException e)
             {
@@ -84,49 +73,36 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_ListBlobsHierarchicalListing>
-        private static void ListBlobsHierarchicalListing(BlobContainerClient container, 
-            string? prefix, int? segmentSize)
+        private static async Task ListBlobsHierarchicalListing(BlobContainerClient container, string? prefix, int? segmentSize)
         {
-            string continuationToken = null;
-            
             try
             {
                 // Call the listing operation and enumerate the result segment.
-                // When the continuation token is empty, the last segment has been returned and
-                // execution can exit the loop.
-                do
+                var resultSegment = container.GetBlobsByHierarchyAsync(prefix:prefix, delimiter:"/")
+                    .AsPages(default, segmentSize);
+
+                await foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
                 {
-                    var resultSegment = container.GetBlobsByHierarchy(prefix:prefix, delimiter:"/")
-                        .AsPages(continuationToken, segmentSize);
-
-                    foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
+                    // A hierarchical listing may return both virtual directories and blobs.
+                    foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
                     {
-                        // A hierarchical listing may return both virtual directories and blobs.
-                        foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
+                        if (blobhierarchyItem.IsPrefix)
                         {
-                            if (blobhierarchyItem.IsPrefix)
-                            {
-                                // Write out the prefix of the virtual directory.
-                                Console.WriteLine("Virtual directory prefix: {0}", blobhierarchyItem.Prefix);
+                            // Write out the prefix of the virtual directory.
+                            Console.WriteLine("Virtual directory prefix: {0}", blobhierarchyItem.Prefix);
 
-                                // Call recursively with the prefix to traverse the virtual directory.
-                                ListBlobsHierarchicalListing(container, blobhierarchyItem.Prefix, null);
-                            }
-                            else
-                            {
-                                // Write out the name of the blob.
-                                Console.WriteLine("Blob name: {0}", blobhierarchyItem.Blob.Name);
-                            }
+                            // Call recursively with the prefix to traverse the virtual directory.
+                            ListBlobsHierarchicalListing(container, blobhierarchyItem.Prefix, null).Wait();
                         }
-
-                        Console.WriteLine();
-
-                        // Get the continuation token and loop until it is empty.
-                        continuationToken = blobPage.ContinuationToken;
+                        else
+                        {
+                            // Write out the name of the blob.
+                            Console.WriteLine("Blob name: {0}", blobhierarchyItem.Blob.Name);
+                        }
                     }
- 
 
-                } while (continuationToken != "");
+                    Console.WriteLine();
+                }
             }
             catch (RequestFailedException e)
             {
@@ -262,7 +238,7 @@ namespace dotnet_v12
             {
                 case "1":
 
-                    ListBlobsFlatListing(blobServiceClient.GetBlobContainerClient(Constants.containerName), null);
+                    await ListBlobsFlatListing(blobServiceClient.GetBlobContainerClient(Constants.containerName), null);
 
                     Console.WriteLine("Press enter to continue");   
                     Console.ReadLine();          
@@ -270,7 +246,7 @@ namespace dotnet_v12
                 
                 case "2":
 
-                    ListBlobsHierarchicalListing(blobServiceClient.GetBlobContainerClient(Constants.containerName), null, null);
+                    await ListBlobsHierarchicalListing(blobServiceClient.GetBlobContainerClient(Constants.containerName), null, null);
 
                     Console.ReadLine();              
                     return true;
