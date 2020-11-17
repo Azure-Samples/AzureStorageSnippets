@@ -36,15 +36,16 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_ListBlobsFlatListing>
-        private static async Task ListBlobsFlatListing(BlobContainerClient blobContainerClient, int? segmentSize)
+        private static async Task ListBlobsFlatListing(BlobContainerClient blobContainerClient, 
+                                                       int? segmentSize)
         {
             try
             {
-                // Call the listing operation and enumerate the result segment.
+                // Call the listing operation and return pages of the specified size.
                 var resultSegment = blobContainerClient.GetBlobsAsync()
                     .AsPages(default, segmentSize);
 
-                // Loop through the blobs returned for each page.
+                // Enumerate the blobs returned for each page.
                 await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
                 {
                     foreach (BlobItem blobItem in blobPage.Values)
@@ -73,14 +74,17 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_ListBlobsHierarchicalListing>
-        private static async Task ListBlobsHierarchicalListing(BlobContainerClient container, string? prefix, int? segmentSize)
+        private static async Task ListBlobsHierarchicalListing(BlobContainerClient container, 
+                                                               string? prefix, 
+                                                               int? segmentSize)
         {
             try
             {
-                // Call the listing operation and enumerate the result segment.
+                // Call the listing operation and return pages of the specified size.
                 var resultSegment = container.GetBlobsByHierarchyAsync(prefix:prefix, delimiter:"/")
                     .AsPages(default, segmentSize);
 
+                // Enumerate the blobs returned for each page.
                 await foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
                 {
                     // A hierarchical listing may return both virtual directories and blobs.
@@ -92,7 +96,7 @@ namespace dotnet_v12
                             Console.WriteLine("Virtual directory prefix: {0}", blobhierarchyItem.Prefix);
 
                             // Call recursively with the prefix to traverse the virtual directory.
-                            ListBlobsHierarchicalListing(container, blobhierarchyItem.Prefix, null).Wait();
+                            await ListBlobsHierarchicalListing(container, blobhierarchyItem.Prefix, null);
                         }
                         else
                         {
@@ -209,15 +213,154 @@ namespace dotnet_v12
              // </Snippet_ReadValidPageRegionsFromPageBlob>
         }
 
-            #endregion
+        #endregion
+
+        #region Trigger new blob version
+        //-------------------------------------------------
+        // TriggerNewBlobVersion
+        //-------------------------------------------------
+
+        // <Snippet_TriggerNewBlobVersion>
+
+        public static async Task UpdateVersionedBlobMetadata(BlobContainerClient blobContainerClient, 
+                                                             string blobName)
+        {
+            try
+            {
+                // Create the container.
+                await blobContainerClient.CreateIfNotExistsAsync();
+
+                // Upload a block blob.
+                BlockBlobClient blockBlobClient = blobContainerClient.GetBlockBlobClient(blobName);
+
+                string blobContents = string.Format("Block blob created at {0}.", DateTime.Now);
+                byte[] byteArray = Encoding.ASCII.GetBytes(blobContents);
+
+                string initalVersionId;
+                using (MemoryStream stream = new MemoryStream(byteArray))
+                {
+                    Response<BlobContentInfo> uploadResponse = 
+                        await blockBlobClient.UploadAsync(stream, null, default);
+
+                    // Get the version ID for the current version.
+                    initalVersionId = uploadResponse.Value.VersionId;
+                }
+
+                // Update the blob's metadata to trigger the creation of a new version.
+                Dictionary<string, string> metadata = new Dictionary<string, string>
+                {
+                    { "key", "value" },
+                    { "key1", "value1" }
+                };
+
+                Response<BlobInfo> metadataResponse = 
+                    await blockBlobClient.SetMetadataAsync(metadata);
+
+                // Get the version ID for the new current version.
+                string newVersionId = metadataResponse.Value.VersionId;
+
+                // Request metadata on the previous version.
+                BlockBlobClient initalVersionBlob = blockBlobClient.WithVersion(initalVersionId);
+                Response<BlobProperties> propertiesResponse = await initalVersionBlob.GetPropertiesAsync();
+                PrintMetadata(propertiesResponse);
+
+                // Request metadata on the current version.
+                BlockBlobClient newVersionBlob = blockBlobClient.WithVersion(newVersionId);
+                Response<BlobProperties> newPropertiesResponse = await newVersionBlob.GetPropertiesAsync();
+                PrintMetadata(newPropertiesResponse);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+                throw;
+            }
+        }
+
+        static void PrintMetadata(Response<BlobProperties> propertiesResponse)
+        {
+            if (propertiesResponse.Value.Metadata.Count > 0)
+            {
+                Console.WriteLine("Metadata values for version {0}:", propertiesResponse.Value.VersionId);
+                foreach (var item in propertiesResponse.Value.Metadata)
+                {
+                    Console.WriteLine("Key:{0}  Value:{1}", item.Key, item.Value);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Version {0} has no metadata.", propertiesResponse.Value.VersionId);
+            }
+        }
+
+        // </Snippet_TriggerNewBlobVersion>
+        #endregion
+
+        #region List blob versions
+        //-------------------------------------------------
+        // ListBlobVersions
+        //-------------------------------------------------
+
+        // <Snippet_ListBlobVersions>
+        private static async Task ListBlobVersions(BlobContainerClient blobContainerClient, 
+                                                   int? segmentSize)
+        {
+            try
+            {
+                // Call the listing operation, specifying that blob versions are returned.
+                var resultSegment = blobContainerClient.GetBlobsAsync(default, BlobStates.Version)
+                    .AsPages(default, segmentSize);
+
+                // Enumerate the blobs returned for each page.
+                await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
+                {
+                    foreach (BlobItem blobItem in blobPage.Values)
+                    {
+                        string blobItemUri;
+
+                        // Check whether the blob item has a version ID.
+                        if (blobItem.VersionId != null)
+                        {
+                            blobItemUri = string.Format("{0}/{1}?versionId={2}",
+                                blobContainerClient.Uri,
+                                blobItem.Name,
+                                blobItem.VersionId);
+
+                            // Check whether the blob item is the latest version.
+                            if ((bool)blobItem.IsLatestVersion.GetValueOrDefault())
+                            {
+                                blobItemUri += " (current version)";
+                            }
+                        }
+                        else
+                        {
+                            blobItemUri = string.Format("{0}/{1}",
+                                blobContainerClient.Uri,
+                                blobItem.Name);
+                        }
+                        Console.WriteLine(blobItemUri);
+                    }
+                    Console.WriteLine();
+                }
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+                throw;
+            }
+        }
+        // </Snippet_ListBlobVersions>
+
+        #endregion
 
         #region User menu
 
-            //-------------------------------------------------
-            // CRUD menu (Can call asynchronous and synchronous methods)
-            //-------------------------------------------------
+        //-------------------------------------------------
+        // CRUD menu (Can call asynchronous and synchronous methods)
+        //-------------------------------------------------
 
-            public async Task<bool> MenuAsync()
+        public async Task<bool> MenuAsync()
         {
             Console.Clear();
             Console.WriteLine("Choose a Create, Read, Update, or Delete (CRUD) scenario:");
@@ -228,6 +371,8 @@ namespace dotnet_v12
             Console.WriteLine("5) Write pages to a page blob");
             Console.WriteLine("6) Read pages from a page blob");
             Console.WriteLine("7) Read valid page regions from a page blob");
+            Console.WriteLine("8) Modify a blob to create a new version. Make sure blob versioning is enabled for the storage account.");
+            Console.WriteLine("9) List blob versions. Make sure blob versioning is enabled for the storage account.");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
@@ -300,7 +445,20 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "x":
+                case "8":
+
+                    await UpdateVersionedBlobMetadata(blobServiceClient.GetBlobContainerClient(Constants.containerName), "blob1.txt");
+
+                    Console.ReadLine();
+                    return true;
+
+                case "9":
+
+                    await ListBlobVersions(blobServiceClient.GetBlobContainerClient(Constants.containerName), 5);
+
+                    Console.ReadLine();
+                    return true;
+
                 case "X":
                 
                    return false;
