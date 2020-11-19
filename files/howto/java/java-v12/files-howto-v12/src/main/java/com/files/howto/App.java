@@ -45,9 +45,11 @@ public class App
         {
             String shareName = "share-" + java.util.UUID.randomUUID();
 
+			// <Snippet_createClient>
             ShareClient shareClient = new ShareClientBuilder()
                 .connectionString(connectStr).shareName(shareName)
                 .buildClient();
+			// </Snippet_createClient>
 
             shareClient.create();
             return shareName;
@@ -60,6 +62,27 @@ public class App
         }
     }
     // </Snippet_createFileShare>
+
+    // <Snippet_deleteFileShare>
+    public static Boolean deleteFileShare(String connectStr, String shareName)
+    {
+        try
+        {
+            ShareClient shareClient = new ShareClientBuilder()
+                .connectionString(connectStr).shareName(shareName)
+                .buildClient();
+
+            shareClient.delete();
+            return true;
+        }
+        catch (Exception e)
+        {
+            // Output the exception message and stack trace
+            System.out.println("Exception: " + e.getMessage());
+            return false;
+        }
+    }
+    // </Snippet_deleteFileShare>
 
     // <Snippet_createDirectory>
     public static String createDirectory(String connectStr, String shareName)
@@ -84,8 +107,8 @@ public class App
     }
     // </Snippet_createDirectory>
 
-    // <Snippet_uploadFile>
-    public static Boolean uploadFile(String connectStr, String shareName, String dirName, String fileName)
+    // <Snippet_deleteDirectory>
+    public static Boolean deleteDirectory(String connectStr, String shareName, String dirName)
     {
         try
         {
@@ -94,10 +117,7 @@ public class App
                 .buildClient();
 
             ShareDirectoryClient dirClient = shareClient.getDirectoryClient(dirName);
-
-            ShareFileClient fileClient = dirClient.getFileClient(fileName);
-            fileClient.create(1024);
-            fileClient.uploadFromFile(fileName);
+            dirClient.delete();
             return true;
         }
         catch (Exception e)
@@ -107,7 +127,7 @@ public class App
             return false;
         }
     }
-    // </Snippet_uploadFile>
+    // </Snippet_deleteDirectory>
 
     // <Snippet_enumerateFilesAndDirs>
     public static Boolean enumerateFilesAndDirs(String connectStr, String shareName, String dirName)
@@ -135,6 +155,31 @@ public class App
         }
     }
     // </Snippet_enumerateFilesAndDirs>
+
+    // <Snippet_uploadFile>
+    public static Boolean uploadFile(String connectStr, String shareName, String dirName, String fileName)
+    {
+        try
+        {
+            ShareClient shareClient = new ShareClientBuilder()
+                .connectionString(connectStr).shareName(shareName)
+                .buildClient();
+
+            ShareDirectoryClient dirClient = shareClient.getDirectoryClient(dirName);
+
+            ShareFileClient fileClient = dirClient.getFileClient(fileName);
+            fileClient.create(1024);
+            fileClient.uploadFromFile(fileName);
+            return true;
+        }
+        catch (Exception e)
+        {
+            // Output the exception message and stack trace
+            System.out.println("Exception: " + e.getMessage());
+            return false;
+        }
+    }
+    // </Snippet_uploadFile>
 
     // <Snippet_downloadFile>
     public static Boolean downloadFile(String connectStr, String shareName, String dirName, String fileName)
@@ -183,47 +228,4 @@ public class App
         }
     }
     // </Snippet_deleteFile>
-
-    // <Snippet_deleteDirectory>
-    public static Boolean deleteDirectory(String connectStr, String shareName, String dirName)
-    {
-        try
-        {
-            ShareClient shareClient = new ShareClientBuilder()
-                .connectionString(connectStr).shareName(shareName)
-                .buildClient();
-
-            ShareDirectoryClient dirClient = shareClient.getDirectoryClient(dirName);
-            dirClient.delete();
-            return true;
-        }
-        catch (Exception e)
-        {
-            // Output the exception message and stack trace
-            System.out.println("Exception: " + e.getMessage());
-            return false;
-        }
-    }
-    // </Snippet_deleteDirectory>
-
-    // <Snippet_deleteFileShare>
-    public static Boolean deleteFileShare(String connectStr, String shareName)
-    {
-        try
-        {
-            ShareClient shareClient = new ShareClientBuilder()
-                .connectionString(connectStr).shareName(shareName)
-                .buildClient();
-
-            shareClient.delete();
-            return true;
-        }
-        catch (Exception e)
-        {
-            // Output the exception message and stack trace
-            System.out.println("Exception: " + e.getMessage());
-            return false;
-        }
-    }
-    // </Snippet_deleteFileShare>
 }
