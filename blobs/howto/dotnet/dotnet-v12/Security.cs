@@ -94,78 +94,103 @@ namespace dotnet_v12
         }
         // </Snippet_DownloadBlobAnonymously>
 
+
+        #region GetServiceSasUriForContainer
+
         //-------------------------------------------------
-        // Create service SAS for blob container
+        // Get service SAS for blob container
         //-------------------------------------------------
 
-        // <Snippet_GetContainerSasUri>
-        private static string GetContainerSasUri(BlobContainerClient container,
-            StorageSharedKeyCredential sharedKeyCredential, string storedPolicyName = null)
+        // <Snippet_GetServiceSasUriForContainer>
+        private static Uri GetServiceSasUriForContainer(BlobContainerClient containerClient,
+                                                  string storedPolicyName = null)
         {
-            // Create a SAS token that's valid for one hour.
-            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            // Check whether this BlobContainerClient object has been authorized with Shared Key.
+            if (containerClient.CanGenerateSasUri)
             {
-                BlobContainerName = container.Name,
-                Resource = "c",
-            };
+                // Create a SAS token that's valid for one hour.
+                BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                {
+                    BlobContainerName = containerClient.Name,
+                    Resource = "c",
+                };
 
-            if (storedPolicyName == null)
-            {
-                sasBuilder.StartsOn = DateTimeOffset.UtcNow;
-                sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
-                sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+                if (storedPolicyName == null)
+                {
+                    sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+                    sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+                }
+                else
+                {
+                    sasBuilder.Identifier = storedPolicyName;
+                }
+
+                Uri sasUri = containerClient.GenerateSasUri(sasBuilder);
+                Console.WriteLine("SAS URI for blob container is: {0}", sasUri);
+                Console.WriteLine();
+
+                return sasUri;
             }
             else
             {
-                sasBuilder.Identifier = storedPolicyName;
+                Console.WriteLine(@"BlobContainerClient must be authorized with Shared Key 
+                                  credentials to create a service SAS.");
+                return null;
             }
-
-            // Use the key to get the SAS token.
-            string sasToken = sasBuilder.ToSasQueryParameters(sharedKeyCredential).ToString();
-
-            Console.WriteLine("SAS token for blob container is: {0}", sasToken);
-            Console.WriteLine();
-
-            return $"{container.Uri}?{sasToken}";
         }
-        // </Snippet_GetContainerSasUri>
+        // </Snippet_GetServiceSasUriForContainer>
+
+        #endregion
+
+
+        #region GetServiceSasUriForBlob
 
         //-------------------------------------------------
-        // Create service SAS for blob
+        // Get service SAS for blob
         //-------------------------------------------------
 
-        // <Snippet_GetBlobSasUri>
-        private static string GetBlobSasUri(BlobContainerClient container,
-            string blobName, StorageSharedKeyCredential key, string storedPolicyName = null)
+        // <Snippet_GetServiceSasUriForBlob>
+        private static Uri GetServiceSasUriForBlob(BlobClient blobClient,
+            string storedPolicyName = null)
         {
-            // Create a SAS token that's valid for one hour.
-            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            // Check whether this BlobClient object has been authorized with Shared Key.
+            if (blobClient.CanGenerateSasUri)
             {
-                BlobContainerName = container.Name,
-                BlobName = blobName,
-                Resource = "b",
-            };
+                // Create a SAS token that's valid for one hour.
+                BlobSasBuilder sasBuilder = new BlobSasBuilder()
+                {
+                    BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
+                    BlobName = blobClient.Name,
+                    Resource = "b",
+                };
 
-            if (storedPolicyName == null)
-            {
-                sasBuilder.StartsOn = DateTimeOffset.UtcNow;
-                sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
-                sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+                if (storedPolicyName == null)
+                {
+                    sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+                    sasBuilder.SetPermissions(BlobSasPermissions.Read | 
+                        BlobSasPermissions.Write);
+                }
+                else
+                {
+                    sasBuilder.Identifier = storedPolicyName;
+                }
+
+                Uri sasUri = blobClient.GenerateSasUri(sasBuilder);
+                Console.WriteLine("SAS URI for blob is: {0}", sasUri);
+                Console.WriteLine();
+
+                return sasUri;
             }
             else
             {
-                sasBuilder.Identifier = storedPolicyName;
+                Console.WriteLine(@"BlobClient must be authorized with Shared Key 
+                                  credentials to create a service SAS.");
+                return null;
             }
-
-            // Use the key to get the SAS token.
-            string sasToken = sasBuilder.ToSasQueryParameters(key).ToString();
-
-            Console.WriteLine("SAS for blob is: {0}", sasToken);
-            Console.WriteLine();
-
-            return $"{container.GetBlockBlobClient(blobName).Uri}?{sasToken}";
         }
         // </Snippet_GetBlobSasUri>
+
+        #endregion
 
         //-------------------------------------------------
         // Get Account SAS Token
@@ -305,8 +330,8 @@ namespace dotnet_v12
                     var connectionString1 = Constants.connectionString;
                     BlobServiceClient blobServiceClient1 = new BlobServiceClient(connectionString1);
 
-                    GetContainerSasUri(blobServiceClient1.GetBlobContainerClient(Constants.containerName),
-                        new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
+                    GetServiceSasUriForContainer(blobServiceClient1.GetBlobContainerClient(Constants.containerName),
+                        Constants.accountKey);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -315,10 +340,10 @@ namespace dotnet_v12
                 case "6":
 
                     var connectionString2 = Constants.connectionString;
-                    BlobServiceClient blobServiceClient2 = new BlobServiceClient(connectionString2);
 
-                    GetBlobSasUri(blobServiceClient2.GetBlobContainerClient(Constants.containerName), "logfile.txt",
-                        new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
+                    BlobClient blobClient = new BlobClient(connectionString2, Constants.containerName, Constants.blobName);
+
+                    GetServiceSasUriForBlob(blobClient, default);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();

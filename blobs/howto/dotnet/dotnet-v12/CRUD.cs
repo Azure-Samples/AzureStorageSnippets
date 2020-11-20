@@ -215,13 +215,12 @@ namespace dotnet_v12
 
         #endregion
 
-        #region Trigger new blob version
+        #region UpdateVersionedBlobMetadata
         //-------------------------------------------------
-        // TriggerNewBlobVersion
+        // UpdateVersionedBlobMetadata
         //-------------------------------------------------
 
-        // <Snippet_TriggerNewBlobVersion>
-
+        // <Snippet_UpdateVersionedBlobMetadata>
         public static async Task UpdateVersionedBlobMetadata(BlobContainerClient blobContainerClient, 
                                                              string blobName)
         {
@@ -293,7 +292,7 @@ namespace dotnet_v12
             }
         }
 
-        // </Snippet_TriggerNewBlobVersion>
+        // </Snippet_UpdateVersionedBlobMetadata>
         #endregion
 
         #region List blob versions
