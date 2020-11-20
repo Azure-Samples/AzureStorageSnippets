@@ -69,6 +69,8 @@ namespace dotnet_v12
         //-------------------------------------------------
         // List containers
         //-------------------------------------------------
+
+        // <Snippet_ListContainers>
         async static Task ListContainers(BlobServiceClient blobServiceClient, 
                                         string prefix, 
                                         int? segmentSize)
@@ -97,6 +99,8 @@ namespace dotnet_v12
                 throw;
             }
         }
+        // </Snippet_ListContainers>
+
         #endregion
 
 
