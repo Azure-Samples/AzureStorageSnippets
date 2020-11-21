@@ -19,6 +19,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
+using Azure.Storage.Files.DataLake;
 using System;
 using System.Threading.Tasks;
 
@@ -112,7 +113,7 @@ namespace dotnet_v12
                 BlobSasBuilder sasBuilder = new BlobSasBuilder()
                 {
                     BlobContainerName = containerClient.Name,
-                    Resource = "c",
+                    Resource = "c"
                 };
 
                 if (storedPolicyName == null)
@@ -142,6 +143,61 @@ namespace dotnet_v12
 
         #endregion
 
+        #region GetServiceSasUriForDirectory
+
+        //-------------------------------------------------
+        // Get service SAS for directory
+        //-------------------------------------------------
+
+        // <Snippet_GetServiceSasUriForDirectory>
+        private static Uri GetServiceSasUriForDirectory(DataLakeDirectoryClient directoryClient,
+                                                  string storedPolicyName = null)
+        {
+            if (directoryClient.CanGenerateSasUri)
+            {
+                // Create a SAS token that's valid for one hour.
+                DataLakeSasBuilder sasBuilder = new DataLakeSasBuilder()
+                {
+                    // Specify the file system name, the path, and indicate that
+                    // the client object points to a directory.
+                    FileSystemName = directoryClient.FileSystemName,
+                    Resource = "d",
+                    IsDirectory = true,
+                    Path = directoryClient.Path,
+                };
+
+                // If no stored access policy is specified, create the policy
+                // by specifying expiry and permissions.
+                if (storedPolicyName == null)
+                {
+                    sasBuilder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+                    sasBuilder.SetPermissions(DataLakeSasPermissions.Read |
+                        DataLakeSasPermissions.Write |
+                        DataLakeSasPermissions.List);
+                }
+                else
+                {
+                    sasBuilder.Identifier = storedPolicyName;
+                }
+
+                // Get the SAS URI for the specified directory.
+                Uri sasUri = directoryClient.GenerateSasUri(sasBuilder);
+                Console.WriteLine("SAS URI for ADLS directory is: {0}", sasUri);
+                Console.WriteLine();
+
+                return sasUri;
+            }
+            else
+            {
+                Console.WriteLine(@"DataLakeDirectoryClient must be authorized with Shared Key 
+                                  credentials to create a service SAS.");
+                return null;
+            }
+        }
+        // </Snippet_GetServiceSasUriForDirectory>
+
+        #endregion
+
 
         #region GetServiceSasUriForBlob
 
@@ -161,7 +217,7 @@ namespace dotnet_v12
                 {
                     BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
                     BlobName = blobClient.Name,
-                    Resource = "b",
+                    Resource = "b"
                 };
 
                 if (storedPolicyName == null)
@@ -188,7 +244,7 @@ namespace dotnet_v12
                 return null;
             }
         }
-        // </Snippet_GetBlobSasUri>
+        // </Snippet_GetServiceSasUriForBlob>
 
         #endregion
 
@@ -361,11 +417,29 @@ namespace dotnet_v12
 
                 case "8":
                     var connectionString4 = Constants.connectionString;
-                        BlobServiceClient blobServiceClient4 = new BlobServiceClient(connectionString4);
+                    BlobServiceClient blobServiceClient4 = new BlobServiceClient(connectionString4);
 
                     string token = GetAccountSASToken(new StorageSharedKeyCredential(Constants.storageAccountName, Constants.accountKey));
 
                     UseAccountSAS(blobServiceClient4.Uri, token);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "9":
+                    // Construct the directory endpoint from the account name.
+                    string directoryEndpoint = string.Format("https://{0}.dfs.core.windows.net/{1}/{2}", 
+                                                             Constants.storageAccountNameAdls,
+                                                             Constants.directoryName,
+                                                             Constants.subDirectoryName);
+
+                    DataLakeDirectoryClient directoryClient =
+                        new DataLakeDirectoryClient(new Uri(directoryEndpoint),
+                                                    new StorageSharedKeyCredential(Constants.storageAccountNameAdls, 
+                                                                                   Constants.accountKeyAdls));
+
+                    GetServiceSasUriForDirectory(directoryClient, default);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();

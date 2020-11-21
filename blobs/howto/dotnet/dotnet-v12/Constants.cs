@@ -27,15 +27,20 @@ namespace dotnet_v12
         // Credential constants
         public const string accountKey = "";
         public const string connectionString = "";
-        
+        public const string accountKeyAdls = "";
+        public const string connectionStringAdls = "";
+
         // Account constants
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";
+        public const string storageAccountNameAdls = "";
 
         // Resource constants
         public const string containerName = "";
         public const string blobName = "";
+        public const string directoryName = "";
+        public const string subDirectoryName = "";
     }
     
 }
