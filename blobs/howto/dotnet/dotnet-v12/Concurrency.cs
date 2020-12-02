@@ -172,7 +172,7 @@ namespace dotnet_v12
                 await blobLeaseClient.ReleaseAsync();
             }
         }
-        // <Snippet_DemonstratePessimisticConcurrencyBlob>
+        // </Snippet_DemonstratePessimisticConcurrencyBlob>
 
         #endregion
 
