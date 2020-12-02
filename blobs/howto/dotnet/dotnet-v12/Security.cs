@@ -341,6 +341,7 @@ namespace dotnet_v12
             Console.WriteLine("6) Create service SAS for a blob");
             Console.WriteLine("7) Create service SAS for the storage account");
             Console.WriteLine("8) Create a storage account by using a SAS token");
+            Console.WriteLine("9) Create service SAS for an ADLS directory");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
