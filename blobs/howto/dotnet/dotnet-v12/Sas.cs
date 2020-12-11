@@ -269,23 +269,14 @@ namespace dotnet_v12
             BlobServiceClient blobServiceClient =
                 blobClient.GetParentBlobContainerClient().GetParentBlobServiceClient();
 
-            // Get a user delegation key for the Blob service that's valid for seven days.
-            // You can use the key to generate any number of shared access signatures over the lifetime of the key.
-            UserDelegationKey key =
+            // Get a user delegation key for the Blob service that's valid for 7 days.
+            // You can use the key to generate any number of shared access signatures 
+            // over the lifetime of the key.
+            UserDelegationKey userDelegationKey =
                 await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
                                                                   DateTimeOffset.UtcNow.AddDays(7));
 
-            // Read the key's properties.
-            Console.WriteLine("User delegation key properties:");
-            Console.WriteLine("Key signed start: {0}", key.SignedStartsOn);
-            Console.WriteLine("Key signed expiry: {0}", key.SignedExpiresOn);
-            Console.WriteLine("Key signed object ID: {0}", key.SignedObjectId);
-            Console.WriteLine("Key signed tenant ID: {0}", key.SignedTenantId);
-            Console.WriteLine("Key signed service: {0}", key.SignedService);
-            Console.WriteLine("Key signed version: {0}", key.SignedVersion);
-            Console.WriteLine();
-
-            // Create a SAS token that's valid for seven days.
+            // Create a SAS token that's valid for 7 days.
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
             {
                 BlobContainerName = blobClient.BlobContainerName,
@@ -298,22 +289,17 @@ namespace dotnet_v12
             sasBuilder.SetPermissions(BlobSasPermissions.Read |
                                       BlobSasPermissions.Write);
 
-            // Use the key to get the SAS token.
-            string sasToken =
-                sasBuilder.ToSasQueryParameters(key, blobServiceClient.AccountName).ToString();
-
-            // Construct the full URI, including the SAS token.
-            UriBuilder fullUri = new UriBuilder()
+            // Add the SAS token to the blob URI.
+            BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobClient.Uri)
             {
-                Scheme = "https",
-                Host = string.Format("{0}.blob.core.windows.net", blobServiceClient.AccountName),
-                Path = string.Format("{0}/{1}", blobClient.BlobContainerName, blobClient.Name),
-                Query = sasToken
+                // Specify the user delegation key.
+                Sas = sasBuilder.ToSasQueryParameters(userDelegationKey, 
+                                                      blobServiceClient.AccountName)
             };
 
-            Console.WriteLine("Blob user delegation SAS URI: {0}", fullUri);
+            Console.WriteLine("Blob user delegation SAS URI: {0}", blobUriBuilder);
             Console.WriteLine();
-            return fullUri.Uri;
+            return blobUriBuilder.ToUri();
         }
         // </Snippet_GetUserDelegationSasBlob>
 
@@ -325,9 +311,7 @@ namespace dotnet_v12
         // <Snippet_ReadBlobWithSasAsync>
         static async Task ReadBlobWithSasAsync(Uri sasUri)
         {
-            // Try performing blob operations using the SAS provided.
-
-            //check for new line and content
+            // Try performing a read operation using the blob SAS provided.
 
             // Create a blob client object for blob operations.
             BlobClient blobClient = new BlobClient(sasUri, null);
@@ -382,10 +366,11 @@ namespace dotnet_v12
             BlobServiceClient blobServiceClient = blobContainerClient.GetParentBlobServiceClient();
 
             // Get a user delegation key for the Blob service that's valid for seven days.
-            // You can use the key to generate any number of shared access signatures over the lifetime of the key.
-            UserDelegationKey key =
+            // You can use the key to generate any number of shared access signatures 
+            // over the lifetime of the key.
+            UserDelegationKey userDelegationKey =
                 await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
-                                                                               DateTimeOffset.UtcNow.AddDays(7));
+                                                                  DateTimeOffset.UtcNow.AddDays(7));
 
             // Create a SAS token that's valid for seven days.
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
@@ -404,22 +389,17 @@ namespace dotnet_v12
                 BlobContainerSasPermissions.List
                 );
 
-            // Use the key to get the SAS token.
-            string sasToken =
-                sasBuilder.ToSasQueryParameters(key, blobServiceClient.AccountName).ToString();
-
-            // Construct the full URI, including the SAS token.
-            UriBuilder fullUri = new UriBuilder()
+            // Add the SAS token to the container URI.
+            BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobContainerClient.Uri)
             {
-                Scheme = "https",
-                Host = string.Format("{0}.blob.core.windows.net", blobServiceClient.AccountName),
-                Path = string.Format("{0}", blobContainerClient.Name),
-                Query = sasToken
+                // Specify the user delegation key.
+                Sas = sasBuilder.ToSasQueryParameters(userDelegationKey,
+                                                      blobServiceClient.AccountName)
             };
 
-            Console.WriteLine("Container user delegation SAS URI: {0}", fullUri);
+            Console.WriteLine("Container user delegation SAS URI: {0}", blobUriBuilder);
             Console.WriteLine();
-            return fullUri.Uri;
+            return blobUriBuilder.ToUri();
         }
         // </Snippet_GetUserDelegationSasContainer>
 
@@ -431,7 +411,7 @@ namespace dotnet_v12
         // <Snippet_ListBlobsWithSasAsync>
         private static async Task ListBlobsWithSasAsync(Uri sasUri)
         {
-            // Try performing a blob operation using the container SAS provided.
+            // Try performing a listing operation using the container SAS provided.
 
             // Create a container client object for blob operations.
             BlobContainerClient blobContainerClient = new BlobContainerClient(sasUri, null);
@@ -513,9 +493,9 @@ namespace dotnet_v12
 
                     var connectionString2 = Constants.connectionString;
 
-                    BlobClient blobClient1 = new BlobClient(connectionString2, Constants.containerName, Constants.blobName);
+                    BlobClient blobClient2 = new BlobClient(connectionString2, Constants.containerName, Constants.blobName);
 
-                    GetServiceSasUriForBlob(blobClient1, default);
+                    GetServiceSasUriForBlob(blobClient2, default);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -562,15 +542,30 @@ namespace dotnet_v12
                     return true;
 
                 case "6":
-                    Uri blobUri = new Uri(string.Format("https://{0}.blob.core.windows.net/{1}/{2}",
+                    Uri blobUri6 = new Uri(string.Format("https://{0}.blob.core.windows.net/{1}/{2}",
                                                              Constants.storageAccountName,
                                                              Constants.containerName,
                                                              Constants.blobName));
 
-                    BlobClient blobClient2 = new BlobClient(blobUri, new DefaultAzureCredential());
+                    BlobClient blobClient6 = new BlobClient(blobUri6, new DefaultAzureCredential());
 
-                    Uri blobSasUri = GetUserDelegationSasBlob(blobClient2).Result;
+                    Uri blobSasUri = GetUserDelegationSasBlob(blobClient6).Result;
                     ReadBlobWithSasAsync(blobSasUri).Wait();
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "7":
+                    Uri blobUri7 = new Uri(string.Format("https://{0}.blob.core.windows.net/{1}/{2}",
+                                                             Constants.storageAccountName,
+                                                             Constants.containerName,
+                                                             Constants.blobName));
+
+                    BlobClient blobClient7 = new BlobClient(blobUri7, new DefaultAzureCredential());
+
+                    Uri containerSasUri7 = GetUserDelegationSasContainer(blobClient7.GetParentBlobContainerClient()).Result;
+                    ListBlobsWithSasAsync(containerSasUri7).Wait();
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
