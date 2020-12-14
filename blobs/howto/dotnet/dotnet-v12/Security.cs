@@ -14,13 +14,14 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-using Azure.Storage;
+using Azure;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using Azure.Storage.Sas;
-using Azure.Storage.Files.DataLake;
 using System;
+using System.IO;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -33,7 +34,7 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_SetPublicContainerPermissions>
-        private static void SetPublicContainerPermissions(BlobContainerClient container)
+        public static void SetPublicContainerPermissions(BlobContainerClient container)
         {
             container.SetAccessPolicy(PublicAccessType.BlobContainer);
             Console.WriteLine("Container {0} - permissions set to {1}",
@@ -96,6 +97,65 @@ namespace dotnet_v12
         // </Snippet_DownloadBlobAnonymously>
 
 
+        #region UploadBlobWithClientKey
+
+        //-------------------------------------------------
+        // Upload a blob with an encryption key
+        //-------------------------------------------------
+
+        // <Snippet_UploadBlobWithClientKey>
+        async static Task UploadBlobWithClientKey(BlobUriBuilder blobUriBuilder,
+                                                  Stream data,
+                                                  byte[] key)
+        {
+            try
+            {
+                // Specify the customer-provided key on the options for the client.
+                BlobClientOptions options = new BlobClientOptions()
+                {
+                    // Key must be AES-256.
+                    CustomerProvidedKey = new CustomerProvidedKey(key)
+                };
+
+                // Get the blob endpoint.
+                BlobUriBuilder blobEndpoint = new BlobUriBuilder(blobUriBuilder.ToUri())
+                {
+                    BlobContainerName = null,
+                    BlobName = null
+                };
+
+                // Create a client object for the Blob service, including options.
+                BlobServiceClient serviceClient =
+                    new BlobServiceClient(blobEndpoint.ToUri(),
+                                          new DefaultAzureCredential(),
+                                          options);
+
+                // Create a client object for the container.
+                // The container client retains the credential and client options.
+                BlobContainerClient containerClient =
+                    serviceClient.GetBlobContainerClient(blobUriBuilder.BlobContainerName);
+
+                // Create a new block blob client object.
+                // The blob client retains the credential and client options.
+                BlobClient blobClient = containerClient.GetBlobClient(blobUriBuilder.BlobName);
+
+                // Create the container if it does not exist.
+                await containerClient.CreateIfNotExistsAsync();
+
+                // Upload the data using the customer-provided key.
+                await blobClient.UploadAsync(data, true);
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+                throw;
+            }
+        }
+        // </Snippet_UploadBlobWithClientKey>
+
+        #endregion
+
 
         //-------------------------------------------------
         // Security menu (Can call asynchronous and synchronous methods)
@@ -109,6 +169,7 @@ namespace dotnet_v12
             Console.WriteLine("2) Create an anonymous client object");
             Console.WriteLine("3) Reference a container anonymously");
             Console.WriteLine("4) Reference a blob anonymously");
+            Console.WriteLine("5) Pass an encryption key on the request");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
@@ -149,6 +210,26 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
+                case "5":
+                    Uri blobUri5 = new Uri(string.Format("https://{0}.blob.core.windows.net/{1}/{2}",
+                                                         Constants.storageAccountName,
+                                                         Constants.containerName,
+                                                         Constants.blobName));
+
+                    AesCryptoServiceProvider keyAes = new AesCryptoServiceProvider();
+
+                    // Create an array of random bytes.
+                    byte[] buffer = new byte[1024];
+                    Random rnd = new Random();
+                    rnd.NextBytes(buffer);
+
+                    await UploadBlobWithClientKey(new BlobUriBuilder(blobUri5),
+                                                  new MemoryStream(buffer), 
+                                                  keyAes.Key);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
 
                 case "x":
                 case "X":
