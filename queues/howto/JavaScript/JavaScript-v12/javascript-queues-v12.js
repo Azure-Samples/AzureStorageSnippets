@@ -26,7 +26,7 @@ async function main() {
 
     // Instantiate a QueueServiceClient which will be used
     // to create a QueueClient and to list all the queues
-    const queueServiceClient = new QueueServiceClient.fromConnectionString(connectionString);
+    const queueServiceClient = QueueServiceClient.fromConnectionString(connectionString);
 
     // Get a QueueClient which will be used
     // to create and manipulate a queue
