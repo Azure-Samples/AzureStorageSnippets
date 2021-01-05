@@ -14,6 +14,7 @@ namespace dotnet_v12
         // Connect to the storage account - get Data Lake service client
         //----------------------------------------------------------
 
+        // <Snippet_AuthorizeWithKey>
         public static void GetDataLakeServiceClient(ref DataLakeServiceClient dataLakeServiceClient,
             string accountName, string accountKey)
         {
@@ -25,11 +26,13 @@ namespace dotnet_v12
             dataLakeServiceClient = new DataLakeServiceClient
                 (new Uri(dfsUri), sharedKeyCredential);
         }
+        // </Snippet_AuthorizeWithKey>
 
         // ---------------------------------------------------------
         // Connect to the storage account (Azure AD - get Data Lake service client)
         //----------------------------------------------------------
 
+        // <Snippet_AuthorizeWithAAD>
         public static void GetDataLakeServiceClient(ref DataLakeServiceClient dataLakeServiceClient,
             String accountName, String clientID, string clientSecret, string tenantID)
         {
@@ -41,5 +44,6 @@ namespace dotnet_v12
 
             dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), credential);
         }
+        // </Snippet_AuthorizeWithAAD>
     }
 }
