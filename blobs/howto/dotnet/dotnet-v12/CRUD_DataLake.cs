@@ -204,12 +204,12 @@ namespace dotnet_v12
         public async Task UploadFile(DataLakeFileSystemClient fileSystemClient)
         {
             DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("");
+                fileSystemClient.GetDirectoryClient("my-directory");
 
-            DataLakeFileClient fileClient = await directoryClient.CreateFileAsync("copy.txt");
+            DataLakeFileClient fileClient = await directoryClient.CreateFileAsync("uploaded-file.txt");
 
             FileStream fileStream =
-                File.OpenRead("C:\\Users\\normesta\\Temp\\copy.txt");
+                File.OpenRead("C:\\Users\\contoso\\Temp\\file-to-upload.txt");
 
             long fileSize = fileStream.Length;
 
@@ -237,7 +237,7 @@ namespace dotnet_v12
             DataLakeFileClient fileClient = directoryClient.GetFileClient("uploaded-file.txt");
 
             FileStream fileStream =
-                File.OpenRead("C:\\Users\\normesta\\Norms-Test-Projects\\mytestfile.txt");
+                File.OpenRead("C:\\Users\\contoso\\file-to-upload.txt");
 
             await fileClient.UploadAsync(fileStream);
 
@@ -258,13 +258,13 @@ namespace dotnet_v12
             DataLakeDirectoryClient directoryClient =
                 fileSystemClient.GetDirectoryClient("my-directory");
 
-            DataLakeFileClient fileClient = directoryClient.GetFileClient("testImageUpload.png");
+            DataLakeFileClient fileClient = directoryClient.GetFileClient("my-image.png");
 
             Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
 
             StreamReader reader = new StreamReader(downloadResponse.Value.Content);
 
-            FileStream fileStream = File.OpenWrite("C:\\Users\\normesta\\Norms-Test-Projects\\testImageDownload.png");
+            FileStream fileStream = File.OpenWrite("C:\\Users\\contoso\\my-image-downloaded.png");
 
             string output = await reader.ReadToEndAsync();
 
@@ -293,14 +293,14 @@ namespace dotnet_v12
                 fileSystemClient.GetDirectoryClient("my-directory");
 
             DataLakeFileClient fileClient =
-                directoryClient.GetFileClient("testImageUpload.png");
+                directoryClient.GetFileClient("my-image.png");
 
             Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
 
             BinaryReader reader = new BinaryReader(downloadResponse.Value.Content);
 
             FileStream fileStream =
-                File.OpenWrite("C:\\Users\\normesta\\Norms-Test-Projects\\testImageDownload.png");
+                File.OpenWrite("C:\\Users\\contoso\\my-image-downloaded.png");
 
             int bufferSize = 4096;
 
