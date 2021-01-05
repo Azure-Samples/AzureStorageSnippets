@@ -228,7 +228,7 @@ namespace dotnet_v12
         // Upload files to the directory - bulk uploads
         //----------------------------------------------------------
 
-        // <Snippet_UploadFileBinary>
+        // <Snippet_UploadFileBulk>
         public async Task UploadFileBulk(DataLakeFileSystemClient fileSystemClient)
         {
             DataLakeDirectoryClient directoryClient =
@@ -242,7 +242,7 @@ namespace dotnet_v12
             await fileClient.UploadAsync(fileStream);
 
         }
-        // </Snippet_UploadFileBinary>
+        // </Snippet_UploadFileBulk>
 
         #endregion
 
