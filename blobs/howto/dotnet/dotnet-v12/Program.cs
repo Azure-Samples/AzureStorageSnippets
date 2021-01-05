@@ -129,6 +129,31 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for CRUD with Data Lake scenarios.
+        //----------------------------------------------- 
+        static bool CRUD_DataLake()
+        {
+            CRUD_DataLake crud_DataLake = new CRUD_DataLake();
+
+            while (crud_DataLake.MenuAsync().Result) { }
+
+            return true;
+        }
+
+        //-----------------------------------------------
+        // Submenu for ACLs with Data Lake scenarios.
+        //----------------------------------------------- 
+        static bool ACL_DataLake()
+        {
+            ACL_DataLake acl_DataLake = new ACL_DataLake();
+
+            while (acl_DataLake.MenuAsync().Result) { }
+
+            return true;
+        }
+
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -153,6 +178,8 @@ namespace dotnet_v12
             Console.WriteLine("7) Container operations");
             Console.WriteLine("8) Copy operations");
             Console.WriteLine("9) Account info");
+            Console.WriteLine("10) CRUD operations for accounts with a hierarchical namespace");
+            Console.WriteLine("11) Access Control Lists (ACL) for accounts with a hierarchical namespace");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -184,6 +211,12 @@ namespace dotnet_v12
 
                 case "9":
                     return Account();
+
+                case "10":
+                    return CRUD_DataLake();
+
+                case "11":
+                    return ACL_DataLake();
 
                 case "x":
                 case "X":
