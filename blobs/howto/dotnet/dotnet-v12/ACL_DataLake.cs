@@ -254,7 +254,7 @@ namespace dotnet_v12
             Console.WriteLine("Number of failures: " +
                 counters.FailedChangesCount.ToString());
         }
-        // </Snippet_Name>
+        // </Snippet_ContinueOnFailure>
 
         #endregion
 
