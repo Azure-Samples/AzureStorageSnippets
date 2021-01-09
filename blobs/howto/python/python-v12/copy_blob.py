@@ -43,7 +43,7 @@ class CopyBlob:
 
         # Create a BlobClient from a connection string
         # retrieved from an environment variable named
-        # AZURE_STORAGE_CONNECTION_STRING
+        # AZURE_STORAGE_CONNECTION_STRING.
         source_blob = BlobClient.from_connection_string(
             os.getenv("AZURE_STORAGE_CONNECTION_STRING"), 
             container_name, blob_name
@@ -73,11 +73,11 @@ class CopyBlob:
             properties = dest_blob.get_blob_properties()
             copy_props = properties.copy
 
-            # Display the copy status
+            # Display the copy status.
             print("Copy status: " + copy_props["status"])
-            print("Copy progress: " + copy_props["progress"]);
-            print("Completion time: " + str(copy_props["completion_time"]));
-            print("Total bytes: " + str(properties.size));
+            print("Copy progress: " + copy_props["progress"])
+            print("Completion time: " + str(copy_props["completion_time"]))
+            print("Total bytes: " + str(properties.size))
 
             if (source_props.lease.state == "leased"):
                 # Break the lease on the source blob.
@@ -121,11 +121,11 @@ class CopyBlob:
                 print("Copy operation " + copy_props["id"] + " has been aborted.")
             # </Snippet_StopBlobCopy>
 
-            # Display the copy status
+            # Display the copy status.
             print("Copy status: " + copy_props["status"])
-            print("Copy progress: " + copy_props["progress"]);
-            print("Completion time: " + str(copy_props["completion_time"]));
-            print("Total bytes: " + str(properties.size));
+            print("Copy progress: " + copy_props["progress"])
+            print("Completion time: " + str(copy_props["completion_time"]))
+            print("Total bytes: " + str(properties.size))
 
         except ResourceNotFoundError as ex:
             print("ResourceNotFoundError: ", ex.message)
