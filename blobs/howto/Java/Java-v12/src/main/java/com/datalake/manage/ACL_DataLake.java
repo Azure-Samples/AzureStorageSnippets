@@ -29,7 +29,8 @@ public class ACL_DataLake {
     // ----------------------------------------------------------
     // Get a file system
     // ----------------------------------------------------------
-
+    
+    // <Snippet_GetFileSystem>
     public DataLakeFileSystemClient GetFileSystem
        (DataLakeServiceClient serviceClient, String fileSystemName){
         
@@ -38,11 +39,13 @@ public class ACL_DataLake {
 
         return fileSystemClient;
     }
+    // </Snippet_GetFileSystem>
     
     // ----------------------------------------------------------
     // Get and set directory-level permissions
     // ----------------------------------------------------------
 
+    // <Snippet_ManageDirectoryACLs>
     public void ManageDirectoryACLs(DataLakeFileSystemClient fileSystemClient){
 
         DataLakeDirectoryClient directoryClient =
@@ -77,11 +80,13 @@ public class ACL_DataLake {
         System.out.println(PathAccessControlEntry.serializeList(pathPermissions));
 
     }
+    // </Snippet_ManageDirectoryACLs>
 
     // ----------------------------------------------------------
     // Get and set file-level permissions
     // ----------------------------------------------------------
 
+    // <Snippet_ManageFileACLs>
     public void ManageFileACLs(DataLakeFileSystemClient fileSystemClient){
 
         DataLakeDirectoryClient directoryClient =
@@ -119,11 +124,13 @@ public class ACL_DataLake {
       System.out.println(PathAccessControlEntry.serializeList(pathPermissions));
 
     }
+    // </Snippet_ManageFileACLs>
 
     //-------------------------------------------------
     // Set ACLs recursively
     //-------------------------------------------------
 
+    // <Snippet_SetACLRecursively>
     public void SetACLRecursively(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
         
         DataLakeDirectoryClient directoryClient =
@@ -176,7 +183,7 @@ public class ACL_DataLake {
 
         userEntry.setDefaultScope(isDefaultScope);
         userEntry.setAccessControlType(AccessControlType.USER);
-        userEntry.setEntityId("4a9028cf-f779-4032-b09d-970ebe3db258");
+        userEntry.setEntityId("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
         userEntry.setPermissions(userPermission);    
         
         pathAccessControlEntries.add(userEntry);
@@ -184,11 +191,13 @@ public class ACL_DataLake {
         directoryClient.setAccessControlRecursive(pathAccessControlEntries);        
 
     }
+    // </Snippet_SetACLRecursively>
 
     //-------------------------------------------------
     // Update ACLs recursively
     //-------------------------------------------------
 
+    // <Snippet_UpdateACLRecursively>
     public void UpdateACLRecursively(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
 
         DataLakeDirectoryClient directoryClient =
@@ -205,7 +214,7 @@ public class ACL_DataLake {
 
         userEntry.setDefaultScope(isDefaultScope);
         userEntry.setAccessControlType(AccessControlType.USER);
-        userEntry.setEntityId("4a9028cf-f779-4032-b09d-970ebe3db258");
+        userEntry.setEntityId("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
         userEntry.setPermissions(userPermission);    
         
         pathAccessControlEntries.add(userEntry);
@@ -213,11 +222,13 @@ public class ACL_DataLake {
         directoryClient.updateAccessControlRecursive(pathAccessControlEntries);        
     
     }
+    // </Snippet_UpdateACLRecursively>
 
     //-------------------------------------------------
     // Remove ACLs recursively
     //-------------------------------------------------
 
+    // <Snippet_RemoveACLRecursively>
     public void RemoveACLRecursively(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
 
         DataLakeDirectoryClient directoryClient =
@@ -234,18 +245,20 @@ public class ACL_DataLake {
 
         userEntry.setDefaultScope(isDefaultScope);
         userEntry.setAccessControlType(AccessControlType.USER);
-        userEntry.setEntityId("4a9028cf-f779-4032-b09d-970ebe3db258"); 
+        userEntry.setEntityId("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"); 
         
         pathRemoveAccessControlEntries.add(userEntry);
         
         directoryClient.removeAccessControlRecursive(pathRemoveAccessControlEntries);      
     
     }
+    // </Snippet_RemoveACLRecursively>
 
     //--------------------------------------------------
     // Use continuation token
     //--------------------------------------------------
 
+    // <Snippet_ResumeSetACLRecursively>
     public String ResumeSetACLRecursively(DataLakeFileSystemClient fileSystemClient,
         DataLakeDirectoryClient directoryClient,
         List<PathAccessControlEntry> accessControlList, 
@@ -276,11 +289,13 @@ public class ACL_DataLake {
 
 
     }
+    // </Snippet_ResumeSetACLRecursively>
 
     //--------------------------------------------------
     // Continue on failure
     //--------------------------------------------------
 
+    // <Snippet_ContinueOnFailure>
     public void ContinueOnFailure(DataLakeFileSystemClient fileSystemClient,
         DataLakeDirectoryClient directoryClient,
         List<PathAccessControlEntry> accessControlList){
@@ -304,6 +319,7 @@ public class ACL_DataLake {
         System.out.println("Number of failures: " + 
             counters.getChangedDirectoriesCount());
     }
+    // </Snippet_ContinueOnFailure>
 
     // ----------------------------------------------------------
     // Driver menu
