@@ -11,7 +11,8 @@ public class Authorize_DataLake {
     // ---------------------------------------------------------
     // Connect to the storage account - use account key
     // ----------------------------------------------------------
-
+    
+    //<Snippet_AuthorizeWithKey>
     static public DataLakeServiceClient GetDataLakeServiceClient
     (String accountName, String accountKey){
 
@@ -25,11 +26,13 @@ public class Authorize_DataLake {
 
         return builder.buildClient();
     }  
+    //</Snippet_AuthorizeWithKey>
     
     // ---------------------------------------------------------
     // Connect to the storage account - use service principal and Azure AD
     // ----------------------------------------------------------
-
+    
+    //<Snippet_AuthorizeWithAzureAD>
     static public DataLakeServiceClient GetDataLakeServiceClient
         (String accountName, String clientId, String ClientSecret, String tenantID){
 
@@ -43,6 +46,7 @@ public class Authorize_DataLake {
            
         DataLakeServiceClientBuilder builder = new DataLakeServiceClientBuilder();
         return builder.credential(clientSecretCredential).endpoint(endpoint).buildClient();
-    }  
+    } 
+    //</Snippet_AuthorizeWithAzureAD> 
     
 }

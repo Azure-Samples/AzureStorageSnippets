@@ -26,16 +26,19 @@ public class CRUD_DataLake {
     // Create a file system
     // ----------------------------------------------------------
     
+    //<Snippet_CreateFileSystem>
     public DataLakeFileSystemClient CreateFileSystem
     (DataLakeServiceClient serviceClient){
 
         return serviceClient.createFileSystem("my-file-system");
     }
+    //</Snippet_CreateFileSystem>
 
     // ----------------------------------------------------------
     // Get a file system
     // ----------------------------------------------------------
 
+    //<Snippet_GetFileSystem>
     public DataLakeFileSystemClient GetFileSystem
     (DataLakeServiceClient serviceClient, String fileSystemName){
         
@@ -44,11 +47,13 @@ public class CRUD_DataLake {
 
         return fileSystemClient;
     }
+    //</Snippet_GetFileSystem>
 
     // ----------------------------------------------------------
     // Create directory
     // ----------------------------------------------------------
 
+    //<Snippet_CreateDirectory>
     public DataLakeDirectoryClient CreateDirectory
     (DataLakeServiceClient serviceClient, String fileSystemName){
     
@@ -60,11 +65,13 @@ public class CRUD_DataLake {
 
         return directoryClient.createSubdirectory("my-subdirectory");
     }
+    //</Snippet_CreateDirectory>
     
     // ----------------------------------------------------------
     // Get a directory
     // ----------------------------------------------------------
 
+    //<Snippet_GetDirectory>
     public DataLakeDirectoryClient GetDirectory
     (DataLakeFileSystemClient fileSystemClient, String directoryName){
 
@@ -73,11 +80,13 @@ public class CRUD_DataLake {
 
         return directoryClient;
     }
+    //</Snippet_GetDirectory>
     
     // ---------------------------------------------------------
     // Rename a directory
     //----------------------------------------------------------
 
+    //<Snippet_RenameDirectory>
     public DataLakeDirectoryClient
         RenameDirectory(DataLakeFileSystemClient fileSystemClient){
 
@@ -86,11 +95,13 @@ public class CRUD_DataLake {
 
         return directoryClient.rename(fileSystemClient.getFileSystemName(),"my-subdirectory-renamed");
     }
+    //</Snippet_RenameDirectory>
   
     // ---------------------------------------------------------
     // Move a directory
     //----------------------------------------------------------
 
+    //<Snippet_MoveDirectory>
     public DataLakeDirectoryClient MoveDirectory
     (DataLakeFileSystemClient fileSystemClient){
 
@@ -99,11 +110,13 @@ public class CRUD_DataLake {
 
         return directoryClient.rename(fileSystemClient.getFileSystemName(),"my-directory-2/my-subdirectory-renamed");                
     }
+    //</Snippet_MoveDirectory>
   
     // ----------------------------------------------------------
     // Delete directory
     // ----------------------------------------------------------
 
+    //<Snippet_DeleteDirectory>
     public void DeleteDirectory(DataLakeFileSystemClient fileSystemClient){
         
         DataLakeDirectoryClient directoryClient =
@@ -111,11 +124,13 @@ public class CRUD_DataLake {
 
         directoryClient.deleteWithResponse(true, null, null, null);
     }
+    //</Snippet_DeleteDirectory>
 
     // ----------------------------------------------------------
     // List directory contents
     // ----------------------------------------------------------
 
+    //<Snippet_ListFilesInDirectory>
     public void ListFilesInDirectory(DataLakeFileSystemClient fileSystemClient){
         
         ListPathsOptions options = new ListPathsOptions();
@@ -143,11 +158,13 @@ public class CRUD_DataLake {
         }
 
     }
+    //</Snippet_ListFilesInDirectory>
 
     // ----------------------------------------------------------
     // Upload files to directory
     // ----------------------------------------------------------
 
+    //<Snippet_UploadFile>
     public void UploadFile(DataLakeFileSystemClient fileSystemClient) 
         throws FileNotFoundException{
         
@@ -156,7 +173,7 @@ public class CRUD_DataLake {
 
         DataLakeFileClient fileClient = directoryClient.createFile("uploaded-file.txt");
 
-        File file = new File("C:\\Users\\normesta\\Norms-Test-Projects\\mytestfile.txt");
+        File file = new File("C:\\Users\\constoso\\mytestfile.txt");
 
      //   InputStream targetStream = new FileInputStream(file);
         InputStream targetStream = new BufferedInputStream(new FileInputStream(file));
@@ -167,11 +184,13 @@ public class CRUD_DataLake {
 
         fileClient.flush(fileSize);
     }
+    //</Snippet_UploadFile>
 
     // ----------------------------------------------------------
     // Upload files in bulk
     // ----------------------------------------------------------
 
+    //<Snippet_UploadFileBulk>
     public void UploadFileBulk(DataLakeFileSystemClient fileSystemClient) 
         throws FileNotFoundException{
         
@@ -180,13 +199,16 @@ public class CRUD_DataLake {
 
         DataLakeFileClient fileClient = directoryClient.getFileClient("uploaded-file.txt");
 
-        fileClient.uploadFromFile("C:\\Users\\normesta\\Norms-Test-Projects\\mytestfile.txt");
+        fileClient.uploadFromFile("C:\\Users\\contoso\\mytestfile.txt");
 
     }
+    //</Snippet_UploadFileBulk>
    
     // ----------------------------------------------------------
     // Download a file from a directory (binary)
     // ----------------------------------------------------------
+    
+    //<Snippet_DownloadFile>
     public void DownloadFile(DataLakeFileSystemClient fileSystemClient)
       throws FileNotFoundException, java.io.IOException{
 
@@ -196,7 +218,7 @@ public class CRUD_DataLake {
         DataLakeFileClient fileClient = 
             directoryClient.getFileClient("uploaded-file.txt");
 
-        File file = new File("C:\\Users\\normesta\\Norms-Test-Projects\\downloadedFile.txt");
+        File file = new File("C:\\Users\\contoso\\downloadedFile.txt");
 
         OutputStream targetStream = new FileOutputStream(file);
         
@@ -207,6 +229,7 @@ public class CRUD_DataLake {
         fileClient.flush(file.length());
         
     }
+    //</Snippet_DownloadFile>
 
     // ----------------------------------------------------------
     // Driver Menu
