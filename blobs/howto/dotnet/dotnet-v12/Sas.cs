@@ -22,6 +22,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.DataLake.Models;
 using System;
 using System.Threading.Tasks;
 using System.IO;
@@ -272,16 +273,17 @@ namespace dotnet_v12
             // Get a user delegation key for the Blob service that's valid for 7 days.
             // You can use the key to generate any number of shared access signatures 
             // over the lifetime of the key.
-            UserDelegationKey userDelegationKey =
+            Azure.Storage.Blobs.Models.UserDelegationKey userDelegationKey =
                 await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
                                                                   DateTimeOffset.UtcNow.AddDays(7));
 
-            // Create a SAS token that's valid for 7 days.
+            // Create a SAS token that's also valid for 7 days.
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
             {
                 BlobContainerName = blobClient.BlobContainerName,
                 BlobName = blobClient.Name,
                 Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow,
                 ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
             };
 
@@ -368,15 +370,16 @@ namespace dotnet_v12
             // Get a user delegation key for the Blob service that's valid for seven days.
             // You can use the key to generate any number of shared access signatures 
             // over the lifetime of the key.
-            UserDelegationKey userDelegationKey =
+            Azure.Storage.Blobs.Models.UserDelegationKey userDelegationKey =
                 await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
                                                                   DateTimeOffset.UtcNow.AddDays(7));
 
-            // Create a SAS token that's valid for seven days.
+            // Create a SAS token that's also valid for seven days.
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
             {
                 BlobContainerName = blobContainerClient.Name,
                 Resource = "c",
+                StartsOn = DateTimeOffset.UtcNow,
                 ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
             };
 
@@ -457,6 +460,125 @@ namespace dotnet_v12
 
         #endregion
 
+        #region
+
+        // <Snippet_GetUserDelegationSasDirectory>
+        async static Task<Uri> GetUserDelegationSasDirectory(DataLakeDirectoryClient directoryClient)
+        {
+            try
+            {
+                // Get service endpoint from the directory URI.
+                DataLakeUriBuilder dataLakeServiceUri = new DataLakeUriBuilder(directoryClient.Uri)
+                {
+                    FileSystemName = null,
+                    DirectoryOrFilePath = null
+                };
+
+                // Get service client.
+                DataLakeServiceClient dataLakeServiceClient =
+                    new DataLakeServiceClient(dataLakeServiceUri.ToUri(),
+                                              new DefaultAzureCredential());
+
+                // Get a user delegation key that's valid for seven days.
+                // You can use the key to generate any number of shared access signatures 
+                // over the lifetime of the key.
+                Azure.Storage.Files.DataLake.Models.UserDelegationKey userDelegationKey =
+                    await dataLakeServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
+                                                                          DateTimeOffset.UtcNow.AddDays(7));
+
+                // Create a SAS token that's valid for seven days.
+                DataLakeSasBuilder sasBuilder = new DataLakeSasBuilder()
+                {
+                    // Specify the file system name and path, and indicate that
+                    // the client object points to a directory.
+                    FileSystemName = directoryClient.FileSystemName,
+                    Resource = "d",
+                    IsDirectory = true,
+                    Path = directoryClient.Path,
+                    ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
+                };
+
+                // Specify racwl permissions for the SAS.
+                sasBuilder.SetPermissions(
+                    DataLakeSasPermissions.Read |
+                    DataLakeSasPermissions.Add |
+                    DataLakeSasPermissions.Create |
+                    DataLakeSasPermissions.Write |
+                    DataLakeSasPermissions.List
+                    );
+
+                // Construct the full URI, including the SAS token.
+                DataLakeUriBuilder fullUri = new DataLakeUriBuilder(directoryClient.Uri)
+                {
+                    Sas = sasBuilder.ToSasQueryParameters(userDelegationKey,
+                                                          dataLakeServiceClient.AccountName)
+                };
+
+                Console.WriteLine("Directory user delegation SAS URI: {0}", fullUri);
+                Console.WriteLine();
+                return fullUri.ToUri();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+        // </Snippet_GetUserDelegationSasDirectory>
+
+        #endregion
+
+        #region
+
+        // <Snippet_ListFilesWithDirectorySasAsync>
+        private static async Task ListFilesWithDirectorySasAsync(Uri sasUri)
+        {
+            // Try performing an operation using the directory SAS provided.
+
+            // Create a directory client object for listing operations.
+            DataLakeDirectoryClient dataLakeDirectoryClient = new DataLakeDirectoryClient(sasUri);
+
+            // List files in the directory.
+            try
+            {
+                // Call the listing operation and return pages of the specified size.
+                var resultSegment = dataLakeDirectoryClient.GetPathsAsync(false, false).AsPages();
+
+                // Enumerate the files returned with each page.
+                // NullReferenceException on this line - resultSegment is null?
+                await foreach (Page<PathItem> pathPage in resultSegment)
+                {
+                    foreach (PathItem pathItem in pathPage.Values)
+                    {
+                        Console.WriteLine("File name: {0}", pathItem.Name);
+                    }
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Directory listing operation succeeded for SAS {0}", sasUri);
+            }
+            catch (RequestFailedException e)
+            {
+                // Check for a 403 (Forbidden) error. If the SAS is invalid, 
+                // Azure Storage returns this error.
+                if (e.Status == 403)
+                {
+                    Console.WriteLine("Directory listing operation failed for SAS {0}", sasUri);
+                    Console.WriteLine("Additional error information: " + e.Message);
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine(e.Message);
+                    Console.ReadLine();
+                    throw;
+                }
+            }
+        }
+        // </Snippet_ListFilesWithDirectorySasAsync>
+
+        #endregion
 
         //-------------------------------------------------
         // Security menu (Can call asynchronous and synchronous methods)
@@ -472,6 +594,8 @@ namespace dotnet_v12
             Console.WriteLine("4) Create a storage account by using a SAS token");
             Console.WriteLine("5) Create service SAS for an ADLS directory");
             Console.WriteLine("6) Create user delegation SAS for a blob and read blob with SAS");
+            Console.WriteLine("7) Create user delegation SAS for a container and list blobs with SAS");
+            Console.WriteLine("8) Create user delegation SAS for a directory and list paths with SAS");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
@@ -566,6 +690,28 @@ namespace dotnet_v12
 
                     Uri containerSasUri7 = GetUserDelegationSasContainer(blobClient7.GetParentBlobContainerClient()).Result;
                     ListBlobsWithSasAsync(containerSasUri7).Wait();
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "8":
+                    // Construct the directory endpoint from the account name.
+                    Uri dataLakeEndpoint = new Uri(string.Format("https://{0}.dfs.core.windows.net", Constants.storageAccountNameAdls));
+
+                    DataLakeServiceClient dataLakeServiceClient = 
+                        new DataLakeServiceClient(dataLakeEndpoint, new DefaultAzureCredential());
+
+                    DataLakeFileSystemClient dataLakeFileSystemClient =
+                        dataLakeServiceClient.GetFileSystemClient(Constants.containerName);
+
+                    DataLakeDirectoryClient directoryClient8 = 
+                        dataLakeFileSystemClient.GetDirectoryClient(Constants.directoryName);
+
+                    Uri directorySasUri = GetUserDelegationSasDirectory(directoryClient8).Result;
+
+                    ListFilesWithDirectorySasAsync(directorySasUri).Wait();
+
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
