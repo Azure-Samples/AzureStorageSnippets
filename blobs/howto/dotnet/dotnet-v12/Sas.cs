@@ -530,22 +530,21 @@ namespace dotnet_v12
 
         #region
 
-        // <Snippet_ListFilesWithDirectorySasAsync>
-        private static async Task ListFilesWithDirectorySasAsync(Uri sasUri)
+        // <Snippet_ListFilePathsWithDirectorySasAsync>
+        private static async Task ListFilesPathsWithDirectorySasAsync(Uri sasUri)
         {
             // Try performing an operation using the directory SAS provided.
 
             // Create a directory client object for listing operations.
             DataLakeDirectoryClient dataLakeDirectoryClient = new DataLakeDirectoryClient(sasUri);
 
-            // List files in the directory.
+            // List file paths in the directory.
             try
             {
                 // Call the listing operation and return pages of the specified size.
                 var resultSegment = dataLakeDirectoryClient.GetPathsAsync(false, false).AsPages();
 
-                // Enumerate the files returned with each page.
-                // NullReferenceException on this line - resultSegment is null?
+                // Enumerate the file paths returned with each page.
                 await foreach (Page<PathItem> pathPage in resultSegment)
                 {
                     foreach (PathItem pathItem in pathPage.Values)
@@ -576,7 +575,7 @@ namespace dotnet_v12
                 }
             }
         }
-        // </Snippet_ListFilesWithDirectorySasAsync>
+        // </Snippet_ListFilePathsWithDirectorySasAsync>
 
         #endregion
 
@@ -710,7 +709,7 @@ namespace dotnet_v12
 
                     Uri directorySasUri = GetUserDelegationSasDirectory(directoryClient8).Result;
 
-                    ListFilesWithDirectorySasAsync(directorySasUri).Wait();
+                    ListFilesPathsWithDirectorySasAsync(directorySasUri).Wait();
 
 
                     Console.WriteLine("Press enter to continue");
