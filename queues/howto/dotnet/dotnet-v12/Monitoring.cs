@@ -16,6 +16,8 @@
 
 using System;
 using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 
@@ -57,6 +59,47 @@ namespace dotnet_v12
         }
 
         //-------------------------------------------------
+        // Update log retention period
+        //-------------------------------------------------
+
+        public void UpdateLogRetentionPeriod()
+        {
+            var connectionString = Constants.connectionString;
+
+            // <Snippet_ModifyRetentionPeriod>
+
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            QueueServiceClient queueServiceClient = new QueueServiceClient(connectionString);
+
+            BlobServiceProperties blobServiceProperties = blobServiceClient.GetProperties().Value;
+            QueueServiceProperties queueServiceProperties = queueServiceClient.GetProperties().Value;
+
+            BlobRetentionPolicy blobRetentionPolicy = new BlobRetentionPolicy();
+
+            blobRetentionPolicy.Enabled = true;
+            blobRetentionPolicy.Days = 4;
+
+            QueueRetentionPolicy queueRetentionPolicy = new QueueRetentionPolicy();
+            
+            queueRetentionPolicy.Enabled = true;
+            queueRetentionPolicy.Days = 4;
+            
+            blobServiceProperties.Logging.RetentionPolicy = blobRetentionPolicy;
+            blobServiceProperties.Cors = null;
+
+            queueServiceProperties.Logging.RetentionPolicy = queueRetentionPolicy;
+            queueServiceProperties.Cors = null;
+
+            blobServiceClient.SetProperties(blobServiceProperties);
+            queueServiceClient.SetProperties(queueServiceProperties);
+
+            Console.WriteLine("Retention policy for blobs and queues is updated");
+
+            // </Snippet_ModifyRetentionPeriod>
+
+        }
+
+        //-------------------------------------------------
         // Diagnostic logs snippet 2
         //-------------------------------------------------
 
@@ -74,7 +117,7 @@ namespace dotnet_v12
             Console.Clear();
             Console.WriteLine("Choose a monitoring scenario:");
             Console.WriteLine("1) Enable diagnostic logging");
-            Console.WriteLine("2) Scenario 2");
+            Console.WriteLine("2) Update retention period");
             Console.WriteLine("3) Return to main menu");
             Console.Write("\r\nSelect an option: ");
             switch (Console.ReadLine())
@@ -87,8 +130,8 @@ namespace dotnet_v12
                    return true;
                 
                 case "2":
-                
-                   ExampleSnippet2();
+
+                   UpdateLogRetentionPeriod();
                    Console.WriteLine("Press enter to continue"); 
                    Console.ReadLine();              
                    return true;
