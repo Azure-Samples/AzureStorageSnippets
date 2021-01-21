@@ -66,14 +66,21 @@ namespace dotnet_v12
         {
             var connectionString = Constants.connectionString;
 
-            // <Snippet_ModifyRetentionPeriod>
-
+            // <Snippet_ViewRetentionPeriod>
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
             QueueServiceClient queueServiceClient = new QueueServiceClient(connectionString);
 
             BlobServiceProperties blobServiceProperties = blobServiceClient.GetProperties().Value;
             QueueServiceProperties queueServiceProperties = queueServiceClient.GetProperties().Value;
 
+            Console.WriteLine("Retention period for logs from the blob service is: " +
+                blobServiceProperties.Logging.RetentionPolicy.Days.ToString());
+
+            Console.WriteLine("Retention period for logs from the queue service is: " +
+                queueServiceProperties.Logging.RetentionPolicy.Days.ToString());
+            // </Snippet_ViewRetentionPeriod>
+
+            // <Snippet_ModifyRetentionPeriod>
             BlobRetentionPolicy blobRetentionPolicy = new BlobRetentionPolicy();
 
             blobRetentionPolicy.Enabled = true;
@@ -94,7 +101,6 @@ namespace dotnet_v12
             queueServiceClient.SetProperties(queueServiceProperties);
 
             Console.WriteLine("Retention policy for blobs and queues is updated");
-
             // </Snippet_ModifyRetentionPeriod>
 
         }
