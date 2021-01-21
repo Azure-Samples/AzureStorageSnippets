@@ -22,7 +22,7 @@ namespace dotnet_v12
     public static class Constants
     {
         public const string accountKey = "";
-        public const string connectionString = "UseDevelopmentStorage=true"; // Use Azurite
+        public const string connectionString = "UseDevelopmentStorage=true"; // Use Azurite    
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";
