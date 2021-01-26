@@ -25,6 +25,7 @@ namespace dotnet_v12
         //----------------------------------------------------------------------------------------------
 
         // Credential constants
+        public const string accountName = "";
         public const string accountKey = "";
         public const string connectionString = "";
         public const string accountKeyAdls = "";
