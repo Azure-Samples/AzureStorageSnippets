@@ -153,6 +153,17 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Scalable scenarios.
+        //----------------------------------------------- 
+        static bool Scalable()
+        {
+            Scalable acct = new Scalable();
+
+            while (acct.MenuAsync().Result) { }
+
+            return true;
+        }
 
         //------------------------------------------------
         // Main function
@@ -180,6 +191,7 @@ namespace dotnet_v12
             Console.WriteLine("9) Account info");
             Console.WriteLine("10) CRUD operations for accounts with a hierarchical namespace");
             Console.WriteLine("11) Access Control Lists (ACL) for accounts with a hierarchical namespace");
+            Console.WriteLine("12) Parallel file transfers");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -217,6 +229,9 @@ namespace dotnet_v12
 
                 case "11":
                     return ACL_DataLake();
+
+                case "12":
+                    return Scalable();
 
                 case "x":
                 case "X":
