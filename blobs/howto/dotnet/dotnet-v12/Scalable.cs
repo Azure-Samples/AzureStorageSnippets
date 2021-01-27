@@ -1,7 +1,24 @@
-﻿/*
- * For these scenarios, create two directories called "upload" and "download" off the current directory.
+﻿//----------------------------------------------------------------------------------
+// Microsoft Developer & Platform Evangelism
+//
+// Copyright (c) Microsoft Corporation. All rights reserved.
+//
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, 
+// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+// OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+//----------------------------------------------------------------------------------
+// The example companies, organizations, products, domain names,
+// e-mail addresses, logos, people, places, and events depicted
+// herein are fictitious.  No association with any real company,
+// organization, product, domain name, email address, logo, person,
+// places, or events is intended or should be inferred.
+//----------------------------------------------------------------------------------
+
+/*
+ * For these scenarios, create a directory called "upload" off the current directory.
  * In the "upload" directory, place the files to upload by using UploadFilesAsync.
- * The "download" directory is the destination for blobs downloaded by using DownloadFilesAsync.
+ * A "download" directory is created by the app as the destination for blobs downloaded by using DownloadFilesAsync.
+ * The "download" directory is removed by the DeleteDownloadDirectory method on menu choice 4.
  */
 using Azure.Storage;
 using Azure.Storage.Blobs;
