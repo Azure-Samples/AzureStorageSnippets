@@ -41,10 +41,10 @@ namespace dotnet_v12
         // <Snippet_UploadFilesAsync>
         private static async Task UploadFilesAsync()
         {
-            // Create random 5 characters containers to upload files to.
+            // Create five randomly named containers to store the uploaded files.
             BlobContainerClient[] containers = await GetRandomContainersAsync();
 
-            // path to the directory to upload
+            // Path to the directory to upload
             string uploadPath = Directory.GetCurrentDirectory() + "\\upload";
 
             // Start a timer to measure how long it takes to upload all the files.
@@ -92,7 +92,8 @@ namespace dotnet_v12
 
                     await sem.WaitAsync();
 
-                    // Create tasks for each file that is uploaded. This is added to a collection that executes them all asyncronously.  
+                    // Create a task for each file to upload. The tasks are
+                    // added to a collection and all run asynchronously.
                     tasks.Add(blockBlob.UploadAsync(stream, options).ContinueWith((t) =>
                     {
                         // Release the semaphore when the upload has completed.
@@ -103,7 +104,7 @@ namespace dotnet_v12
                     count++;
                 }
 
-                // Creates an asynchronous task that completes when all the uploads complete.
+                // Run all the tasks asynchronously.
                 await Task.WhenAll(tasks);
 
                 timer.Stop();
@@ -136,7 +137,7 @@ namespace dotnet_v12
         {
             BlobServiceClient blobServiceClient = GetBlobServiceClient();
 
-            // path to the directory to upload
+            // Path to the directory to upload
             string downloadPath = Directory.GetCurrentDirectory() + "\\download\\";
             Directory.CreateDirectory(downloadPath);
             Console.WriteLine($"Created directory {downloadPath}");
@@ -162,7 +163,7 @@ namespace dotnet_v12
                 containers.Add(blobServiceClient.GetBlobContainerClient(container.Name));
             }
 
-            // Start a timer to measure how long it takes to upload all the files.
+            // Start a timer to measure how long it takes to download all the files.
             Stopwatch timer = Stopwatch.StartNew();
 
             // Download the blobs
@@ -172,7 +173,8 @@ namespace dotnet_v12
                 int max_outstanding = 100;
                 int completed_count = 0;
 
-                // Create a new instance of the SemaphoreSlim class to define the number of threads to use in the application.
+                // Create a new instance of the SemaphoreSlim class to 
+                // define the number of threads to use in the application.
                 SemaphoreSlim sem = new SemaphoreSlim(max_outstanding, max_outstanding);
 
                 List<Task> tasks = new List<Task>();
@@ -192,10 +194,11 @@ namespace dotnet_v12
 
                             await sem.WaitAsync();
 
-                            // Create tasks for each file that is uploaded. This is added to a collection that executes them all asyncronously.  
+                            // Create a task for each file to download. The tasks are
+                            // added to a collection and all run asynchronously.
                             tasks.Add(blockBlob.DownloadToAsync(stream, default, options).ContinueWith((t) =>
                             {
-                                // Close the file stream and release the semaphore when the download has completed.
+                                // Close the file stream and release the semaphore when the download completes.
                                 stream.Close();
                                 sem.Release();
                                 Interlocked.Increment(ref completed_count);
@@ -206,9 +209,10 @@ namespace dotnet_v12
                     }
                 }
 
-                // Creates an asynchronous task that completes when all the uploads complete.
+                // Run all the tasks asynchronously.
                 await Task.WhenAll(tasks);
 
+                // Report the elapsed time.
                 timer.Stop();
                 Console.WriteLine($"Download has been completed in {timer.Elapsed.TotalSeconds} seconds.");
             }
