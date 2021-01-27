@@ -3,6 +3,7 @@
  * In the "upload" directory, place the files to upload by using UploadFilesAsync.
  * The "download" directory is the destination for blobs downloaded by using DownloadFilesAsync.
  */
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -63,6 +64,23 @@ namespace dotnet_v12
                 List<Task> tasks = new List<Task>();
                 Console.WriteLine($"Found {Directory.GetFiles(uploadPath).Length} file(s)");
 
+                // Specify the StorageTransferOptions
+                BlobUploadOptions options = new BlobUploadOptions
+                {
+                    TransferOptions = new StorageTransferOptions
+                    {
+                        // Set the size of the first range request to 10MB.
+                        InitialTransferSize = 10 * 1024 * 1024,
+
+                        // Set the maximum number of workers that 
+                        // may be used in a parallel transfer.
+                        MaximumConcurrency = 8,
+
+                        // Set the maximum length of a transfer to 100MB.
+                        MaximumTransferSize = 100 * 1024 * 1024
+                    }
+                };
+
                 // Iterate through the files
                 foreach (string path in Directory.GetFiles(uploadPath))
                 {
@@ -75,7 +93,7 @@ namespace dotnet_v12
                     await sem.WaitAsync();
 
                     // Create tasks for each file that is uploaded. This is added to a collection that executes them all asyncronously.  
-                    tasks.Add(blockBlob.UploadAsync(stream).ContinueWith((t) =>
+                    tasks.Add(blockBlob.UploadAsync(stream, options).ContinueWith((t) =>
                     {
                         // Release the semaphore when the upload has completed.
                         sem.Release();
@@ -123,6 +141,20 @@ namespace dotnet_v12
             Directory.CreateDirectory(downloadPath);
             Console.WriteLine($"Created directory {downloadPath}");
 
+            // Specify the StorageTransferOptions
+            StorageTransferOptions options = new StorageTransferOptions
+            {
+                // Set the size of the first range request to 10MB.
+                InitialTransferSize = 10 * 1024 * 1024,
+
+                // Set the maximum number of workers that 
+                // may be used in a parallel transfer.
+                MaximumConcurrency = 8,
+
+                // Set the maximum length of a transfer to 100MB.
+                MaximumTransferSize = 100 * 1024 * 1024
+            };
+
             List<BlobContainerClient> containers = new List<BlobContainerClient>();
 
             foreach (BlobContainerItem container in blobServiceClient.GetBlobContainers())
@@ -161,7 +193,7 @@ namespace dotnet_v12
                             await sem.WaitAsync();
 
                             // Create tasks for each file that is uploaded. This is added to a collection that executes them all asyncronously.  
-                            tasks.Add(blockBlob.DownloadToAsync(stream).ContinueWith((t) =>
+                            tasks.Add(blockBlob.DownloadToAsync(stream, default, options).ContinueWith((t) =>
                             {
                                 // Close the file stream and release the semaphore when the download has completed.
                                 stream.Close();
