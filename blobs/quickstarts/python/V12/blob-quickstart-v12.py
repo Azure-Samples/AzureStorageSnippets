@@ -74,7 +74,7 @@ try:
         print("\t" + blob.name)
     #</Snippet_ListBlobs>
 
-    #<Snippet_DownloadBlob>
+    #<Snippet_DownloadBlobs>
     # Download the blob to a local file
     # Add 'DOWNLOAD' before the .txt extension so you can see both files in the data directory
     download_file_path = os.path.join(local_path, str.replace(local_file_name ,'.txt', 'DOWNLOAD.txt'))
@@ -82,9 +82,9 @@ try:
 
     with open(download_file_path, "wb") as download_file:
         download_file.write(blob_client.download_blob().readall())
-    #</Snippet_DownloadBlob>
+    #</Snippet_DownloadBlobs>
 
-    #<Snippet_DeleteContainer>
+    #<Snippet_CleanUp>
     # Clean up
     print("\nPress the Enter key to begin clean up")
     input()
@@ -98,7 +98,7 @@ try:
     os.rmdir(local_path)
 
     print("Done")
-    #</Snippet_DeleteContainer>
+    #</Snippet_CleanUp>
 
 except Exception as ex:
     print('Exception:')
