@@ -20,6 +20,7 @@
  * A "download" directory is created by the app as the destination for blobs downloaded by using DownloadFilesAsync.
  * The "download" directory is removed by the DeleteDownloadDirectory method on menu choice 4.
  */
+using Azure;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -52,9 +53,9 @@ namespace dotnet_v12
             return containers;
         }
 
-        //-------------------------------------------------
-        // Upload multiple block blobs simultaneously
-        //-------------------------------------------------
+        //-----------------------------------------
+        // Upload multiple blobs simultaneously
+        //-----------------------------------------
         // <Snippet_UploadFilesAsync>
         private static async Task UploadFilesAsync()
         {
@@ -71,14 +72,7 @@ namespace dotnet_v12
             {
                 Console.WriteLine($"Iterating in directory: {uploadPath}");
                 int count = 0;
-                int max_outstanding = 100;
-                int completed_count = 0;
 
-                // Create a new instance of the SemaphoreSlim class
-                // to define the number of threads to use.
-                SemaphoreSlim sem = new SemaphoreSlim(max_outstanding, max_outstanding);
-
-                List<Task> tasks = new List<Task>();
                 Console.WriteLine($"Found {Directory.GetFiles(uploadPath).Length} file(s)");
 
                 // Specify the StorageTransferOptions
@@ -86,38 +80,28 @@ namespace dotnet_v12
                 {
                     TransferOptions = new StorageTransferOptions
                     {
-                        // Set the size of the first range request to 10MB.
-                        InitialTransferSize = 10 * 1024 * 1024,
-
                         // Set the maximum number of workers that 
                         // may be used in a parallel transfer.
                         MaximumConcurrency = 8,
 
-                        // Set the maximum length of a transfer to 100MB.
-                        MaximumTransferSize = 100 * 1024 * 1024
+                        // Set the maximum length of a transfer to 8MB.
+                        MaximumTransferSize = 8 * 1024 * 1024
                     }
                 };
 
+                // Create a queue of tasks that will each upload one file.
+                var tasks = new Queue<Task<Response<BlobContentInfo>>>();
+
                 // Iterate through the files
-                foreach (string path in Directory.GetFiles(uploadPath))
+                foreach (string filePath in Directory.GetFiles(uploadPath))
                 {
                     BlobContainerClient container = containers[count % 5];
-                    string fileName = Path.GetFileName(path);
-                    FileStream stream = new FileStream(path, FileMode.Open);
-                    Console.WriteLine($"Uploading {path} to container {container.Name}.");
-                    BlockBlobClient blockBlob = container.GetBlockBlobClient(fileName);
+                    string fileName = Path.GetFileName(filePath);
+                    Console.WriteLine($"Uploading {fileName} to container {container.Name}");
+                    BlobClient blob = container.GetBlobClient(fileName);
 
-                    await sem.WaitAsync();
-
-                    // Create a task for each file to upload. The tasks are
-                    // added to a collection and all run asynchronously.
-                    tasks.Add(blockBlob.UploadAsync(stream, options).ContinueWith((t) =>
-                    {
-                        // Release the semaphore when the upload has completed.
-                        sem.Release();
-                        Interlocked.Increment(ref completed_count);
-                    }));
-
+                    // Add the upload task to the queue
+                    tasks.Enqueue(blob.UploadAsync(filePath, options));
                     count++;
                 }
 
@@ -125,7 +109,11 @@ namespace dotnet_v12
                 await Task.WhenAll(tasks);
 
                 timer.Stop();
-                Console.WriteLine($"Upload has been completed in {timer.Elapsed.TotalSeconds} seconds.");
+                Console.WriteLine($"Uploaded {count} files in {timer.Elapsed.TotalSeconds} seconds");
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Azure request failed: {ex.Message}");
             }
             catch (DirectoryNotFoundException ex)
             {
@@ -133,7 +121,7 @@ namespace dotnet_v12
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Exception: {ex.Message}");
             }
         }
         // </Snippet_UploadFilesAsync>
@@ -146,9 +134,9 @@ namespace dotnet_v12
             return new BlobServiceClient(Constants.connectionString);
         }
 
-        //-------------------------------------------------
-        // Download multiple block blobs simultaneously
-        //-------------------------------------------------
+        //------------------------------------------
+        // Download multiple blobs simultaneously
+        //------------------------------------------
         // <Snippet_DownloadFilesAsync>
         private static async Task DownloadFilesAsync()
         {
@@ -160,17 +148,14 @@ namespace dotnet_v12
             Console.WriteLine($"Created directory {downloadPath}");
 
             // Specify the StorageTransferOptions
-            StorageTransferOptions options = new StorageTransferOptions
+            var options = new StorageTransferOptions
             {
-                // Set the size of the first range request to 10MB.
-                InitialTransferSize = 10 * 1024 * 1024,
-
                 // Set the maximum number of workers that 
                 // may be used in a parallel transfer.
                 MaximumConcurrency = 8,
 
-                // Set the maximum length of a transfer to 100MB.
-                MaximumTransferSize = 100 * 1024 * 1024
+                // Set the maximum length of a transfer to 8MB.
+                MaximumTransferSize = 8 * 1024 * 1024
             };
 
             List<BlobContainerClient> containers = new List<BlobContainerClient>();
@@ -187,42 +172,23 @@ namespace dotnet_v12
             try
             {
                 int count = 0;
-                int max_outstanding = 100;
-                int completed_count = 0;
 
-                // Create a new instance of the SemaphoreSlim class to 
-                // define the number of threads to use in the application.
-                SemaphoreSlim sem = new SemaphoreSlim(max_outstanding, max_outstanding);
-
-                List<Task> tasks = new List<Task>();
+                // Create a queue of tasks that will each upload one file.
+                var tasks = new Queue<Task<Response>>();
 
                 foreach (BlobContainerClient container in containers)
                 {                     
                     // Iterate through the files
                     foreach (BlobItem blobItem in container.GetBlobs())
                     {
-                        if (blobItem.Properties.BlobType == BlobType.Block)
-                        {
-                            string fileName = downloadPath + blobItem.Name;
-                            FileStream stream = new FileStream(fileName, FileMode.Create);
-                            Console.WriteLine($"Downloading {blobItem.Name} to directory {downloadPath}.");
+                        string fileName = downloadPath + blobItem.Name;
+                        Console.WriteLine($"Downloading {blobItem.Name} to {downloadPath}");
 
-                            BlockBlobClient blockBlob = container.GetBlockBlobClient(blobItem.Name);
+                        BlobClient blob = container.GetBlobClient(blobItem.Name);
 
-                            await sem.WaitAsync();
-
-                            // Create a task for each file to download. The tasks are
-                            // added to a collection and all run asynchronously.
-                            tasks.Add(blockBlob.DownloadToAsync(stream, default, options).ContinueWith((t) =>
-                            {
-                                // Close the file stream and release the semaphore when the download completes.
-                                stream.Close();
-                                sem.Release();
-                                Interlocked.Increment(ref completed_count);
-                            }));
-
-                            count++;
-                        }
+                        // Add the download task to the queue
+                        tasks.Enqueue(blob.DownloadToAsync(fileName, default, options));
+                        count++;
                     }
                 }
 
@@ -231,7 +197,11 @@ namespace dotnet_v12
 
                 // Report the elapsed time.
                 timer.Stop();
-                Console.WriteLine($"Download has been completed in {timer.Elapsed.TotalSeconds} seconds.");
+                Console.WriteLine($"Downloaded {count} files in {timer.Elapsed.TotalSeconds} seconds");
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Azure request failed: {ex.Message}");
             }
             catch (DirectoryNotFoundException ex)
             {
@@ -239,41 +209,63 @@ namespace dotnet_v12
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Exception: {ex.Message}");
             }
         }
         // </Snippet_DownloadFilesAsync>
 
-        //-------------------------------------------------
+        //---------------------------------------------------
         // Clean up containers created by UploadFilesAsync
-        //-------------------------------------------------
+        //---------------------------------------------------
         private static async Task DeleteExistingContainersAsync()
         {
             BlobServiceClient blobServiceClient = GetBlobServiceClient();
 
-            foreach (BlobContainerItem container in blobServiceClient.GetBlobContainers())
+            try
             {
-                await blobServiceClient.DeleteBlobContainerAsync(container.Name);
-                Console.WriteLine($"Deleted container {container.Name}");
+                foreach (BlobContainerItem container in blobServiceClient.GetBlobContainers())
+                {
+                    await blobServiceClient.DeleteBlobContainerAsync(container.Name);
+                    Console.WriteLine($"Deleted container {container.Name}");
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Container delete request failed: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
             }
         }
 
-        //-------------------------------------------------------------
+        //--------------------------------------------------------------
         // Clean up files and directory created by DownloadFilesAsync
-        //-------------------------------------------------------------
+        //--------------------------------------------------------------
         private static void DeleteDownloadDirectory()
         {
             string downloadDir = Directory.GetCurrentDirectory() + "\\download\\";
 
-            // Delete the files
-            foreach (string filePath in Directory.GetFiles(downloadDir))
+            try
             {
-                File.Delete(filePath);
-                Console.WriteLine($"Deleted file {filePath}");
-            }
+                // Delete the files
+                foreach (string filePath in Directory.GetFiles(downloadDir))
+                {
+                    File.Delete(filePath);
+                    Console.WriteLine($"Deleted file {filePath}");
+                }
 
-            Directory.Delete(downloadDir);
-            Console.WriteLine($"Deleted directory {downloadDir}");
+                Directory.Delete(downloadDir);
+                Console.WriteLine($"Deleted directory {downloadDir}");
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.WriteLine($"Directory not found exception: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
         }
 
         public async Task<bool> MenuAsync()

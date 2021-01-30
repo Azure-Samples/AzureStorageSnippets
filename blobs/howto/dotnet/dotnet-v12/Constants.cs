@@ -27,7 +27,7 @@ namespace dotnet_v12
         // Credential constants
         public const string accountName = "";
         public const string accountKey = "";
-        public const string connectionString = "";
+        public const string connectionString = "DefaultEndpointsProtocol=https;AccountName=mytutorialacct;AccountKey=9ifaVq2BIFQTq8z8eXH3P78/71EctKdr2cLRD7sYE4gT9e8Q0+rkQMDsh0U5G4LK7ET7RyAXk9GXUgrSeSLs5A==;EndpointSuffix=core.windows.net";
         public const string accountKeyAdls = "";
         public const string connectionStringAdls = "";
         public const string clientSecret = "";
