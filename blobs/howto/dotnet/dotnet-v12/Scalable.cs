@@ -24,12 +24,10 @@ using Azure;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -84,8 +82,8 @@ namespace dotnet_v12
                         // may be used in a parallel transfer.
                         MaximumConcurrency = 8,
 
-                        // Set the maximum length of a transfer to 8MB.
-                        MaximumTransferSize = 8 * 1024 * 1024
+                        // Set the maximum length of a transfer to 50MB.
+                        MaximumTransferSize = 50 * 1024 * 1024
                     }
                 };
 
@@ -154,8 +152,8 @@ namespace dotnet_v12
                 // may be used in a parallel transfer.
                 MaximumConcurrency = 8,
 
-                // Set the maximum length of a transfer to 8MB.
-                MaximumTransferSize = 8 * 1024 * 1024
+                // Set the maximum length of a transfer to 50MB.
+                MaximumTransferSize = 50 * 1024 * 1024
             };
 
             List<BlobContainerClient> containers = new List<BlobContainerClient>();
