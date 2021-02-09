@@ -194,6 +194,51 @@ public class ACL_DataLake {
     // </Snippet_SetACLRecursively>
 
     //-------------------------------------------------
+    // Update an ACL
+    //-------------------------------------------------
+
+    // <Snippet_UpdateACL>
+    public void UpdateACL(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
+
+        DataLakeDirectoryClient directoryClient =
+        fileSystemClient.getDirectoryClient("my-parent-directory");
+
+        List<PathAccessControlEntry> pathAccessControlEntries = 
+            directoryClient.getAccessControl().getAccessControlList();
+
+        int index = -1;
+
+        for (PathAccessControlEntry pathAccessControlEntry : pathAccessControlEntries){
+            
+            if (pathAccessControlEntry.getAccessControlType() == AccessControlType.OTHER){
+                index = pathAccessControlEntries.indexOf(pathAccessControlEntry);
+                break;
+            }
+        }
+
+        if (index > -1){
+
+        PathAccessControlEntry userEntry = new PathAccessControlEntry();
+
+        RolePermissions userPermission = new RolePermissions();
+        userPermission.setExecutePermission(true).setReadPermission(true).setWritePermission(true);
+
+        userEntry.setDefaultScope(isDefaultScope);
+        userEntry.setAccessControlType(AccessControlType.OTHER);
+        userEntry.setPermissions(userPermission);  
+        
+        pathAccessControlEntries.set(index, userEntry);
+        }
+ 
+        directoryClient.setAccessControlList(pathAccessControlEntries, 
+            directoryClient.getAccessControl().getGroup(), 
+            directoryClient.getAccessControl().getOwner());
+    
+    }
+    // </Snippet_UpdateACL>
+
+
+    //-------------------------------------------------
     // Update ACLs recursively
     //-------------------------------------------------
 
@@ -225,11 +270,51 @@ public class ACL_DataLake {
     // </Snippet_UpdateACLRecursively>
 
     //-------------------------------------------------
+    // Remove an ACL entry
+    //-------------------------------------------------
+
+    // <Snippet_RemoveACLEntry>
+    public void RemoveACLEntry(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
+
+        DataLakeDirectoryClient directoryClient =
+        fileSystemClient.getDirectoryClient("my-parent-directory");
+
+        List<PathAccessControlEntry> pathAccessControlEntries = 
+            directoryClient.getAccessControl().getAccessControlList();
+
+        PathAccessControlEntry entryToRemove = null;
+
+        for (PathAccessControlEntry pathAccessControlEntry : pathAccessControlEntries){
+            
+            if (pathAccessControlEntry.getEntityId() != null){
+
+                if (pathAccessControlEntry.getEntityId().equals("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")){
+                    entryToRemove = pathAccessControlEntry;
+                    break;
+                }
+            }
+
+        }
+
+        if (entryToRemove != null){
+            
+            pathAccessControlEntries.remove(entryToRemove);
+
+            directoryClient.setAccessControlList(pathAccessControlEntries, 
+            directoryClient.getAccessControl().getGroup(), 
+            directoryClient.getAccessControl().getOwner());   
+        }
+   
+    
+    }
+    // </Snippet_RemoveACLEntry>
+
+    //-------------------------------------------------
     // Remove ACLs recursively
     //-------------------------------------------------
 
     // <Snippet_RemoveACLRecursively>
-    public void RemoveACLRecursively(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
+    public void RemoveACLEntryRecursively(DataLakeFileSystemClient fileSystemClient, Boolean isDefaultScope){
 
         DataLakeDirectoryClient directoryClient =
         fileSystemClient.getDirectoryClient("my-parent-directory");
@@ -344,7 +429,8 @@ public class ACL_DataLake {
             System.out.println("Enter a command");
 
             System.out.println("(1) Manage directory ACL | (2) Manage File ACLs | (3) Set ACL recursive | " +
-                            "(4) Update ACL recursive | (5) Remove ACL recursive | (6) Resume ACL recursive | (7) Exit");
+                            "(4) Update an ACL | (5) Update ACL recursive | | (6) Remove an ACL | (7) Remove ACL recursive " +
+                            "|(8) Resume ACL recursive | (9) Exit");
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -365,12 +451,18 @@ public class ACL_DataLake {
                         SetACLRecursively(fileSystemClient, false);
                     break;
                     case "4":
-                        UpdateACLRecursively(fileSystemClient, false);
+                        UpdateACL(fileSystemClient, false);
                     break;
                     case "5":
-                        RemoveACLRecursively(fileSystemClient, false);
+                        UpdateACLRecursively(fileSystemClient, false);
                     break;
                     case "6":
+                        RemoveACLEntry(fileSystemClient, false);
+                    break;
+                    case "7":
+                        RemoveACLEntryRecursively(fileSystemClient, false);
+                    break;
+                    case "8":
                         DataLakeDirectoryClient directoryClient =
                         fileSystemClient.getDirectoryClient("my-parent-directory");
 
@@ -430,7 +522,7 @@ public class ACL_DataLake {
                         ContinueOnFailure(fileSystemClient, directoryClient, pathAccessControlEntries);
 
                     break;
-                    case "7":
+                    case "9":
                         return;
                     default:
                         break;
