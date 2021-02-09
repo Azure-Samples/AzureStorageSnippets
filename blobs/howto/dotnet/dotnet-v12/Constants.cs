@@ -28,7 +28,6 @@ namespace dotnet_v12
         public const string accountName = "";
         public const string accountKey = "";
         public const string connectionString = "";
-        public const string accountKeyAdls = "";
         public const string connectionStringAdls = "";
         public const string clientSecret = "";
         public const string clientID = "";

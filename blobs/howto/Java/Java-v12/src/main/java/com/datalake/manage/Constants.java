@@ -21,7 +21,7 @@ public class Constants
     public static final String storageAccountNameAdls = "";
 
     // Resource constants
-    public static final String containerName = "my-container";
+    public static final String containerName = "";
     public static final String blobName = "";
     public static final String directoryName = "";
     public static final String subDirectoryName = "";

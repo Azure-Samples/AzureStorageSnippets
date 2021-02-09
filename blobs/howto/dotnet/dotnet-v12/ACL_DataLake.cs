@@ -110,10 +110,53 @@ namespace dotnet_v12
 
         #endregion
 
+        #region Update ACL
+        // ---------------------------------------------------------
+        // Update directory-level ACLs
+        //----------------------------------------------------------
+
+        // <Snippet_UpdateACL>
+        public async Task UpdateDirectoryACLs(DataLakeFileSystemClient fileSystemClient)
+        {
+            DataLakeDirectoryClient directoryClient =
+              fileSystemClient.GetDirectoryClient("");
+
+            PathAccessControl directoryAccessControl =
+                await directoryClient.GetAccessControlAsync();
+
+            List<PathAccessControlItem> accessControlListUpdate 
+                = (List<PathAccessControlItem>)directoryAccessControl.AccessControlList;
+
+            int index = -1;
+
+            foreach (var item in accessControlListUpdate)
+            {
+                if (item.AccessControlType == AccessControlType.Other)
+                {
+                    index = accessControlListUpdate.IndexOf(item);
+                    break;
+                }
+            }
+
+            if (index > -1)
+            {
+                accessControlListUpdate[index] = new PathAccessControlItem(AccessControlType.Other,
+                RolePermissions.Read |
+                RolePermissions.Execute);
+
+                directoryClient.SetAccessControlList(accessControlListUpdate);
+            }
+
+           }
+
+            // </Snippet_UpdateACL>
+
+            #endregion
+
         #region Set ACLs recursively
 
-        // <Snippet_SetACLRecursively>
-        public async Task SetACLRecursively(DataLakeServiceClient serviceClient, bool isDefaultScope)
+            // <Snippet_SetACLRecursively>
+            public async Task SetACLRecursively(DataLakeServiceClient serviceClient, bool isDefaultScope)
         {
             DataLakeDirectoryClient directoryClient =
                 serviceClient.GetFileSystemClient("my-container").
@@ -171,6 +214,46 @@ namespace dotnet_v12
 
         }
         // </Snippet_UpdateACLsRecursively>
+
+        #endregion
+
+        #region Remove ACL entry
+        // ---------------------------------------------------------
+        // Remove directory-level ACL entry
+        //----------------------------------------------------------
+
+        // <Snippet_RemoveACLEntry>
+        public async Task RemoveDirectoryACLEntry
+            (DataLakeFileSystemClient fileSystemClient)
+        {
+            DataLakeDirectoryClient directoryClient =
+              fileSystemClient.GetDirectoryClient("");
+
+            PathAccessControl directoryAccessControl =
+                await directoryClient.GetAccessControlAsync();
+
+            List<PathAccessControlItem> accessControlListUpdate
+                = (List<PathAccessControlItem>)directoryAccessControl.AccessControlList;
+
+            PathAccessControlItem entryToRemove = null;
+
+            foreach (var item in accessControlListUpdate)
+            {
+                if (item.EntityId == "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+                {
+                    entryToRemove = item;
+                    break;
+                }
+            }
+
+            if (entryToRemove != null)
+            {
+                accessControlListUpdate.Remove(entryToRemove);
+                directoryClient.SetAccessControlList(accessControlListUpdate);
+            }
+
+        }
+        // </Snippet_RemoveACLEntry>
 
         #endregion
 
@@ -266,13 +349,16 @@ namespace dotnet_v12
         {
             Console.Clear();
             Console.WriteLine("Choose a security scenario:");
-            Console.WriteLine("1) Get and set directory-level permissions");
-            Console.WriteLine("2) Get and set file-level permissions");
-            Console.WriteLine("3) Set ACLs recursively");
-            Console.WriteLine("4) Update ACLs recursively");
-            Console.WriteLine("5) Remove ACLs recursively");
-            Console.WriteLine("6) Resume after failure with token");
-            Console.WriteLine("7) Continue past failure");
+            Console.WriteLine("1) Set a directory ACL");
+            Console.WriteLine("2) Set a file ACL");
+            Console.WriteLine("3) Update an ACL");
+            Console.WriteLine("4) Set ACLs recursively");
+            Console.WriteLine("5) Update ACLs recursively");
+            Console.WriteLine("6) Remove an ACL entry");
+            Console.WriteLine("7) Remove ACLs recursively");
+            Console.WriteLine("8) Resume after failure with token");
+            Console.WriteLine("9) Continue past failure");
+
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
@@ -307,7 +393,7 @@ namespace dotnet_v12
 
                 case "3":
 
-                    await SetACLRecursively(dataLakeServiceClient, false);
+                    await UpdateDirectoryACLs(fileSystemClient);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -315,7 +401,7 @@ namespace dotnet_v12
 
                 case "4":
 
-                    await UpdateACLsRecursively(dataLakeServiceClient, false);
+                    await SetACLRecursively(dataLakeServiceClient, false);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -323,13 +409,29 @@ namespace dotnet_v12
 
                 case "5":
 
-                    await RemoveACLsRecursively(dataLakeServiceClient, false);
+                    await UpdateACLsRecursively(dataLakeServiceClient, false);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 case "6":
+
+                    await RemoveDirectoryACLEntry(fileSystemClient);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "7":
+
+                    await RemoveACLsRecursively(dataLakeServiceClient, false);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "8":
 
                     DataLakeDirectoryClient directoryClient =
                         dataLakeServiceClient.GetFileSystemClient("my-container").
@@ -366,7 +468,7 @@ namespace dotnet_v12
                     Console.ReadLine();
                     return true;
 
-                case "7":
+                case "9":
 
                     DataLakeDirectoryClient directoryClient2 =
                         dataLakeServiceClient.GetFileSystemClient("my-container").
