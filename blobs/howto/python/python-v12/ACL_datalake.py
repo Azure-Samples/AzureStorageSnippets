@@ -47,57 +47,61 @@ file_system_client=""
 file_system_name=""
 directory_path=""
 
-def menu(self):  
+def menu():  
+
+      initialize_storage_account(storage_account_name, storage_account_key)
     
-    os.system("cls")
-    initialize_storage_account(storage_account_name, storage_account_key)
+      command = '0'
 
-    print("Choose a security scenario:")
+      while command != 'X':
 
-    print("1) Get and set directory-level permissions")
-    print("2) Get and set file-level permissions")
-    print("3) Set ACLs recursively")
-    print("4) Update ACLs recursively")
-    print("5) Remove ACLs recursively")
-    print("6) Continue past failure")
-    print("7) Resume after failure with token")
-    print("X) Exit to main menu")
-    option = input("\r\nSelect an option: ")
+        os.system("cls")
+        print("Choose a security scenario:")
+        print("1) Get and set directory-level permissions")
+        print("2) Get and set file-level permissions")
+        print("3) Set ACLs recursively")
+        print("4) Update ACLs recursively")
+        print("5) Remove ACLs recursively")
+        print("6) Continue past failure")
+        print("7) Resume after failure with token")
+        print("X) Exit to main menu")
 
-    if option == "1":
-        manage_directory_permissions()
-        input("Press Enter to continue ")
-        return True
-    elif option == "2":
-        manage_file_permissions()
-        input("Press Enter to continue ")
-        return True
-    elif option == "3":
-        set_permission_recursively(False)
-        input("Press Enter to continue ")
-        return True
-    elif option == "4":
-        update_permission_recursively(False)
-        input("Press Enter to continue ")
-        return True
-    elif option == "5":
-        remove_permission_recursively(False)
-        input("Press Enter to continue ")
-        return True
-    elif option == "6":
-        continue_on_failure()
-        input("Press Enter to continue ")
-        return True
-    elif option == "7":
-        resume_set_acl_recursive(None)
-        input("Press Enter to continue ")
-        return True
-    elif option == "x" or option == "X":
-        return False
-    else:
-        print("Unknown option: " + str(option))
-        input("Press Enter to continue ")
-        return True
+        option = input("\r\nSelect an option: ")
+
+        if option == "1":
+            manage_directory_permissions()
+            input("Press Enter to continue ")
+            return True
+        elif option == "2":
+            manage_file_permissions()
+            input("Press Enter to continue ")
+            return True
+        elif option == "3":
+            set_permission_recursively(False)
+            input("Press Enter to continue ")
+            return True
+        elif option == "4":
+            update_permission_recursively(False)
+            input("Press Enter to continue ")
+            return True
+        elif option == "5":
+            remove_permission_recursively(False)
+            input("Press Enter to continue ")
+            return True
+        elif option == "6":
+            continue_on_failure()
+            input("Press Enter to continue ")
+            return True
+        elif option == "7":
+            resume_set_acl_recursive(None)
+            input("Press Enter to continue ")
+            return True
+        elif option == "x" or option == "X":
+            return False
+        else:
+            print("Unknown option: " + str(option))
+            input("Press Enter to continue ")
+            return True
 
 # -------------------------------------------------
 # Connect to account
@@ -144,7 +148,7 @@ def manage_directory_permissions():
         
         acl_props = directory_client.get_access_control()
         
-        print(acl_props['permissions'])
+        print(acl_props['acl'])
         
         new_dir_permissions = "rwxr-xrw-"
         
@@ -312,3 +316,7 @@ def resume_set_acl_recursive(continuation_token):
      print(e) 
      return continuation_token
 # </Snippet_ResumeContinuationToken>
+
+# Main method.
+if __name__ == '__main__':
+    menu()
