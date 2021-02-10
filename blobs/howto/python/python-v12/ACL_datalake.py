@@ -148,7 +148,7 @@ def manage_directory_permissions():
         
         acl_props = directory_client.get_access_control()
         
-        print(acl_props['acl'])
+        print(acl_props['permissions'])
         
         new_dir_permissions = "rwxr-xrw-"
         
