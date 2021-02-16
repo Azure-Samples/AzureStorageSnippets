@@ -22,12 +22,12 @@ try:
     connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
     # Create a unique name for the queue
-    queue_name = "queue-" + str(uuid.uuid4())
+    q_name = "queue-" + str(uuid.uuid4())
 
     # Instantiate a QueueClient object which will
     # be used to create and manipulate the queue
-    print("Creating queue: " + queue_name)
-    queue_client = QueueClient.from_connection_string(connect_str, queue_name)
+    print("Creating queue: " + q_name)
+    queue_client = QueueClient.from_connection_string(connect_str, q_name)
 
     # Create the queue
     queue_client.create_queue()
@@ -35,8 +35,11 @@ try:
 
     # <Snippet_EncodeMessage>
     # Setup Base64 encoding and decoding functions
-    queue_client.message_encode_policy = BinaryBase64EncodePolicy()
-    queue_client.message_decode_policy = BinaryBase64DecodePolicy()
+    base64_queue_client = QueueClient.from_connection_string(
+                                conn_str=connect_str, queue_name=q_name,
+                                message_encode_policy = BinaryBase64EncodePolicy(),
+                                message_decode_policy = BinaryBase64DecodePolicy()
+                            )
     # </Snippet_EncodeMessage>
 
     # <Snippet_AddMessage>
