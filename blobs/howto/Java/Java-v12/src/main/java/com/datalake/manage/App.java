@@ -22,7 +22,7 @@ public class App
 
                 System.out.println("(1) CRUD operations for accounts with a hierarchical namespace " + 
                                "(2) Access Control Lists (ACL) for accounts with a hierarchical namespace | " +
-                               "(3) Exit");
+                               " (3) Blob security | (4) Exit");
                   
                 String input = reader.readLine();
 
@@ -37,6 +37,10 @@ public class App
                         acl_DataLake.ShowMenu();
                     break;
                     case "3":
+                        Security security = new Security();
+                        security.ShowMenu();
+                break;
+                    case "4":
                         System.out.println("Cleaning up the sample and exiting!");
                         System.exit(0);
                         break;
