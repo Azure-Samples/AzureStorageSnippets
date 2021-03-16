@@ -24,10 +24,7 @@ from azure.core.exceptions import (
 
 from azure.storage.blob import (
     BlobClient,
-    BlobLeaseClient,
-    BlobProperties,
-    ContainerClient,
-    CopyProperties
+    BlobLeaseClient
 )
 # </Snippet_Imports>
 
