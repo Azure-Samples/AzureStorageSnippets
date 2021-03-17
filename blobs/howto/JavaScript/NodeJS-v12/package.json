@@ -1,0 +1,16 @@
+{
+    "name": "blob-how-to-v12",
+    "version": "1.0.0",
+    "description": "Use the @azure/storage-blob SDK version 12 to interact with Azure Blob storage",
+    "main": "blob-how-to-v12.js",
+    "scripts": {
+        "start": "node blob-how-to-v12.js"
+    },
+    "author": "mhopkins",
+    "license": "MIT",
+    "dependencies": {
+        "@azure/storage-blob": "^12.0.0",
+        "@types/dotenv": "^4.0.3",
+        "dotenv": "^6.0.0"
+    }
+}
