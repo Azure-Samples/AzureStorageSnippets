@@ -26,7 +26,8 @@
 
 const readline = require('readline').createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
+    terminal: false
   });
 
 const Constants = require('./constants.js');
@@ -35,14 +36,14 @@ var constants = new Constants();
 //-----------------------------------------------
 // Main menu
 //-----------------------------------------------
-function MainMenu() {
+async function MainMenu() {
     console.clear();
     console.log('Choose a feature area:');
     console.log('1) Copy operations');
     console.log('2) SAS operations');
     console.log('X) Exit');
+
     readline.question('Select an option: ', option => {
-        console.log('You chose: ', option);
         readline.close();
 
         switch (option) {
@@ -54,6 +55,7 @@ function MainMenu() {
                 console.log('Run SAS operations...');
                 return true;
 
+
             case "x":
             case "X":
                 console.log('Exit...');
@@ -64,8 +66,6 @@ function MainMenu() {
                 return true;
         }
     });
-
-    return true;
 }
 
 //-----------------------------------------------
@@ -73,11 +73,12 @@ function MainMenu() {
 //-----------------------------------------------
 async function main() {
     try {
-        while (MainMenu()){}
+        while (await MainMenu()){}
+        console.log('WTF?!!!');
     }
     catch (ex) {
         console.log(ex.message);
     }
 }
 
-main(); //.then(() => console.log('Done')).catch((ex) => console.log(ex.message));
+main();
