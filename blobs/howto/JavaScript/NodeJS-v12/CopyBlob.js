@@ -14,33 +14,5 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-// All files in this project can access these values. 
-// You won't have to modify the code in your methods to test them. 
-// Just update this file with the relevant values.
+//const { v1: uuidv1} = require('uuidv1');
 
-class Constants {
-    constructor () {
-        // Credential constants
-        this.accountKey = "";
-        this.connectionString = "";
-        this.accountKeyAdls = "";
-        this.connectionStringAdls = "";
-        this.clientSecret = "";
-        this.clientID = "";
-
-        // Account constants
-        this.tenantID = "";
-        this.subscription = "";
-        this.resourceID = "";
-        this.storageAccountName = "";
-        this.storageAccountNameAdls = "";
-
-        // Resource constants
-        this.containerName = "";
-        this.blobName = "";
-        this.directoryName = "";
-        this.subDirectoryName = "";
-    }
-}
-
-module.exports = Constants;

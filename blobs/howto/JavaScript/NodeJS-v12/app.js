@@ -14,7 +14,15 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
-//const { v1: uuidv1} = require('uuidv1');
+//----------------------------------------------------------------------------------
+// Run the following npm command from a console prompt in this directory
+// to install the required Azure Blob Storage client libraries:
+//
+// npm install
+//
+// Update package.json to keep the required versions current.
+//
+//----------------------------------------------------------------------------------
 
 const readline = require('readline').createInterface({
     input: process.stdin,
@@ -27,7 +35,7 @@ var constants = new Constants();
 //-----------------------------------------------
 // Main menu
 //-----------------------------------------------
-async function MainMenu() {
+function MainMenu() {
     console.clear();
     console.log('Choose a feature area:');
     console.log('1) Copy operations');
@@ -56,13 +64,20 @@ async function MainMenu() {
                 return true;
         }
     });
+
+    return true;
 }
 
 //-----------------------------------------------
 // main - program entry point
 //-----------------------------------------------
 async function main() {
-    while (await MainMenu()){}
+    try {
+        while (MainMenu()){}
+    }
+    catch (ex) {
+        console.log(ex.message);
+    }
 }
 
-main().then(() => console.log('Done')).catch((ex) => console.log(ex.message));
+main(); //.then(() => console.log('Done')).catch((ex) => console.log(ex.message));
