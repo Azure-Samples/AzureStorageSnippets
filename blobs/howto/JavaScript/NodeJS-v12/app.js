@@ -29,7 +29,7 @@ const SAS = require('./SAS.js');
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout,
-    terminal: true
+    terminal: false
   });
 
 //-----------------------------------------------
