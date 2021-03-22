@@ -15,44 +15,95 @@
 //----------------------------------------------------------------------------------
 
 const { BlobServiceClient, ContainerClient } = require('@azure/storage-blob');
+const { SASQueryParameters } = require('@azure/storage-blob');
 
-// Create a service SAS for a blob container
-function getContainerSasUri(containerClient, sharedKeyCredential, storedPolicyName) {
-    const sasOptions = {
-        containerName: containerClient.containerName,
-        permissions: ContainerSASPermissions.parse("c")
-    };
+const Constants = require('./constants.js');
+var constants = new Constants();
 
-    if (storedPolicyName == null) {
-        sasOptions.startsOn = new Date();
-        sasOptions.expiresOn = new Date(new Date().valueOf() + 3600 * 1000);
-    } else {
-        sasOptions.identifier = storedPolicyName;
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+  });
+
+class SAS {
+    constructor () { }
+
+    //<Snippet_ContainerSAS>
+    // Create a service SAS for a blob container
+    getContainerSasUri(containerClient, sharedKeyCredential, storedPolicyName) {
+        const sasOptions = {
+            containerName: containerClient.containerName,
+            permissions: ContainerSASPermissions.parse("c")
+        };
+
+        if (storedPolicyName == null) {
+            sasOptions.startsOn = new Date();
+            sasOptions.expiresOn = new Date(new Date().valueOf() + 3600 * 1000);
+        } else {
+            sasOptions.identifier = storedPolicyName;
+        }
+
+        const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
+        console.log(`SAS token for blob container is: ${sasToken}`);
+
+        return `${containerClient.url}?${sasToken}`;
     }
+    //</Snippet_ContainerSAS>
 
-    const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
-    console.log(`SAS token for blob container is: ${sasToken}`);
+    //<Snippet_BlobSAS>
+    // Create a service SAS for a blob
+    getBlobSasUri(containerClient, blobName, sharedKeyCredential, storedPolicyName) {
+        const sasOptions = {
+            containerName: containerClient.containerName,
+            blobName: blobName
+        };
 
-    return `${containerClient.url}?${sasToken}`;
+        if (storedPolicyName == null) {
+            sasOptions.startsOn = new Date();
+            sasOptions.expiresOn = new Date(new Date().valueOf() + 3600 * 1000);
+            sasOptions.permissions = BlobSASPermissions.parse("r");
+        } else {
+            sasOptions.identifier = storedPolicyName;
+        }
+
+        const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
+        console.log(`SAS token for blob is: ${sasToken}`);
+
+        return `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
+    }
+    //</Snippet_BlobSAS>
+
+    //-----------------------------------------------
+    // SAS menu
+    //-----------------------------------------------
+    Menu() {
+        console.clear();
+        console.log('SAS scenario menu:');
+        console.log('1) SAS for a container');
+        console.log('2) SAS for a blob');
+        console.log('X) Exit');
+
+        readline.question('Select an option: ', (option) => {
+            readline.close();
+
+            switch (option) {
+                case "1":
+                    console.log('Get a container SAS...');
+                    return true;
+                case "2":
+                    console.log('Get blob SAS...');
+                    return true;
+                case "x":
+                case "X":
+                    console.log('Exit...');
+                    return false;
+                default:
+                    console.log('default...');
+                    return true;
+            }
+        });
+    }
 }
 
-// Create a service SAS for a blob
-function getBlobSasUri(containerClient, blobName, sharedKeyCredential, storedPolicyName) {
-    const sasOptions = {
-        containerName: containerClient.containerName,
-        blobName: blobName
-    };
-
-    if (storedPolicyName == null) {
-        sasOptions.startsOn = new Date();
-        sasOptions.expiresOn = new Date(new Date().valueOf() + 3600 * 1000);
-        sasOptions.permissions = BlobSASPermissions.parse("r");
-    } else {
-        sasOptions.identifier = storedPolicyName;
-    }
-
-    const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
-    console.log(`SAS token for blob is: ${sasToken}`);
-
-    return `${containerClient.getBlockBlobClient(blobName).url}?${sasToken}`;
-}
+module.exports = SAS;

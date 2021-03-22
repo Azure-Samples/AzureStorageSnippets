@@ -24,43 +24,36 @@
 //
 //----------------------------------------------------------------------------------
 
+const SAS = require('./SAS.js');
+
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout,
     terminal: false
   });
 
-const Constants = require('./constants.js');
-var constants = new Constants();
-
 //-----------------------------------------------
 // Main menu
 //-----------------------------------------------
-async function MainMenu() {
+function MainMenu() {
     console.clear();
     console.log('Choose a feature area:');
-    console.log('1) Copy operations');
-    console.log('2) SAS operations');
+    console.log('1) SAS operations');
     console.log('X) Exit');
 
-    readline.question('Select an option: ', option => {
+    readline.question('Select an option: ', (option) => {
         readline.close();
 
         switch (option) {
             case "1":
-                console.log('Run copy operations...');
-                return true;
-
-            case "2":
                 console.log('Run SAS operations...');
+                sas = new SAS();
+                sas.Menu();
                 return true;
-
-
             case "x":
             case "X":
                 console.log('Exit...');
                 return false;
-
             default:
                 console.log('default...');
                 return true;
@@ -71,10 +64,9 @@ async function MainMenu() {
 //-----------------------------------------------
 // main - program entry point
 //-----------------------------------------------
-async function main() {
+function main() {
     try {
-        while (await MainMenu()){}
-        console.log('WTF?!!!');
+        while (MainMenu()){ }
     }
     catch (ex) {
         console.log(ex.message);

@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Use the @azure/storage-blob SDK version 12 to interact with Azure Blob storage",
     "main": "app.js",
-    "repository": "",
+    "repository": "https://github.com/Azure-Samples/AzureStorageSnippets",
     "scripts": {
         "start": "node app.js"
     },
