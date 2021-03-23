@@ -15,12 +15,17 @@
 //----------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------
-// Run the following npm command from a console prompt in this directory
-// to install the required Azure Blob Storage client libraries:
+// Update package.json to keep the required versions current.
 //
+// Run the following npm command from a console prompt in this directory
+// to install the required libraries:
 // npm install
 //
-// Update package.json to keep the required versions current.
+// Use the following command to run this test app:
+// node app.js
+//
+// Due to the asynchronous nature of Node.js, this menu system doesn't work as
+// intended. Run individual scenario files (i.e SAS.js) to test code.
 //
 //----------------------------------------------------------------------------------
 
