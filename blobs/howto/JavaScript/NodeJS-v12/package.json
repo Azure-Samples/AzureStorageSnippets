@@ -10,8 +10,8 @@
     "author": "mhopkins",
     "license": "MIT",
     "dependencies": {
+        "@azure/core-auth": "^1.2.0",
         "@azure/storage-blob": "^12.0.0",
-        "@types/dotenv": "^4.0.3",
-        "dotenv": "^6.0.0"
+        "dotenv": "^8.2.0"
     }
 }

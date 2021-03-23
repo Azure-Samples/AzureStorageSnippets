@@ -21,6 +21,7 @@
 class Constants {
     constructor () {
         // Credential constants
+        this.accountName = "";
         this.accountKey = "";
         this.connectionString = "";
         this.accountKeyAdls = "";
