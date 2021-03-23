@@ -21,8 +21,8 @@
 class Constants {
     constructor () {
         // Credential constants
-        this.accountName = "queuetestacct";
-        this.accountKey = "O2fhC/fOEOrui29QoSZPf25SLYebALm5LWNAAKA18PriwrKomjjq17oAXArJDRPZQfVfCegAhmfjENV9grOUDQ==";
+        this.accountName = "";
+        this.accountKey = "";
         this.connectionString = "";
         this.accountKeyAdls = "";
         this.connectionStringAdls = "";
@@ -37,8 +37,8 @@ class Constants {
         this.storageAccountNameAdls = "";
 
         // Resource constants
-        this.containerName = "sastestcontainer";
-        this.blobName = "copymachine.jpg";
+        this.containerName = "";
+        this.blobName = "";
         this.directoryName = "";
         this.subDirectoryName = "";
     }
