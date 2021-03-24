@@ -37,20 +37,20 @@ class ListBlobs:
 
     # <Snippet_ListBlobs>
     # Regular blob listing
-    def list_blobs_in_container(self, container_client):
-        # Get and iterate through list of blobs in specified container.
+    def list_blobs_flat_listing(self, container_client):
+        # List blobs in the specified container
         blobs_list = container_client.list_blobs()
         for blob in blobs_list:
-            print(blob.name + '\n')
+            print('Blob: ' + blob.name)
 
-        # Another way of iterating through the list of blobs with fine grain control over page items.
+        # Another way of iterating through the list of blobs with fine grain control over page items
         not_finished = True
         blob_list_iter = container_client.list_blobs(results_per_page=2).by_page()
         while not_finished:
             try:
                 blob_list = next(blob_list_iter)
                 for blob in blob_list:
-                    print(blob.name + '\n')
+                    print('Blob: ' + blob.name)
             except StopIteration:
                 not_finished = False
     # </Snippet_ListBlobs>
@@ -58,12 +58,12 @@ class ListBlobs:
 
     #<Snippet_WalkHierarchy>
     '''
-    Listing blob hierarchy
-    This example walks blobs in a container within a storage account,
+    List blob hierarchy
+    Walk the blobs in a container within a storage account,
     displaying them in a hierarchical structure and, when present, showing
     the number of snapshots that are available per blob.
     '''
-    def walk_container(self, container_client):
+    def list_blobs_hierarchical_listing(self, container_client):
         depth = 1
         separator = '   '
 
@@ -72,12 +72,12 @@ class ListBlobs:
             for item in container_client.walk_blobs(name_starts_with=prefix):
                 short_name = item.name[len(prefix):]
                 if isinstance(item, BlobPrefix):
-                    print('F: ' + separator * depth + short_name)
+                    print('Folder: ' + separator * depth + short_name)
                     depth += 1
                     walk_blob_hierarchy(prefix=item.name)
                     depth -= 1
                 else:
-                    message = 'B: ' + separator * depth + short_name
+                    message = 'Blob: ' + separator * depth + short_name
                     results = list(container_client.list_blobs(name_starts_with=item.name, include=['snapshots']))
                     num_snapshots = len(results) - 1
                     if num_snapshots:
@@ -95,11 +95,11 @@ class ListBlobs:
         option = input("\r\nSelect an option: ")
 
         if option == "1":
-            self.list_blobs_in_container(self.containerClient)
+            self.list_blobs_flat_listing(self.containerClient)
             input("Press Enter to continue ")
             return True
         elif option == "2":
-            self.walk_container(self.containerClient)
+            self.list_blobs_hierarchical_listing(self.containerClient)
             input("Press Enter to continue ")
             return True
         elif option == "x" or option == "X":
