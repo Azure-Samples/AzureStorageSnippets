@@ -15,12 +15,21 @@
 #----------------------------------------------------------------------------------
 
 from copy_blob import CopyBlob
+from list_blobs import ListBlobs
 import os
 
-def copy_operations():
+def copy_blobs():
     copyblob = CopyBlob()
 
     while (copyblob.menu()):
+        pass
+
+    return True
+
+def list_blobs():
+    listblobs = ListBlobs()
+
+    while (listblobs.menu()):
         pass
 
     return True
@@ -30,20 +39,18 @@ def main():
         os.system("cls")
 
         print("Choose a feature area:")
-        print("1) Copy operations")
-        print("2) Empty")
+        print("1) Copy a blob")
+        print("2) List blobs")
         print("3) Empty")
         print("4) Empty")
         print("X) Exit")
 
         option = input("\r\nSelect an option: ")
-        # print("You chose option: " + option)
-        # input("Press Enter to continue ")
 
         if option == "1":
-            return copy_operations()
+            return copy_blobs()
         elif option == "2":
-            return True
+            return list_blobs()
         elif option == "3":
             return True
         elif option == "4":
