@@ -14,6 +14,7 @@
 // places, or events is intended or should be inferred.
 //----------------------------------------------------------------------------------
 
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -74,10 +75,10 @@ namespace dotnet_v12
         }
 
         //-------------------------------------------------
-        // Recover a specific blob version
+        // Recover a specific blob snapshot
         //-------------------------------------------------
 
-        private static async void RecoverSpecificBlobVersion()
+        private static async Task CopySnapshotToBaseBlob()
         {
             var connectionString = Constants.connectionString;
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
@@ -85,27 +86,66 @@ namespace dotnet_v12
             BlobContainerClient container =
                 blobServiceClient.GetBlobContainerClient(Constants.containerName);
 
-            // Get a specific blob to undelete.
-                  BlobClient blockBlob = container.GetBlobClient("logfile.txt");
+            // Get a specific blob to restore.
+            BlobClient blockBlob = container.GetBlobClient("blob1.txt");
 
-            // <Snippet_RecoverSpecificBlobVersion>
+            // <Snippet_RecoverSpecificBlobSnapshot>
 
-            // undelete
+            // Restore deleted blob.
             await blockBlob.UndeleteAsync();
 
-            // List all blobs and snapshots in the container prefixed by the blob name
-            IEnumerable<BlobItem> allBlobVersions =  container.GetBlobs
-                (BlobTraits.None, BlobStates.Snapshots, prefix: blockBlob.Name);
+            // List all blobs and snapshots in the container that start with prefix.
+            IEnumerable<BlobItem> allBlobSnapshots = container.GetBlobs
+                (BlobTraits.None, BlobStates.Snapshots, prefix: blockBlob.Name).OrderBy
+                (snapshot => snapshot.Snapshot);
 
-            // Restore the most recently generated snapshot to the active blob    
-            BlobItem copySource = allBlobVersions.First(version => ((BlobItem)version).Snapshot.Length > 0 
-            && ((BlobItem)version).Name == blockBlob.Name) as BlobItem;
-            
-            blockBlob.StartCopyFromUri(container.GetBlockBlobClient(copySource.Name).Uri);
+            BlobUriBuilder blobSnapshotUri = new BlobUriBuilder(blockBlob.Uri)
+            {
+                // Get ID for the most recent snapshot and append to snapshot URI.
+                Snapshot = allBlobSnapshots.ElementAt(allBlobSnapshots.Count() - 1).Snapshot
+            };
 
-            // </Snippet_RecoverSpecificBlobVersion>
+            blockBlob.StartCopyFromUri(blobSnapshotUri.ToUri());
 
+            // </Snippet_RecoverSpecificBlobSnapshot>
         }
+
+
+        //-------------------------------------------------
+        // Restore a previous version
+        //-------------------------------------------------
+
+        private static void CopyVersionToBaseBlob()
+        {
+            var connectionString = Constants.connectionString;
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+
+            BlobContainerClient container =
+                blobServiceClient.GetBlobContainerClient(Constants.containerName);
+
+            // Get a specific blob to restore.
+            BlobClient blockBlob = container.GetBlobClient("blob3.txt");
+
+            // <Snippet_RestorePreviousVersion>
+
+            // List blobs and blob versions in the container that start with blob name.
+            // Order results by version ID in ascending order.
+            IEnumerable<BlobItem> allBlobVersions = container.GetBlobs
+                (BlobTraits.None, BlobStates.Version, prefix: blockBlob.Name).OrderBy
+                (version => version.VersionId);
+
+            BlobUriBuilder blobVersionUri = new BlobUriBuilder(blockBlob.Uri)
+            {
+                // Get ID for the version before the current version and append to URI.
+                VersionId = allBlobVersions.ElementAt(allBlobVersions.Count() - 2).VersionId
+            };
+
+            // Restore the most recently generated version by copying it to the base blob.
+            blockBlob.StartCopyFromUri(blobVersionUri.ToUri());
+
+            // </Snippet_RestorePreviousVersion>
+        }
+
 
 
         //-------------------------------------------------
@@ -118,7 +158,8 @@ namespace dotnet_v12
             Console.WriteLine("Choose a data protection scenario:");
             Console.WriteLine("1) Enable soft delete");
             Console.WriteLine("2) Recover deleted blobs");
-            Console.WriteLine("3) Recover a specific blob version");
+            Console.WriteLine("3) Restore a specific blob snapshot");
+            Console.WriteLine("4) Restore a specific blob version");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
  
@@ -142,9 +183,17 @@ namespace dotnet_v12
 
                 case "3":
 
-                    RecoverSpecificBlobVersion();
+                    await CopySnapshotToBaseBlob();
 
-                    Console.WriteLine("Press enter to continue");
+                    Console.WriteLine("Snapshot restored. Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "4":
+
+                    CopyVersionToBaseBlob();
+
+                    Console.WriteLine("Blob version restored. Press enter to continue");
                     Console.ReadLine();
                     return true;
 
