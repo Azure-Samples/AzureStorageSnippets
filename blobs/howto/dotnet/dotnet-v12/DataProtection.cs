@@ -90,7 +90,6 @@ namespace dotnet_v12
             BlobClient blockBlob = container.GetBlobClient("blob1.txt");
 
             // <Snippet_RecoverSpecificBlobSnapshot>
-
             // Restore deleted blob.
             await blockBlob.UndeleteAsync();
 
@@ -106,7 +105,6 @@ namespace dotnet_v12
             };
 
             blockBlob.StartCopyFromUri(blobSnapshotUri.ToUri());
-
             // </Snippet_RecoverSpecificBlobSnapshot>
         }
 
@@ -127,7 +125,6 @@ namespace dotnet_v12
             BlobClient blockBlob = container.GetBlobClient("blob3.txt");
 
             // <Snippet_RestorePreviousVersion>
-
             // List blobs and blob versions in the container that start with blob name.
             // Order results by version ID in ascending order.
             IEnumerable<BlobItem> allBlobVersions = container.GetBlobs
@@ -142,7 +139,6 @@ namespace dotnet_v12
 
             // Restore the most recently generated version by copying it to the base blob.
             blockBlob.StartCopyFromUri(blobVersionUri.ToUri());
-
             // </Snippet_RestorePreviousVersion>
         }
 
