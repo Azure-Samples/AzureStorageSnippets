@@ -44,7 +44,8 @@ int main()
         // Initialize a new instance of BlobContainerClient
         BlobContainerClient containerClient
             = BlobContainerClient::CreateFromConnectionString(connectionString, containerName);
-        // Create the container. This will throw an exception if the container already exists.
+        
+        // Create the container. This will do nothing if the container already exists.
         std::cout << "Creating container: " << containerName << std::endl;
         containerClient.CreateIfNotExists();
         //</Snippet_CreateContainer>
@@ -54,6 +55,7 @@ int main()
         uint8_t blobContent[] = "Hello Azure!";
         // Create the block blob client
         BlockBlobClient blobClient = containerClient.GetBlockBlobClient(blobName);
+        
         // Upload the blob
         std::cout << "Uploading blob: " << blobName << std::endl;
         blobClient.UploadFrom(blobContent, sizeof(blobContent));
