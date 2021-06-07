@@ -21,6 +21,7 @@ using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -90,20 +91,23 @@ namespace dotnet_v12
             BlobClient blockBlob = container.GetBlobClient("blob1.txt");
 
             // <Snippet_RecoverSpecificBlobSnapshot>
-            // Restore deleted blob.
+            // Restore the deleted blob.
             await blockBlob.UndeleteAsync();
 
-            // List all blobs and snapshots in the container that start with prefix.
-            IEnumerable<BlobItem> allBlobSnapshots = container.GetBlobs
-                (BlobTraits.None, BlobStates.Snapshots, prefix: blockBlob.Name).OrderBy
-                (snapshot => snapshot.Snapshot);
+            // List blobs in this container that match prefix.
+            // Include snapshots in listing.
+            Pageable<BlobItem> blobItems = container.GetBlobs
+                            (BlobTraits.None, BlobStates.Snapshots, prefix: blockBlob.Name);
 
+            // Get the URI for the most recent snapshot.
             BlobUriBuilder blobSnapshotUri = new BlobUriBuilder(blockBlob.Uri)
             {
-                // Get ID for the most recent snapshot and append to snapshot URI.
-                Snapshot = allBlobSnapshots.ElementAt(allBlobSnapshots.Count() - 1).Snapshot
+                Snapshot = blobItems
+                           .OrderByDescending(snapshot => snapshot.Snapshot)
+                           .ElementAtOrDefault(1)?.Snapshot
             };
 
+            // Restore the most recent snapshot by copying it to the blob.
             blockBlob.StartCopyFromUri(blobSnapshotUri.ToUri());
             // </Snippet_RecoverSpecificBlobSnapshot>
         }
@@ -113,7 +117,7 @@ namespace dotnet_v12
         // Restore a previous version
         //-------------------------------------------------
 
-        private static void CopyVersionToBaseBlob()
+        private static void CopyVersionToBaseBlob(string blobName)
         {
             var connectionString = Constants.connectionString;
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
@@ -122,19 +126,20 @@ namespace dotnet_v12
                 blobServiceClient.GetBlobContainerClient(Constants.containerName);
 
             // Get a specific blob to restore.
-            BlobClient blockBlob = container.GetBlobClient("blob3.txt");
+            BlobClient blockBlob = container.GetBlobClient(blobName);
 
             // <Snippet_RestorePreviousVersion>
-            // List blobs and blob versions in the container that start with blob name.
-            // Order results by version ID in ascending order.
-            IEnumerable<BlobItem> allBlobVersions = container.GetBlobs
-                (BlobTraits.None, BlobStates.Version, prefix: blockBlob.Name).OrderBy
-                (version => version.VersionId);
+            // List blobs in this container that match prefix.
+            // Include versions in listing.
+            Pageable<BlobItem> blobItems = container.GetBlobs
+                            (BlobTraits.None, BlobStates.Version, prefix: blockBlob.Name);
 
+            // Get the URI for the most recent version.
             BlobUriBuilder blobVersionUri = new BlobUriBuilder(blockBlob.Uri)
             {
-                // Get ID for the version before the current version and append to URI.
-                VersionId = allBlobVersions.ElementAt(allBlobVersions.Count() - 2).VersionId
+                VersionId = blobItems
+                            .OrderByDescending(version => version.VersionId)
+                            .ElementAtOrDefault(1)?.VersionId
             };
 
             // Restore the most recently generated version by copying it to the base blob.
@@ -187,7 +192,7 @@ namespace dotnet_v12
 
                 case "4":
 
-                    CopyVersionToBaseBlob();
+                    CopyVersionToBaseBlob("blob1.txt");
 
                     Console.WriteLine("Blob version restored. Press enter to continue");
                     Console.ReadLine();

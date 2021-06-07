@@ -21,6 +21,7 @@ using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -301,45 +302,34 @@ namespace dotnet_v12
         //-------------------------------------------------
 
         // <Snippet_ListBlobVersions>
-        private static async Task ListBlobVersions(BlobContainerClient blobContainerClient, 
-                                                   int? segmentSize)
+        private static void ListBlobVersions(BlobContainerClient blobContainerClient, 
+                                                   string blobName)
         {
             try
             {
                 // Call the listing operation, specifying that blob versions are returned.
-                var resultSegment = blobContainerClient.GetBlobsAsync(default, BlobStates.Version)
-                    .AsPages(default, segmentSize);
+                // Use the blob name as the prefix. 
+                var blobVersions = blobContainerClient.GetBlobs
+                    (BlobTraits.None, BlobStates.Version, prefix: blobName)
+                    .OrderByDescending(version => version.VersionId);
 
-                // Enumerate the blobs returned for each page.
-                await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
+                // Construct the URI for each blob version.
+                foreach (var version in blobVersions)
                 {
-                    foreach (BlobItem blobItem in blobPage.Values)
+                    BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobContainerClient.Uri)
                     {
-                        string blobItemUri;
+                        BlobName = version.Name,
+                        VersionId = version.VersionId
+                    };
 
-                        // Check whether the blob item has a version ID.
-                        if (blobItem.VersionId != null)
-                        {
-                            blobItemUri = string.Format("{0}/{1}?versionId={2}",
-                                blobContainerClient.Uri,
-                                blobItem.Name,
-                                blobItem.VersionId);
-
-                            // Check whether the blob item is the latest version.
-                            if ((bool)blobItem.IsLatestVersion.GetValueOrDefault())
-                            {
-                                blobItemUri += " (current version)";
-                            }
-                        }
-                        else
-                        {
-                            blobItemUri = string.Format("{0}/{1}",
-                                blobContainerClient.Uri,
-                                blobItem.Name);
-                        }
-                        Console.WriteLine(blobItemUri);
+                    if ((bool)version.IsLatestVersion.GetValueOrDefault())
+                    {
+                        Console.WriteLine("Current version: {0}", blobUriBuilder);
                     }
-                    Console.WriteLine();
+                    else
+                    {
+                        Console.WriteLine("Previous version: {0}", blobUriBuilder);
+                    }
                 }
             }
             catch (RequestFailedException e)
@@ -453,7 +443,7 @@ namespace dotnet_v12
 
                 case "9":
 
-                    await ListBlobVersions(blobServiceClient.GetBlobContainerClient(Constants.containerName), 5);
+                    ListBlobVersions(blobServiceClient.GetBlobContainerClient(Constants.containerName), Constants.blobName);
 
                     Console.ReadLine();
                     return true;
