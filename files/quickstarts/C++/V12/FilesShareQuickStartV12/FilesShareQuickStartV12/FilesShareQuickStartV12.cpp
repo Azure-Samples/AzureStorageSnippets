@@ -1,8 +1,10 @@
 // BlobQuickstartV12.cpp
 
 //<Snippet_Includes>
-#include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
+#include <vector>
+
 #include <azure/storage/files/shares.hpp>
 //</Snippet_Includes>
 
@@ -51,15 +53,16 @@ int main()
 
         //<Snippet_UploadFile>
         std::string fileName = "sample-file";
-        std::string fileContent = "Hello Azure!";
+        uint8_t fileContent[] = "Hello Azure!";
 
         // Create the ShareFileClient
         ShareFileClient fileClient = shareClient.GetRootDirectoryClient().GetFileClient(fileName);
 
         // Upload the file
         std::cout << "Uploading file: " << fileName << std::endl;
-        fileClient.UploadFrom(reinterpret_cast<const uint8_t*>(fileContent.data()), fileContent.size());
+        fileClient.UploadFrom(fileContent, sizeof(fileContent));
         //</Snippet_UploadFile>
+
 
         //<Snippet_SetFileMetadata>
         Azure::Storage::Metadata fileMetadata = { {"key1", "value1"}, {"key2", "value2"} };
@@ -77,11 +80,12 @@ int main()
         //</Snippet_GetFileMetadata>
 
         //<Snippet_DownloadFile>
-        fileContent.resize(static_cast<size_t>(properties.FileSize));
-        fileClient.DownloadTo(reinterpret_cast<uint8_t*>(&fileContent[0]), fileContent.size());
+        std::vector<uint8_t> fileDownloaded(properties.FileSize);
+        fileClient.DownloadTo(fileDownloaded.data(), fileDownloaded.size());
 
-        std::cout << "Downloaded file contents: " << fileContent << std::endl;
+        std::cout << "Downloaded file contents: " << std::string(fileDownloaded.begin(), fileDownloaded.end()) << std::endl;
         //<Snippet_DownloadFile>
+
 
         //<Snippet_DeleteFile>
         std::cout << "Deleting file: " << fileName << std::endl;
