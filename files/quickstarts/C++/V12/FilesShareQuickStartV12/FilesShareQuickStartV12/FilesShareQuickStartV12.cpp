@@ -67,7 +67,7 @@ int main()
         //<Snippet_SetFileMetadata>
         Azure::Storage::Metadata fileMetadata = { {"key1", "value1"}, {"key2", "value2"} };
         fileClient.SetMetadata(fileMetadata);
-        //<Snippet_SetFileMetadata>
+        //</Snippet_SetFileMetadata>
 
         //<Snippet_GetFileMetadata>
         // Retrieve the file properties
@@ -84,18 +84,18 @@ int main()
         fileClient.DownloadTo(fileDownloaded.data(), fileDownloaded.size());
 
         std::cout << "Downloaded file contents: " << std::string(fileDownloaded.begin(), fileDownloaded.end()) << std::endl;
-        //<Snippet_DownloadFile>
+        //</Snippet_DownloadFile>
 
 
         //<Snippet_DeleteFile>
         std::cout << "Deleting file: " << fileName << std::endl;
         fileClient.DeleteIfExists();
-        //<Snippet_DeleteFile>
+        //</Snippet_DeleteFile>
 
         //<Snippet_DeleteFilesShare>
         std::cout << "Deleting files share: " << shareName << std::endl;
         shareClient.DeleteIfExists();
-        //<Snippet_DeleteFilesShare>
+        //</Snippet_DeleteFilesShare>
     }
     catch (std::runtime_error& e)
     {
