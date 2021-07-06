@@ -47,10 +47,8 @@ namespace BlobQuickstartV12
 
             Console.WriteLine("Uploading to Blob storage as blob:\n\t {0}\n", blobClient.Uri);
 
-            // Open the file and upload its data
-            using FileStream uploadFileStream = File.OpenRead(localFilePath);
-            await blobClient.UploadAsync(uploadFileStream, true);
-            uploadFileStream.Close();
+            // Upload data from the local file
+            await blobClient.UploadAsync(localFilePath, true);
             // </Snippet_UploadBlobs>
 
             // <Snippet_ListBlobs>
@@ -72,13 +70,7 @@ namespace BlobQuickstartV12
             Console.WriteLine("\nDownloading blob to\n\t{0}\n", downloadFilePath);
 
             // Download the blob's contents and save it to a file
-            BlobDownloadInfo download = await blobClient.DownloadAsync();
-
-            using (FileStream downloadFileStream = File.OpenWrite(downloadFilePath))
-            {
-                await download.Content.CopyToAsync(downloadFileStream);
-                downloadFileStream.Close();
-            }
+            await blobClient.DownloadToAsync(downloadFilePath);
             // </Snippet_DownloadBlobs>
 
             // <Snippet_DeleteContainer>
