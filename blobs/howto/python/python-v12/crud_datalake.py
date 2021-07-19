@@ -175,7 +175,7 @@ def rename_directory():
        directory_client = file_system_client.get_directory_client("my-directory")
        
        new_dir_name = "my-directory-renamed"
-       directory_client.rename_directory(rename_destination=directory_client.file_system_name + '/' + new_dir_name)
+       directory_client.rename_directory(new_name=directory_client.file_system_name + '/' + new_dir_name)
 
     except Exception as e:
      print(e) 
