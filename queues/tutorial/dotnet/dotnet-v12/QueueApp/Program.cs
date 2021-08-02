@@ -76,7 +76,7 @@ namespace QueueApp
                 if (properties.ApproximateMessagesCount > 0)
                 {
                     QueueMessage[] retrievedMessage = await theQueue.ReceiveMessagesAsync(1);
-                    string theMessage = retrievedMessage[0].MessageText;
+                    string theMessage = retrievedMessage[0].Body.ToString();
                     await theQueue.DeleteMessageAsync(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
                     return theMessage;
                 }
