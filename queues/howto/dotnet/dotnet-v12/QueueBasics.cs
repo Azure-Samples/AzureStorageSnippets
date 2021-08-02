@@ -120,7 +120,7 @@ namespace dotnet_v12
                 PeekedMessage[] peekedMessage = queueClient.PeekMessages();
 
                 // Display the message
-                Console.WriteLine($"Peeked message: '{peekedMessage[0].MessageText}'");
+                Console.WriteLine($"Peeked message: '{peekedMessage[0].Body}'");
             }
         }
         // </snippet_PeekMessage>
@@ -170,7 +170,7 @@ namespace dotnet_v12
                 QueueMessage[] retrievedMessage = queueClient.ReceiveMessages();
 
                 // Process (i.e. print) the message in less than 30 seconds
-                Console.WriteLine($"Dequeued message: '{retrievedMessage[0].MessageText}'");
+                Console.WriteLine($"Dequeued message: '{retrievedMessage[0].Body}'");
 
                 // Delete the message
                 queueClient.DeleteMessage(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
@@ -223,7 +223,7 @@ namespace dotnet_v12
                 foreach (QueueMessage message in receivedMessages)
                 {
                     // Process (i.e. print) the messages in less than 5 minutes
-                    Console.WriteLine($"De-queued message: '{message.MessageText}'");
+                    Console.WriteLine($"De-queued message: '{message.Body}'");
 
                     // Delete the message
                     queueClient.DeleteMessage(message.MessageId, message.PopReceipt);
@@ -284,11 +284,11 @@ namespace dotnet_v12
 
             // Async receive the message
             QueueMessage[] retrievedMessage = await queueClient.ReceiveMessagesAsync();
-            Console.WriteLine($"Retrieved message with content '{retrievedMessage[0].MessageText}'");
+            Console.WriteLine($"Retrieved message with content '{retrievedMessage[0].Body}'");
 
             // Async delete the message
             await queueClient.DeleteMessageAsync(retrievedMessage[0].MessageId, retrievedMessage[0].PopReceipt);
-            Console.WriteLine($"Deleted message: '{retrievedMessage[0].MessageText}'");
+            Console.WriteLine($"Deleted message: '{retrievedMessage[0].Body}'");
 
             // Async delete the queue
             await queueClient.DeleteAsync();
