@@ -18,6 +18,7 @@
 using System; // Namespace for Console output
 using System.Configuration; // Namespace for ConfigurationManager
 using System.Threading.Tasks; // Namespace for Task
+using Azure.Identity;
 using Azure.Storage.Queues; // Namespace for Queue storage types
 using Azure.Storage.Queues.Models; // Namespace for PeekedMessage
 // </snippet_UsingStatements>
@@ -76,6 +77,39 @@ namespace dotnet_v12
             }
         }
         // </snippet_CreateQueue>
+
+        // <Snippet_CreateQueueAsync>
+        //-------------------------------------------------
+        // Create a message queue
+        //-------------------------------------------------
+        public async Task<bool> CreateQueueAsync(Uri queueUri)
+        {
+            try
+            {
+                QueueClient queueClient = new QueueClient(queueUri, new DefaultAzureCredential());
+
+                // Create the queue
+                await queueClient.CreateIfNotExistsAsync();
+
+                if (await queueClient.ExistsAsync())
+                {
+                    Console.WriteLine($"Queue created: '{queueClient.Name}'");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine($"Make sure the Azurite storage emulator running and try again.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}\n\n");
+                Console.WriteLine($"Make sure the Azurite storage emulator running and try again.");
+                return false;
+            }
+        }
+        // </Snippet_CreateQueueAsync>
 
         // <snippet_InsertMessage>
         //-------------------------------------------------
@@ -313,6 +347,7 @@ namespace dotnet_v12
             Console.WriteLine("6) Dequeue one message");
             Console.WriteLine("7) Dequeue multiple messages");
             Console.WriteLine("8) Delete queue");
+            Console.WriteLine("9) Create a queue with Azure AD credentials");
             //Console.WriteLine("9) Async queue operations");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
@@ -379,6 +414,17 @@ namespace dotnet_v12
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
+
+                case "9":
+                    Uri queueUri = new Uri(string.Format("https://{0}.queue.core.windows.net/{1}",
+                                                             Constants.storageAccountName,
+                                                             Constants.queueName));
+
+                    CreateQueueAsync(queueUri);
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
 
                 // Async queue operations
                 // case "9":

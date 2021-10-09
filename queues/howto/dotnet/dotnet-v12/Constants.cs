@@ -26,6 +26,8 @@ namespace dotnet_v12
         public const string subscription = "";
         public const string resourceID = "";
         public const string storageAccountName = "";
+
+        public const string queueName = "";
     }
     
 }
