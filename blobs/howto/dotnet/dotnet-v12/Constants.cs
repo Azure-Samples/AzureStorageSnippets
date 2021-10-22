@@ -38,11 +38,11 @@ namespace dotnet_v12
         public const string tenantID = "";
         public const string subscription = "";
         public const string resourceID = "";
-        public const string storageAccountName = "";
+        public const string storageAccountName = "storagesamplesarchive";
         public const string storageAccountNameAdls = "";
 
         // Resource constants
-        public const string containerName = "";
+        public const string containerName = "container3";
         public const string blobName = "";
         public const string directoryName = "";
         public const string subDirectoryName = "";

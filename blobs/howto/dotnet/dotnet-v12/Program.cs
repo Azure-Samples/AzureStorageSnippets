@@ -165,6 +165,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for AccessTiers scenarios.
+        //----------------------------------------------- 
+        static bool AccessTiers()
+        {
+            AccessTiers acct = new AccessTiers();
+
+            while (acct.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -192,6 +204,7 @@ namespace dotnet_v12
             Console.WriteLine("10) CRUD operations for accounts with a hierarchical namespace");
             Console.WriteLine("11) Access Control Lists (ACL) for accounts with a hierarchical namespace");
             Console.WriteLine("12) Parallel file transfers");
+            Console.WriteLine("13) Manage access tiers");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -232,6 +245,9 @@ namespace dotnet_v12
 
                 case "12":
                     return Scalable();
+
+                case "13":
+                    return AccessTiers();
 
                 case "x":
                 case "X":
