@@ -21,8 +21,6 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -77,7 +75,7 @@ namespace dotnet_v12
             {
                 case "1":
 
-                    BulkArchiveContainerContents(Constants.storageAccountName, Constants.containerName);
+                    await BulkArchiveContainerContents(Constants.storageAccountName, Constants.containerName);
 
                     return true;
 
