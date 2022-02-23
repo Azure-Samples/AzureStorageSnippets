@@ -11,7 +11,7 @@ if (!AZURE_STORAGE_CONNECTION_STRING) {
 
 async function main() {
   console.log("Azure Blob storage v12 - JavaScript quickstart sample");
-  // Quick start code goes here
+
   // Create the BlobServiceClient object which will be used to create a container client
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     AZURE_STORAGE_CONNECTION_STRING
