@@ -2,19 +2,25 @@
   "name": "azure-blobs-javascript",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "source": [
+    "./index.js"
+  ],
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "parcel ./index.html"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "browserslist": [
     "last 1 Edge version",
     "last 1 Chrome version",
     "last 1 Firefox version"
   ],
   "dependencies": {
-    "@azure/storage-blob": "^12.1.1"
+    "@azure/storage-blob": "^12.8.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.3.2"
   }
 }
