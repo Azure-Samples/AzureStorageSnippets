@@ -76,7 +76,7 @@ namespace dotnet_v12
 
         // <Snippet_ListBlobsHierarchicalListing>
         private static async Task ListBlobsHierarchicalListing(BlobContainerClient container, 
-                                                               string? prefix, 
+                                                               string prefix, 
                                                                int? segmentSize)
         {
             try
@@ -311,7 +311,7 @@ namespace dotnet_v12
                 // Use the blob name as the prefix. 
                 var blobVersions = blobContainerClient.GetBlobs
                     (BlobTraits.None, BlobStates.Version, prefix: blobName)
-                    .OrderByDescending(version => version.VersionId);
+                    .OrderByDescending(version => version.VersionId).Where(blob => blob.Name == blobName);
 
                 // Construct the URI for each blob version.
                 foreach (var version in blobVersions)
