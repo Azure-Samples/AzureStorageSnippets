@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 // Enter your storage account name and SAS
 const account = process.env.ACCOUNT_NAME || "diberrystoragedevguide1";// "<account name>";
-const accountKey = process.env.ACCOUNT_SAS || "D/QzQP2De3xU7ZnnN8WKx8fbKtPbM8XIHRPBNHR9inQhFLTcxDZ6ou29ZGvn7WY7YDbI0o2gV6AB+AStlF+LMw==";// "<account SAS>";
+const accountKey = process.env.ACCOUNT_SAS || "";// "<account SAS>";
 
 if (!account || !accountKey) {
   throw Error("Azure Storage required params are empty");
