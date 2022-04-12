@@ -42,7 +42,6 @@ async function setMetadataOfContainer(containerClient){
       }
 }
 
-
 listContainers(client)
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));
