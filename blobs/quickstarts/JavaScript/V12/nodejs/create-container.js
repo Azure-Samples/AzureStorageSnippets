@@ -15,7 +15,7 @@ async function createContainer(blobServiceClient, containerName) {
 
 // only one root per blob storage
 // change name to create a different container
-const containerName = "dina-is-testing";
+const containerName = "$root";
 
 createContainer(client, containerName)
   .then((containerClient) => {
