@@ -1,0 +1,12 @@
+how do I make sure I close my stream? 
+
+.NET writeable streams
+
+Upload to a stream in Blob Storage
+docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-upload#upload-to-a-stream-in-blob-storage
+
+Upload with staging blocks
+docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-upload#upload-by-staging-blocks-and-then-committing-them
+
+Download from a stream
+docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-download#download-from-a-stream
