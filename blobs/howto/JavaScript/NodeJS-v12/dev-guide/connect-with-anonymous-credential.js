@@ -12,11 +12,17 @@ const blobServiceClient = new BlobServiceClient(
   new AnonymousCredential()
 );
 
-async function main(){
-  const serviceGetPropertiesResponse = await blobServiceClient.getProperties();
-  console.log(`${JSON.stringify(serviceGetPropertiesResponse)}`);
+async function getContainerProperties(){
+
+  // Access level: "container"
+  const containerName = `blob-storage-dev-guide-1`;
+
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+  const containerProperties = await containerClient.getProperties();
+  console.log(JSON.stringify(containerProperties));
+
 }
 
-main()
+getContainerProperties()
   .then(() => console.log(`done`))
   .catch((ex) => console.log(`error: ${ex.message}`));
