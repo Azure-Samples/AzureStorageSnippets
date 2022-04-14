@@ -10,10 +10,10 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-async function createBlobFromLocalPath(containerClient, blobName, localFileWithPath){
+async function createBlobFromLocalPath(containerClient, blobName, localFileWithPath, uploadOptions){
   console.log(`creating blob ${blobName} from ${localFileWithPath}`);
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
-  const uploadBlobResponse = await blockBlobClient.uploadFile(localFileWithPath, { tags: blobTags});
+  const uploadBlobResponse = await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
 
   if(uploadBlobResponse.errorCode) console.log(`${blobName} failed to upload from file: ${errorCode}`);
 }
@@ -37,13 +37,22 @@ async function main(blobServiceClient){
   // create 10 blobs with Promise.all
   for (let i=0; i<10; i++){
 
-    const blobTags = {
-      createdBy: 'YOUR-NAME',
-      createdWith: `StorageSnippetsForDocs-${i}`,
-      createdOn: (new Date()).toDateString()
+    const uploadOptions = {
+
+      // not indexed for searching
+      metadata: {
+        owner: 'PhillyProject'
+      },
+
+      // indexed for searching
+      tags: {
+        createdBy: 'YOUR-NAME',
+        createdWith: `StorageSnippetsForDocs-${i}`,
+        createdOn: (new Date()).toDateString()
+      }
     }
 
-    blobs.push(createBlobFromLocalPath(containerClient, `${containerName}-${i}.txt`, localFileWithPath, blobTags));
+    blobs.push(createBlobFromLocalPath(containerClient, `${containerName}-${i}.txt`, localFileWithPath, uploadOptions));
   }
   await Promise.all(blobs);
 

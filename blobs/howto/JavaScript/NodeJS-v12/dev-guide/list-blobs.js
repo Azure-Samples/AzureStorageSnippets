@@ -5,19 +5,25 @@ require('dotenv').config()
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 if (!connString) throw Error("Azure Storage Connection string not found");
 
-const client = BlobServiceClient.fromConnectionString(connString);
+const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
 async function listBlobsFlatWithPageMarker(containerClient){
-
-    // add prefix to filter list
-    const blobNamePrefix = "";
 
     // page size
     const maxPageSize = 2;
 
     let i = 1;
     let marker;
-    let iterator = containerClient.listBlobsFlat().byPage({ maxPageSize });
+
+    const listOptions = {
+      includeMetadata: true,
+      includeSnapshots: false,
+      includeTags: true,
+      includeVersions: false,
+      prefix: ''
+    };  
+
+    let iterator = containerClient.listBlobsFlat(listOptions).byPage({ maxPageSize });
     let response = (await iterator.next()).value;
     
     // Prints 2 blob names
@@ -50,9 +56,17 @@ async function listBlobHierarchical(containerClient){
     // page size
     const maxPageSize = 2;
 
+    const listOptions = {
+      includeMetadata: true,
+      includeSnapshots: false,
+      includeTags: true,
+      includeVersions: false,
+      prefix: blobNamePrefix
+    };    
+
     let i = 1;
     for await (const response of containerClient
-      .listBlobsByHierarchy(virtualHierarchyDelimiter, { prefix: blobNamePrefix })
+      .listBlobsByHierarchy(virtualHierarchyDelimiter, listOptions)
       .byPage({ maxPageSize })) {
 
       console.log(`Page ${i++}`);
@@ -70,19 +84,92 @@ async function listBlobHierarchical(containerClient){
     }
 }
 
-async function listBlobVersion(blobServiceClient){
+async function listBlobVersion(containerClient){
 
+    // page size
+    const maxPageSize = 2;
+
+    let i = 1;
+    let marker;
+
+    const listOptions = {
+      includeMetadata: true,
+      includeSnapshots: false,
+      includeTags: true,
+      includeVersions: true,
+      prefix: ''
+    }
+
+    let iterator = containerClient.listBlobsFlat(listOptions).byPage({ maxPageSize });
+    let response = (await iterator.next()).value;
+    
+    // Prints 2 blob names
+    for (const blob of response.segment.blobItems) {
+      console.log(`Blob ${i++}: ${blob.name}`);
+    }
+    
+    // Gets next marker
+    marker = response.continuationToken;
+   
+    // Passing next marker as continuationToken    
+    iterator = containerClient.listBlobsFlat(listOptions).byPage({ continuationToken: marker, maxPageSize: maxPageSize * 2 });
+    response = (await iterator.next()).value;
+    
+    // Prints next 4 blob names
+    for (const blob of response.segment.blobItems) {
+      console.log(`Blob ${i++}: ${blob.name}`);
+    }
 }
 
-async function listBlobSnapshot(blobServiceClient){
+async function listBlobSnapshot(containerClient){
 
+    // page size
+    const maxPageSize = 2;
+
+    let i = 1;
+    let marker;
+
+    const listOptions = {
+      includeMetadata: true,
+      includeSnapshots: true,
+      includeTags: true,
+      includeVersions: false,
+      prefix: ''
+    };
+
+    let iterator = containerClient.listBlobsFlat(listOptions).byPage({ maxPageSize });
+    let response = (await iterator.next()).value;
+    
+    // Prints 2 blob names
+    for (const blob of response.segment.blobItems) {
+      console.log(`Blob ${i++}: ${blob.name}`);
+    }
+    
+    // Gets next marker
+    marker = response.continuationToken;
+    
+    // Passing next marker as continuationToken    
+    iterator = containerClient.listBlobsFlat(listOptions).byPage({ continuationToken: marker, maxPageSize: maxPageSize * 2 });
+    response = (await iterator.next()).value;
+    
+    // Prints next 4 blob names
+    for (const blob of response.segment.blobItems) {
+      console.log(`Blob ${i++}: ${blob.name}`);
+    }
 }
 
-listContainers(client)
+async function main(){
+
+  const { containerClient, containerCreateResponse } = await blobServiceClient.getContainerClient(containerName);
+
+  if(!containerCreateResponse.errorCode) {
+    await listBlobHierarchical(containerClient);
+    await listBlobsFlatWithPageMarker(containerClient);
+    await listBlobVersion(containerClient);
+    await listBlobSnapshot(containerClient);
+  }
+}
+
+main(client)
   .then(() => console.log(`done`))
-  .catch((ex) => console.log(ex.message));
-
-
-listContainersWithPagingMarker(client)
-.then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));

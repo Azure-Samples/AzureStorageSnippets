@@ -8,10 +8,10 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-async function createBlobFromString(client, blobName, fileContentsAsString, tags){
+async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions){
   console.log(`creating blob ${blobName}`);
   const blockBlobClient = await client.getBlockBlobClient(blobName);
-  const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
+  const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
 }
 
 async function main(blobServiceClient){
@@ -29,13 +29,22 @@ async function main(blobServiceClient){
   // create 10 blobs with Promise.all
   for (let i=0; i<10; i++){
 
-    const blobTags = {
+    const uploadOptions = {
+
+      // not indexed for searching
+      metadata: {
+        owner: 'PhillyProject'
+      },
+  
+      // indexed for searching
+      tags: {
         createdBy: 'YOUR-NAME',
         createdWith: `StorageSnippetsForDocs-${i}`,
         createdOn: (new Date()).toDateString()
       }
+    }
 
-    blobs.push(createBlobFromString(containerClient, `${containerName}-${i}.txt`, `Hello from a string ${i}`, blobTags));
+    blobs.push(createBlobFromString(containerClient, `${containerName}-${i}.txt`, `Hello from a string ${i}`, uploadOptions));
   }
   await Promise.all(blobs);
 
