@@ -18,10 +18,9 @@ async function findBlobsByTag(blobStorageClient, odataTagQuery, prefix) {
     foundBlobNames.push(blob.name);
 
     try {
-      // don't return blobs marked for deletion
+      const containerClient = new containerClient(connString, blob.containerName);
+
       const blobClient = new BlobClient(connString, blob.containerName, blob.name);
-      const currentProperties = await blobClient.getProperties();
-      if (currentProperties.deletedOn) console.log(`${blob.name} deleted on ${blob.deletedOn}`);
     } catch (ex) {
       console.log(ex.details.errorCode)
       throw new Error(ex.details.errorCode);
@@ -91,7 +90,10 @@ async function createBlobFromString(client, blobName, fileContentsAsString, uplo
 
 async function createContainer1AndBlobs(containerName1, blob1) {
 
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName1);
+  const containerOptions = {
+    access: 'container'
+  }; 
+  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName1, containerOptions);
 
   if (!containerCreateResponse.errorCode) {
 
@@ -101,8 +103,10 @@ async function createContainer1AndBlobs(containerName1, blob1) {
 }
 
 async function createContainer2AndBlobs(containerName2, blob2, blob3) {
-
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName2);
+  const containerOptions = {
+    access: 'container'
+  }; 
+  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName2, containerOptions);
 
   if (!containerCreateResponse.errorCode) {
 

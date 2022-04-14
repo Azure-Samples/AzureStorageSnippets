@@ -45,7 +45,10 @@ async function main(blobServiceClient) {
     const timestamp = Date.now();
     const containerName = `download-blob-to-string-${timestamp}`;
     console.log(`creating container ${containerName}`);
-    const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName);
+    const containerOptions = {
+        access: 'container'
+    }; 
+    const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
 
     if (containerCreateResponse.errorCode) console.log("container creation failed");
 

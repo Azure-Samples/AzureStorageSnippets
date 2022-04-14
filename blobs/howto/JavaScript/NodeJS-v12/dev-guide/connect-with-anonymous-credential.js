@@ -3,11 +3,9 @@ const { BlobServiceClient, AnonymousCredential } = require('@azure/storage-blob'
 require('dotenv').config()
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const sasToken = process.env.AZURE_STORAGE_SAS_TOKEN;
 if (!accountName) throw Error('Azure Storage accountName not found');
-if (!sasToken) throw Error('Azure Storage accountKey not found');
 
-const blobServiceUri = `https://${accountName}.blob.core.windows.net${sasToken}`;
+const blobServiceUri = `https://${accountName}.blob.core.windows.net`;
 
 const blobServiceClient = new BlobServiceClient(
   blobServiceUri,

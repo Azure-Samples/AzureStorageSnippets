@@ -39,3 +39,13 @@ Cancel copy operation of async copy only
 2. destBlob.abortCopyFromURL(string, BlobAbortCopyFromURLOptions)
 
 odata syntax for multiple tags
+
+
+append blob at end  - logging from web site
+(and block blob)
+
+staging - upload data separately - commit in order you want
+
+Ted Glaza - know if service doesn't something weird
+
+for can't recreate blob

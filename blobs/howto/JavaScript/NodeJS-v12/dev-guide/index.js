@@ -32,7 +32,10 @@ async function main() {
   // Get a reference to a container
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // Create the container
-  const createContainerResponse = await containerClient.create();
+  const containerOptions = {
+    access: 'container'
+  }; 
+  const createContainerResponse = await containerClient.create(containerOptions);
   console.log(
     "Container was created successfully. requestId: ",
     createContainerResponse.requestId

@@ -10,7 +10,11 @@ const client = BlobServiceClient.fromConnectionString(connString);
 
 async function createContainer(client, containerName){
   console.log(`creating ${containerName}`);
-  const { containerClient, result } = await client.createContainer(containerName);
+
+  const options = {
+    access: 'container'
+  };
+  const { containerClient, result } = await client.createContainer(containerName, options);
 }
 
 async function main(blobServiceClient){

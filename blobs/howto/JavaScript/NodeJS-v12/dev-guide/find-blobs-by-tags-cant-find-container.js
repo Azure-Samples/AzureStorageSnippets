@@ -16,13 +16,20 @@ async function findBlobsByTag(blobStorageClient, odataTagQuery, prefix) {
     foundBlobNames.push(blob.name);
 
     try {
+
       // don't return blobs marked for deletion
       const blobClient = new BlobClient(connString, blob.containerName, blob.name);
+
+      if(!connString || !blob.containerName || !blob.name)console.log("blob property - missing c'tor info");
 
       // this line fails - with can't find container
       // the error is buried in the details - this isn't the pattern of some of the other methods
       const currentProperties = await blobClient.getProperties();
-      if (currentProperties.deletedOn) console.log(`${blob.name} deleted on ${blob.deletedOn}`);
+      if (currentProperties.deletedOn) {
+        console.log(`${blob.name} properties - deleted on ${blob.deletedOn}`);
+      } else {
+        console.log(`${blob.name} properties - not deleted`);
+      }
     } catch (ex) {
       console.log(ex.details.errorCode)
       throw new Error(ex.details.errorCode);
@@ -64,7 +71,10 @@ async function main() {
       }
     }
 
-    const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName1);
+    const containerOptions = {
+      access: 'container'
+    }; 
+    const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName1, containerOptions);
 
     if (!containerCreateResponse.errorCode) {
       console.log(`creating blob ${blob1.name}`);
