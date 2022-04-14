@@ -1,4 +1,4 @@
-// index.js
+// connect-with-anonymous-credential.js
 const { BlobServiceClient, AnonymousCredential } = require('@azure/storage-blob');
 require('dotenv').config()
 

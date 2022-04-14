@@ -1,4 +1,4 @@
-// index.js
+// connect-with-default-azure-credential.js
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config()

@@ -1,4 +1,4 @@
-// index.js
+// connect-with-connection-string.js
 const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config()
 

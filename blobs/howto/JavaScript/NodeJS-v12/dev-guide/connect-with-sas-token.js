@@ -1,4 +1,4 @@
-// index.js
+// connect-with-sas-token.js
 const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config()
 

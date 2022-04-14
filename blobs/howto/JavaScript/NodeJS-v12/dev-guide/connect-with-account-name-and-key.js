@@ -1,4 +1,4 @@
-// index.js
+// connect-with-account-name-and-key.js
 const { BlobServiceClient, StorageSharedKeyCredential } = require('@azure/storage-blob');
 require('dotenv').config()
 
