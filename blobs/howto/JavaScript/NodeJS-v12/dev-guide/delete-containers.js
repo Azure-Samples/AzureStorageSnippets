@@ -50,25 +50,44 @@ async function deleteContainersWithPrefix(blobServiceClient, prefix) {
   }
 }
 
-// Undelete everything except root
-async function undeleteContainer(blobServiceClient, containerName, containerVersion) {
+// Undelete specific container - last version
+async function undeleteContainer(blobServiceClient, containerName) {
 
+  // version to undelete
+  let containerVersion;
 
-    const { containerClient, containerUndeleteResponse } = await blobServiceClient.undeleteContainer(
-      containerName, 
-      containerVersion, 
+  const containerOptions = {
+    includeDeleted: true,
+    prefix: containerName
+  }
 
-      // optional/new container name - if unused, original container name is used
-      //newContainerName 
-      );
+  // container listing returns version (timestamp) in the ContainerItem
+  for await (const containerItem of blobServiceClient.listContainers(containerOptions)) {
 
-    if (!containerUndeleteResponse.errorCode) {
-      console.log(`${containerName} is undeleted`);
-
-      // do something with containerClient
-      const containerProperties = await containerClient.getProperties();
-      console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
+    // if there are multiple deleted versions of the same container,
+    // the versions are in asc time order
+    // the last version is the most recent
+    if (containerItem.name === containerName) {
+      containerVersion = containerItem.version;
     }
+  }
+
+  const { containerClient, containerUndeleteResponse } = await blobServiceClient.undeleteContainer(
+    containerName,
+    containerVersion,
+
+    // optional/new container name - if unused, original container name is used
+    //newContainerName 
+  );
+
+  // undelete was successful
+  if (!containerUndeleteResponse.errorCode) {
+    console.log(`${containerName} is undeleted`);
+
+    // do something with containerClient
+    const containerProperties = await containerClient.getProperties();
+    console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
+  }
 }
 async function createContainer(blobServiceClient, containerName) {
 
@@ -94,7 +113,7 @@ async function main(blobServiceClient) {
   let containers = [];
 
   // container name prefix must be unique
-  const containerName = 'blob-storage-dev-guide-containers-example';
+  const containerName = 'blob-storage-dev-guide-example';
 
   // create containers with Promise.all
   for (let i = 1; i < 9; i++) {
@@ -103,26 +122,13 @@ async function main(blobServiceClient) {
   await Promise.all(containers);
 
   // delete 1 container immediately with BlobServiceClient
-  await deleteContainerImmediately(blobServiceClient, `blob-storage-dev-guide-containers-example-1`);
+  await deleteContainerImmediately(blobServiceClient, `blob-storage-dev-guide-example-1`);
 
   // soft deletes take 30 seconds - waiting now so that undelete won't throw error
   await sleep(30000);
 
-  const containerOptions = {
-    includeDeleted: true
-  }
-
-  let containerVersionForUndelete;
-
-  // container listing returns version (timestamp) in the ContainerItem
-  for await (const containerItem of blobServiceClient.listContainers(containerOptions)) {
-    if(containerItem.name===`blob-storage-dev-guide-containers-example-1`){
-      containerVersionForUndelete = containerItem.version;
-    }
-  }
-
   // soft delete container with ContainerClient
-  const containerClient = blobServiceClient.getContainerClient(`blob-storage-dev-guide-containers-example-2`);
+  const containerClient = blobServiceClient.getContainerClient(`blob-storage-dev-guide-example-2`);
   await deleteContainerSoft(containerClient);
 
   // delete with prefix and not already deleted
@@ -130,10 +136,9 @@ async function main(blobServiceClient) {
 
   // undelete container
   await undeleteContainer(
-    blobServiceClient, 
-    `blob-storage-dev-guide-containers-example-1`, 
-    containerVersionForUndelete
-    );
+    blobServiceClient,
+    `blob-storage-dev-guide-example-1`
+  );
 }
 main(blobServiceClient)
   .then(() => console.log('done'))

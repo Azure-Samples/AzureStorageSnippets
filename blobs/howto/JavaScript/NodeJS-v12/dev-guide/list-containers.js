@@ -7,10 +7,8 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 
 const client = BlobServiceClient.fromConnectionString(connString);
 
-async function listContainers(blobServiceClient){
-
-  // add prefix to filter list
-  const containerNamePrefix = "";
+// return up to 5000 containers
+async function listContainers(blobServiceClient, containerNamePrefix) {
 
   const options = {
     includeDeleted: false,
@@ -21,14 +19,20 @@ async function listContainers(blobServiceClient){
 
   for await (const containerItem of blobServiceClient.listContainers(options)) {
 
-      console.log(`${containerItem.name} with version ${containerItem.version} last modified on ${containerItem.properties.lastModified}`);
-      const containerClient = blobServiceClient.getContainerClient(containerItem.name);
-      const containerProperties = await containerClient.getProperties();
-      console.log(containerProperties);
+    // ContainerItem
+    console.log(`${containerItem.name} last modified on ${containerItem.properties.lastModified}`);
+
+    // ContainerClient
+    const containerClient = blobServiceClient.getContainerClient(containerItem.name);
+
+    // ContainerProperties
+    const containerProperties = await containerClient.getProperties();
+    console.log(containerProperties);
   }
 }
 
-async function listContainersWithPagingMarker(blobServiceClient){
+
+async function listContainersWithPagingMarker(blobServiceClient) {
 
   // add prefix to filter list
   const containerNamePrefix = "";
@@ -52,11 +56,11 @@ async function listContainersWithPagingMarker(blobServiceClient){
     for (const container of response.containerItems) {
       console.log(`Container ${i++}: ${container.name}`);
     }
-  } 
+  }
 
   // Gets next marker
   marker = response.continuationToken;
-  
+
   // Passing next marker as continuationToken
   iterator = blobServiceClient.listContainers().byPage({ continuationToken: marker, maxPageSize: maxPageSize * 2 });
   response = (await iterator.next()).value;
@@ -66,14 +70,15 @@ async function listContainersWithPagingMarker(blobServiceClient){
     for (const container of response.containerItems) {
       console.log(`Container ${i++}: ${container.name}`);
     }
-  }  
+  }
 }
 
-listContainers(client)
+// assumes containers are already in storage
+async function main(blobServiceClient) {
+  await listContainers(blobServiceClient);
+  await listContainersWithPagingMarker(blobServiceClient);
+}
+
+main(client)
   .then(() => console.log(`done`))
-  .catch((ex) => console.log(ex.message));
-
-
-listContainersWithPagingMarker(client)
-.then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));
