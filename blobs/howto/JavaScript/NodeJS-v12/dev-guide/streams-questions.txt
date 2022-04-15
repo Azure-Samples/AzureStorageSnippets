@@ -49,3 +49,21 @@ staging - upload data separately - commit in order you want
 Ted Glaza - know if service doesn't something weird
 
 for can't recreate blob
+
+
+
+delete blobs
+
+versioning only => undeleteBlob (https://docs.microsoft.com/en-us/rest/api/storageservices/undelete-blob)
+
+
+versioning + soft delete => copy a previous version over current blob to restore
+
+a
+b
+c - deleted
+c - copy previous as undelete - reference with datatime url or listing operation and include versions and order with linq - (https://docs.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-manage?tabs=dotnet#restore-soft-deleted-blobs-when-versioning-is-enabled-1)
+
+replace orderby with takeWhile
+
+blob listing is guaranteed to be alphabetical
