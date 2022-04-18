@@ -9,19 +9,14 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 async function getContainerProperties(containerClient) {
   // Get Properties including existing metadata
   const containerProperties = await containerClient.getProperties();
-  if(!containerProperties.errorCode){
-    console.log(containerProperties);
-  }
+  console.log(containerProperties);
 }
 // metadata keys are all lowercase
 async function getMetadataOfContainer(containerClient) {
   const containerPropertiesResponse = await containerClient.getProperties();
 
-  if(!containerPropertiesResponse.errorCode){
-
-    console.log(containerPropertiesResponse.metadata);
-    return containerPropertiesResponse.metadata;
-  }
+  console.log(containerPropertiesResponse.metadata);
+  return containerPropertiesResponse.metadata;
 }
 async function setMetadataOfContainer(containerClient) {
 
@@ -35,9 +30,8 @@ async function setMetadataOfContainer(containerClient) {
 
   const response = await containerClient.setMetadata(metadata);
 
-  if (!response.errorCode) {
-    console.log(`metadata set successfully`);
-  }
+  console.log(`metadata set successfully`);
+
 }
 async function listContainers(blobServiceClient) {
 

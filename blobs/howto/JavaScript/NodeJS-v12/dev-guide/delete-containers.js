@@ -11,21 +11,16 @@ const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitT
 
 // delete container immediately on blobServiceClient
 async function deleteContainerImmediately(blobServiceClient, containerName) {
-  const response = await blobServiceClient.deleteContainer(containerName);
+  
+  return await blobServiceClient.deleteContainer(containerName);
 
-  if (!response.errorCode) {
-    console.log(`deleted ${containerName} container`);
-  }
 }
 
 // soft delete container on ContainerClient
 async function deleteContainerSoft(containerClient) {
 
-  const response = await containerClient.delete();
+  return await containerClient.delete();
 
-  if (!response.errorCode) {
-    console.log(`deleted ${containerClient.name} container`);
-  }
 }
 
 async function deleteContainersWithPrefix(blobServiceClient, prefix) {
@@ -40,12 +35,14 @@ async function deleteContainersWithPrefix(blobServiceClient, prefix) {
 
   for await (const containerItem of blobServiceClient.listContainers(containerOptions)) {
 
-    const containerClient = blobServiceClient.getContainerClient(containerItem.name);
+    try{
+      const containerClient = blobServiceClient.getContainerClient(containerItem.name);
 
-    const response = await containerClient.delete();
-
-    if (!response.errorCode) {
-      console.log(`deleted ${containerItem.name} container`);
+      await containerClient.delete();
+  
+      console.log(`deleted ${containerItem.name} container - success`);
+    }catch(ex){
+      console.log(`deleted ${containerItem.name} container - failed - ${ex.message}`);
     }
   }
 }
@@ -81,13 +78,11 @@ async function undeleteContainer(blobServiceClient, containerName) {
   );
 
   // undelete was successful
-  if (!containerUndeleteResponse.errorCode) {
-    console.log(`${containerName} is undeleted`);
+  console.log(`${containerName} is undeleted`);
 
-    // do something with containerClient
-    const containerProperties = await containerClient.getProperties();
-    console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
-  }
+  // do something with containerClient
+  const containerProperties = await containerClient.getProperties();
+  console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
 }
 async function createContainer(blobServiceClient, containerName) {
 
@@ -99,13 +94,10 @@ async function createContainer(blobServiceClient, containerName) {
   // creating client also creates container
   const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, options);
 
-  // check if creation worked
-  if (!containerCreateResponse.errorCode) {
-
-    // list container properties
-    const containerProperties = await containerClient.getProperties();
-    console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
-  }
+  // list container properties
+  const containerProperties = await containerClient.getProperties();
+  console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
+  
 }
 
 async function main(blobServiceClient) {

@@ -160,14 +160,12 @@ async function listBlobSnapshot(containerClient){
 
 async function main(){
 
-  const { containerClient, containerCreateResponse } = await blobServiceClient.getContainerClient(containerName);
+  const { containerClient } = await blobServiceClient.getContainerClient(containerName);
 
-  if(!containerCreateResponse.errorCode) {
-    await listBlobHierarchical(containerClient);
-    await listBlobsFlatWithPageMarker(containerClient);
-    await listBlobVersion(containerClient);
-    await listBlobSnapshot(containerClient);
-  }
+  await listBlobHierarchical(containerClient);
+  await listBlobsFlatWithPageMarker(containerClient);
+  await listBlobVersion(containerClient);
+  await listBlobSnapshot(containerClient);
 }
 
 main(client)

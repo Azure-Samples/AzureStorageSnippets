@@ -13,8 +13,8 @@ const client = BlobServiceClient.fromConnectionString(connString);
 async function createBlobFromString(client, blobName, fileContentsAsString, tags) {
     console.log(`creating blob ${blobName}`);
     const blockBlobClient = await client.getBlockBlobClient(blobName);
-    const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
-    if(uploadBlobResponse.errorCode)console.log(`upload of ${blobName} failed`);
+    await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
+    console.log(`upload of ${blobName} succeed`);
 }
 // customer hands SDK a readable stream 
 // SDK doesn't return writable stream
@@ -22,13 +22,11 @@ async function downloadBlobAsStreamWriteToFile(client, blobName, writableStream)
     console.log(`downloading blob ${blobName}`);
     const blobClient = await client.getBlobClient(blobName);
     const downloadResponse = await blobClient.download();
-    if(downloadResponse.errorCode)console.log(`download of ${blobName} failed`);
+    console.log(`download of ${blobName} succeeded`);
     downloadResponse.readableStreamBody.pipe(writableStream);
 }
 
 async function main(blobServiceClient) {
-
-    let blobs = [];
 
     // create container
     const timestamp = Date.now();
@@ -38,9 +36,9 @@ async function main(blobServiceClient) {
     const containerOptions = {
         access: 'container'
     };  
-    const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
+    const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-    if (containerCreateResponse.errorCode) console.log("container creation failed");
+    console.log("container creation success");
 
     // create blob
     const blobTags = {

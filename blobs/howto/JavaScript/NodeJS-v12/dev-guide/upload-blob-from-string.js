@@ -25,14 +25,9 @@ async function createBlobFromString(client, blobName, fileContentsAsString, uplo
   // Upload string
   const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
 
-  // Check for errors or get tags from Azure
-  if(uploadBlobResponse.errorCode) {
-    console.log(`${blobName} failed to upload from file: ${errorCode}`);
-  } else {
-    // do something with blob
-    const getTagsResponse = await blockBlobClient.getTags();
-    console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
-  }
+  // do something with blob
+  const getTagsResponse = await blockBlobClient.getTags();
+  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
 }
 
 async function main(blobServiceClient){
@@ -47,9 +42,9 @@ async function main(blobServiceClient){
   const containerOptions = {
     access: 'container'
   };  
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
+  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-  if(containerCreateResponse.errorCode) console.log("container creation failed");
+  console.log("container creation succeeded");
 
   // create 10 blobs with Promise.all
   for (let i=0; i<10; i++){

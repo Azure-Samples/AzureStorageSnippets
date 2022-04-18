@@ -82,8 +82,8 @@ async function setTagsOnBlob(blockBlobClient, tags) {
 async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions, indexableTags) {
   console.log(`creating blob from string ${blobName}`);
   const blockBlobClient = await client.getBlockBlobClient(blobName);
-  const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
-  if (uploadBlobResponse.errorCode) console.log(`can't create blob ${blobName}`);
+  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
+  console.log(`created blob ${blobName}`);
 
   await setTagsOnBlob(blockBlobClient, indexableTags);
 }
@@ -93,29 +93,25 @@ async function createContainer1AndBlobs(containerName1, blob1) {
   const containerOptions = {
     access: 'container'
   }; 
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName1, containerOptions);
+  const { containerClient } = await blobServiceClient.createContainer(containerName1, containerOptions);
 
-  if (!containerCreateResponse.errorCode) {
+  console.log(`creating blob ${blob1.name}`);
+  await createBlobFromString(containerClient, blob1.name, blob1.text, blob1.options, blob1.tags);
 
-    console.log(`creating blob ${blob1.name}`);
-    await createBlobFromString(containerClient, blob1.name, blob1.text, blob1.options, blob1.tags);
-  }
 }
 
 async function createContainer2AndBlobs(containerName2, blob2, blob3) {
   const containerOptions = {
     access: 'container'
   }; 
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName2, containerOptions);
+  const { containerClient } = await blobServiceClient.createContainer(containerName2, containerOptions);
 
-  if (!containerCreateResponse.errorCode) {
+  console.log(`creating blob ${blob2.name}`);
+  await createBlobFromString(containerClient, blob2.name, blob2.text, blob2.options, blob2.tags);
 
-    console.log(`creating blob ${blob2.name}`);
-    await createBlobFromString(containerClient, blob2.name, blob2.text, blob2.options, blob2.tags);
+  console.log(`creating blob ${blob3.name}`);
+  await createBlobFromString(containerClient, blob3.name, blob3.text, blob3.options, blob3.tags);
 
-    console.log(`creating blob ${blob3.name}`);
-    await createBlobFromString(containerClient, blob3.name, blob3.text, blob3.options, blob3.tags);
-  }
 }
 
 async function main() {

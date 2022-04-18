@@ -42,11 +42,11 @@ async function findBlobsByTag(blobStorageClient, odataTagQuery, prefix) {
 async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions, indexableTags) {
   console.log(`creating blob from string ${blobName}`);
   const blockBlobClient = await client.getBlockBlobClient(blobName);
-  const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
-  if (uploadBlobResponse.errorCode) console.log(`can't create blob ${blobName}`);
+  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
+  console.log(`created blob ${blobName}`);
 
-  const blobSetTagsResponse = await blockBlobClient.setTags(indexableTags);
-  if (blobSetTagsResponse.errorCode) console.log(`can't set tags on blob ${blockBlobClient.name}`);
+  await blockBlobClient.setTags(indexableTags);
+  console.log(`set tags on blob ${blockBlobClient.name}`);
 }
 
 async function main() {
@@ -76,16 +76,14 @@ async function main() {
     }; 
     const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName1, containerOptions);
 
-    if (!containerCreateResponse.errorCode) {
-      console.log(`creating blob ${blob1.name}`);
-      await createBlobFromString(containerClient, blob1.name, blob1.text, blob1.options, blob1.tags);
-    }
+    console.log(`creating blob ${blob1.name}`);
+    await createBlobFromString(containerClient, blob1.name, blob1.text, blob1.options, blob1.tags);
 
     // query 0 - all containers, no tags, no prefix
     // should return all blobs
     const odataTagQuery0 = 'owner=\'PhillyProject\'';
     console.log(`find tags with ${odataTagQuery0}`)
-    const foundBlobs0 = await findBlobsByTag(blobServiceClient, odataTagQuery0);
+    await findBlobsByTag(blobServiceClient, odataTagQuery0);
 
   } catch (ex) {
     console.log(ex.message);

@@ -31,14 +31,9 @@ async function createBlobFromBuffer(containerClient, blobName, buffer, uploadOpt
   // Upload buffer
   const uploadBlobResponse = await blockBlobClient.uploadData(buffer, uploadOptions);
 
-  // Check for errors or get tags from Azure
-  if(uploadBlobResponse.errorCode) {
-    console.log(`${blobName} failed to upload from file: ${errorCode}`);
-  } else {
-    // do something with blob
-    const getTagsResponse = await blockBlobClient.getTags();
-    console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
-  }
+  // do something with blob
+  const getTagsResponse = await blockBlobClient.getTags();
+  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
 }
 
 async function main(blobServiceClient) {

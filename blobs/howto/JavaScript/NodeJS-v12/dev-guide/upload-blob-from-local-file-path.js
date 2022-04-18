@@ -20,12 +20,8 @@ async function createBlobFromLocalPath(containerClient, blobName, localFileWithP
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // upload file to blob storage
-  const uploadBlobResponse = await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
-
-  // check upload was successful
-  if(!uploadBlobResponse.errorCode){
-    console.log(`${blobName} succeeded`);
-  } 
+  await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
+  console.log(`${blobName} succeeded`);
 }
 
 async function main(blobServiceClient){
@@ -41,9 +37,8 @@ async function main(blobServiceClient){
     access: 'container'
   };
 
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  if(containerCreateResponse.errorCode) console.log("container creation failed");
+  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
+  console.log("container creation succeeded");
 
   // get fully qualified path of file
   // Create file `my-local-file.txt` in same directory as this file

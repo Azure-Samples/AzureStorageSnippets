@@ -19,15 +19,11 @@ async function createContainer(blobServiceClient, containerName){
   // creating client also creates container
   const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, options);
 
-  // check if creation worked
-  if(!containerCreateResponse.errorCode){
+  console.log(`container ${containerName} created`);
 
-    console.log(`container ${containerName} created`);
-
-    // list container properties
-    const containerProperties = await containerClient.getProperties();
-    console.log(`container properties = ${JSON.stringify(containerProperties)}`);
-  }
+  // list container properties
+  const containerProperties = await containerClient.getProperties();
+  console.log(`container properties = ${JSON.stringify(containerProperties)}`);
 }
 
 async function main(blobServiceClient){

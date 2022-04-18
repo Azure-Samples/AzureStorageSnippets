@@ -36,15 +36,10 @@ async function createBlobFromLocalPath(containerClient, blobName, readableStream
 
   // Upload stream
   const uploadBlobResponse = await blockBlobClient.uploadStream(readableStream, bufferSize, maxConcurrency, uploadOptions);
-  
-  // Check for errors or get tags from Azure
-  if(uploadBlobResponse.errorCode) {
-    console.log(`${blobName} failed to upload from file: ${errorCode}`);
-  } else {
-    // do something with blob
-    const getTagsResponse = await blockBlobClient.getTags();
-    console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
-  }
+
+  // do something with blob
+  const getTagsResponse = await blockBlobClient.getTags();
+  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
 }
 
 async function main(blobServiceClient){
@@ -55,9 +50,9 @@ async function main(blobServiceClient){
   const timestamp = Date.now();
   const containerName = `create-blob-from-stream-${timestamp}`;
   console.log(`creating container ${containerName}`);
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName);
+  const { containerClient } = await blobServiceClient.createContainer(containerName);
 
-  if(containerCreateResponse.errorCode) console.log("container creation failed");
+  console.log("container creation succeeded");
 
   // get fully qualified path of file
   // Create file `my-local-file.txt` in same directory as this file

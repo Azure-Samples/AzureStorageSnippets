@@ -12,14 +12,14 @@ async function createBlobFromString(client, blobName, fileContentsAsString, tags
     console.log(`creating blob ${blobName}`);
     const blockBlobClient = await client.getBlockBlobClient(blobName);
     const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
-    if(uploadBlobResponse.errorCode)console.log(`upload of ${blobName} failed`);
+    console.log(`upload of ${blobName} success`);
 }
 
 async function downloadBlobAsStreamConvertToString(client, blobName) {
     console.log(`downloading blob ${blobName}`);
     const blobClient = await client.getBlobClient(blobName);
     const downloadResponse = await blobClient.download();
-    if(downloadResponse.errorCode)console.log(`download of ${blobName} failed`);
+    console.log(`download of ${blobName} success`);
     const downloaded = await streamToBuffer(downloadResponse.readableStreamBody);
     console.log("Downloaded blob content:", downloaded.toString());
 }
@@ -39,8 +39,6 @@ async function streamToBuffer(readableStream) {
 
 async function main(blobServiceClient) {
 
-    let blobs = [];
-
     // create container
     const timestamp = Date.now();
     const containerName = `download-blob-to-string-${timestamp}`;
@@ -48,9 +46,9 @@ async function main(blobServiceClient) {
     const containerOptions = {
         access: 'container'
     }; 
-    const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
+    const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-    if (containerCreateResponse.errorCode) console.log("container creation failed");
+    console.log("container creation success");
 
     // create blob
     const blobTags = {
@@ -63,10 +61,10 @@ async function main(blobServiceClient) {
     const blobContent = `Hello from a string`;
 
     // create blob from string
-    const resultUpload = await createBlobFromString(containerClient, blobName, blobContent, blobTags);
+    await createBlobFromString(containerClient, blobName, blobContent, blobTags);
 
     // download blob to string
-    const resultDownload = await downloadBlobAsStreamConvertToString(containerClient, blobName)
+    await downloadBlobAsStreamConvertToString(containerClient, blobName)
 
 }
 main(client)
