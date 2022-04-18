@@ -8,10 +8,31 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// containerName: string
+// blobName: string, includes file extension if provided
+// fileContentsAsString: blob content
+// uploadOptions: {
+//    metadata, 
+//    onProgress: fnUpdater
+//    tags, 
+//    tier: accessTier (hot, cool, archive), 
+//  }
 async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions){
-  console.log(`creating blob ${blobName}`);
+
+  // Create blob client from container client
   const blockBlobClient = await client.getBlockBlobClient(blobName);
+
+  // Upload string
   const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
+
+  // Check for errors or get tags from Azure
+  if(uploadBlobResponse.errorCode) {
+    console.log(`${blobName} failed to upload from file: ${errorCode}`);
+  } else {
+    // do something with blob
+    const getTagsResponse = await blockBlobClient.getTags();
+    console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
+  }
 }
 
 async function main(blobServiceClient){

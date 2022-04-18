@@ -10,12 +10,22 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// containerName: string
+// blobName: string, includes file extension if provided
+// localFileWithPath: fully qualified path and file name
+// uploadOptions: 
 async function createBlobFromLocalPath(containerClient, blobName, localFileWithPath, uploadOptions){
-  console.log(`creating blob ${blobName} from ${localFileWithPath}`);
+
+  // create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+
+  // upload file to blob storage
   const uploadBlobResponse = await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
 
-  if(uploadBlobResponse.errorCode) console.log(`${blobName} failed to upload from file: ${errorCode}`);
+  // check upload was successful
+  if(!uploadBlobResponse.errorCode){
+    console.log(`${blobName} succeeded`);
+  } 
 }
 
 async function main(blobServiceClient){
@@ -24,7 +34,7 @@ async function main(blobServiceClient){
 
   // create container
   const timestamp = Date.now();
-  const containerName = `createblobfromstring-${timestamp}`;
+  const containerName = `create-blob-from-local-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
   const containerOptions = {

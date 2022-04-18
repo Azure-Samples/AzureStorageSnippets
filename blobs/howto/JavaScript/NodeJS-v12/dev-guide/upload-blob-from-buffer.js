@@ -11,13 +11,34 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-async function createBlobFromLocalPath(containerClient, blobName, buffer, uploadOptions) {
-  console.log(`creating blob ${blobName} from buffer`);
+// containerName: string
+// blobName: string, includes file extension if provided
+// readableStream: Node.js Readable stream
+// uploadOptions: {
+//    blockSize: destination block blob size in bytes,
+//    concurrency: concurrency of parallel uploading - must be greater than or equal to 0,
+//    maxSingleShotSize: blob size threshold in bytes to start concurrency uploading
+//    metadata, 
+//    onProgress: fnUpdater
+//    tags, 
+//    tier: accessTier (hot, cool, archive), 
+//  }
+async function createBlobFromBuffer(containerClient, blobName, buffer, uploadOptions) {
+
+  // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
+  // Upload buffer
   const uploadBlobResponse = await blockBlobClient.uploadData(buffer, uploadOptions);
 
-  if (uploadBlobResponse.errorCode) console.log(`${blobName} failed to upload from file: ${errorCode}`);
+  // Check for errors or get tags from Azure
+  if(uploadBlobResponse.errorCode) {
+    console.log(`${blobName} failed to upload from file: ${errorCode}`);
+  } else {
+    // do something with blob
+    const getTagsResponse = await blockBlobClient.getTags();
+    console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
+  }
 }
 
 async function main(blobServiceClient) {
@@ -63,7 +84,7 @@ async function main(blobServiceClient) {
       }
     }
 
-    blobs.push(createBlobFromLocalPath(containerClient, `${containerName}-${i}.jpg`, buffer, uploadOptions));
+    blobs.push(createBlobFromBuffer(containerClient, `${containerName}-${i}.jpg`, buffer, uploadOptions));
   }
   await Promise.all(blobs);
 

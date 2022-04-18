@@ -4,44 +4,63 @@ require('dotenv').config()
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 if (!connString) throw Error("Azure Storage Connection string not found");
 
-const client = BlobServiceClient.fromConnectionString(connString);
+const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
-async function listContainers(blobServiceClient){
+async function getContainerProperties(containerClient) {
+  // Get Properties including existing metadata
+  const containerProperties = await containerClient.getProperties();
+  if(!containerProperties.errorCode){
+    console.log(containerProperties);
+  }
+}
+// metadata keys are all lowercase
+async function getMetadataOfContainer(containerClient) {
+  const containerPropertiesResponse = await containerClient.getProperties();
+
+  if(!containerPropertiesResponse.errorCode){
+
+    console.log(containerPropertiesResponse.metadata);
+    return containerPropertiesResponse.metadata;
+  }
+}
+async function setMetadataOfContainer(containerClient) {
+
+  const currentDate = new Date();
+
+  const metadata = {
+    // values must be strings
+    lastFileReview: currentDate.toString(),
+    reviewer: `johnh`
+  }
+
+  const response = await containerClient.setMetadata(metadata);
+
+  if (!response.errorCode) {
+    console.log(`metadata set successfully`);
+  }
+}
+async function listContainers(blobServiceClient) {
 
   for await (const containerItem of blobServiceClient.listContainers()) {
 
-      console.log(`${containerItem.name} with version ${containerItem.version} last modified on ${containerItem.properties.lastModified}`);
-      const containerClient = blobServiceClient.getContainerClient(containerItem.name);
+    console.log(`${containerItem.name} with version ${containerItem.version} last modified on ${containerItem.properties.lastModified}`);
+    const containerClient = blobServiceClient.getContainerClient(containerItem.name);
 
-      // Get Properties including existing metadata
-      const containerProperties = await containerClient.getProperties();
-      console.log(containerProperties);
+    // get system properties and custom metadata
+    await getContainerProperties(containerClient);
 
-      // Set metadata
-      await setMetadataOfContainer(containerClient);
+    // Set metadata
+    await setMetadataOfContainer(containerClient);
 
-      // Get updated metadata from properties
-      const containerProperties2 = await containerClient.getProperties();
-      console.log(containerProperties2.metadata);
+    // Get updated metadata from properties
+    await getMetadataOfContainer(containerClient);
   }
 }
-
-async function setMetadataOfContainer(containerClient){
-
-      const currentDate = new Date();
-
-      const metadata = {
-        // values must be strings
-        lastDateSet: currentDate.toString()
-      }
-
-      const response = await containerClient.setMetadata(metadata);
-
-      if(!response.errorCode){
-        console.log(`metadata set to ${metadata.lastDateSet}`);
-      }
+async function main(blobServiceClient){
+  // containers must already exist
+  await listContainers(blobServiceClient);
 }
 
-listContainers(client)
+main(blobServiceClient)
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));
