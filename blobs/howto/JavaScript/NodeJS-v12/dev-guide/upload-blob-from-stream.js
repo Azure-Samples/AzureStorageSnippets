@@ -1,11 +1,25 @@
 const fs = require('fs');
 const path = require('path');
+const { Transform } = require('stream');
 const { BlobServiceClient } = require("@azure/storage-blob");
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 if (!connString) throw Error("Azure Storage Connection string not found");
+
+// Reasons to transform:
+// 1. Sanitize the data - remove PII
+// 2. Compress or uncompress
+const myTransform = new Transform({
+  transform(chunk, encoding, callback) {
+    // see what is in the artificially
+    // small chunk
+    console.log(chunk);
+    callback(null, chunk);
+  },
+  decodeStrings: false
+});
 
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
@@ -19,7 +33,7 @@ const client = BlobServiceClient.fromConnectionString(connString);
 //    tier: accessTier (hot, cool, archive), 
 //    onProgress: fnUpdater
 //  }
-async function createBlobFromLocalPath(containerClient, blobName, readableStream, uploadOptions){
+async function createBlobFromReadStream(containerClient, blobName, readableStream, uploadOptions) {
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
@@ -34,17 +48,20 @@ async function createBlobFromLocalPath(containerClient, blobName, readableStream
   // with max uploading concurrency. Default value is 5
   const maxConcurrency = 20;
 
+  // use transform per chunk - only to see chunck
+  const transformedReadableStream = readableStream.pipe(myTransform);
+  
   // Upload stream
-  const uploadBlobResponse = await blockBlobClient.uploadStream(readableStream, bufferSize, maxConcurrency, uploadOptions);
+  await blockBlobClient.uploadStream(transformedReadableStream, bufferSize, maxConcurrency, uploadOptions);
 
   // do something with blob
   const getTagsResponse = await blockBlobClient.getTags();
   console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
 }
 
-async function main(blobServiceClient){
- 
-    let blobs=[];
+async function main(blobServiceClient) {
+
+  let blobs = [];
 
   // create container
   const timestamp = Date.now();
@@ -58,10 +75,14 @@ async function main(blobServiceClient){
   // Create file `my-local-file.txt` in same directory as this file
   const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
 
-  const readableStream = fs.createReadStream(localFileWithPath);
+  // highWaterMark: artificially low value to demonstrate appendBlob
+  // encoding: just to see the chunk as it goes by
+  const streamOptions = { highWaterMark: 20, encoding: 'utf-8' }
+
+  const readableStream = fs.createReadStream(localFileWithPath, streamOptions);
 
   // create blobs with Promise.all
-  for (let i=0; i<9; i++){
+  for (let i = 0; i < 9; i++) {
 
     const uploadOptions = {
 
@@ -69,7 +90,7 @@ async function main(blobServiceClient){
       metadata: {
         owner: 'PhillyProject'
       },
-  
+
       // indexed for searching
       tags: {
         createdBy: 'YOUR-NAME',
@@ -78,11 +99,11 @@ async function main(blobServiceClient){
       }
     }
 
-    blobs.push(createBlobFromLocalPath(containerClient, `${containerName}-${i}.txt`, readableStream, uploadOptions));
+    blobs.push(createBlobFromReadStream(containerClient, `${containerName}-${i}.txt`, readableStream, uploadOptions));
   }
   await Promise.all(blobs);
 
 }
 main(client)
-.then(() => console.log("done"))
-.catch((ex) => console.log(ex.message));
+  .then(() => console.log("done"))
+  .catch((ex) => console.log(ex.message));

@@ -67,3 +67,8 @@ c - copy previous as undelete - reference with datatime url or listing operation
 replace orderby with takeWhile
 
 blob listing is guaranteed to be alphabetical
+
+
+-- SDK storage - 
+append to blob - is supposed to get the full content at each append,
+not optimized for streams
