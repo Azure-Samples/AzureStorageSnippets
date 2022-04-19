@@ -1,5 +1,4 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
-const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
@@ -17,29 +16,24 @@ async function createBlobFromString(client, blobName, fileContentsAsString) {
     await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
     console.log(`created blob ${blobName}`);
 }
-// customer hands SDK a readable stream 
-// SDK doesn't return writable stream
-async function downloadBlobAsStream(client, blobName, writableStream) {
 
-    const blobClient = await client.getBlobClient(blobName);
+async function downloadBlobToFile(containerClient, blobName, fileNameWithPath) {
 
-    const downloadResponse = await blobClient.download();
-
-    downloadResponse.readableStreamBody.pipe(writableStream);
-    console.log(`download of ${blobName} succeeded`);
-
+    const blobClient = await containerClient.getBlobClient(blobName);
+    
+    await blobClient.downloadToFile(fileNameWithPath);
+    console.log(`download of ${blobName} success`);
 }
 
 async function main(blobServiceClient) {
 
     // create container
     const timestamp = Date.now();
-    const containerName = `download-blob-to-string-${timestamp}`;
+    const containerName = `download-blob-to-file-${timestamp}`;
     console.log(`creating container ${containerName}`);
-    
     const containerOptions = {
         access: 'container'
-    };  
+    }; 
     const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
     console.log("container creation success");
@@ -53,14 +47,13 @@ async function main(blobServiceClient) {
 
     const blobName = `${containerName}-from-string.txt`;
     const blobContent = `Hello from a string`;
-    const localFileNameWithPath = path.join(__dirname, blobName);
-    const writableStream = fs.createWriteStream(localFileNameWithPath, {encoding: 'utf-8', autoClose: true});
+    const newFileNameAndPath = path.join(__dirname, `${containerName}-downloaded-to-file.txt`);
 
     // create blob from string
     await createBlobFromString(containerClient, blobName, blobContent, blobTags);
 
     // download blob to string
-    await downloadBlobAsStream(containerClient, blobName, writableStream);
+    await downloadBlobToFile(containerClient, blobName, newFileNameAndPath)
 
 }
 main(client)
