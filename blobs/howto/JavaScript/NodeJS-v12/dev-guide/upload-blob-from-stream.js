@@ -1,13 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 const { Transform } = require('stream');
+
 const { BlobServiceClient } = require("@azure/storage-blob");
+
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 if (!connString) throw Error("Azure Storage Connection string not found");
 
+// Transform stream
 // Reasons to transform:
 // 1. Sanitize the data - remove PII
 // 2. Compress or uncompress
@@ -50,7 +53,7 @@ async function createBlobFromReadStream(containerClient, blobName, readableStrea
 
   // use transform per chunk - only to see chunck
   const transformedReadableStream = readableStream.pipe(myTransform);
-  
+
   // Upload stream
   await blockBlobClient.uploadStream(transformedReadableStream, bufferSize, maxConcurrency, uploadOptions);
 
@@ -60,8 +63,6 @@ async function createBlobFromReadStream(containerClient, blobName, readableStrea
 }
 
 async function main(blobServiceClient) {
-
-  let blobs = [];
 
   // create container
   const timestamp = Date.now();
@@ -81,27 +82,22 @@ async function main(blobServiceClient) {
 
   const readableStream = fs.createReadStream(localFileWithPath, streamOptions);
 
-  // create blobs with Promise.all
-  for (let i = 0; i < 9; i++) {
+  const uploadOptions = {
 
-    const uploadOptions = {
+    // not indexed for searching
+    metadata: {
+      owner: 'PhillyProject'
+    },
 
-      // not indexed for searching
-      metadata: {
-        owner: 'PhillyProject'
-      },
-
-      // indexed for searching
-      tags: {
-        createdBy: 'YOUR-NAME',
-        createdWith: `StorageSnippetsForDocs-${i}`,
-        createdOn: (new Date()).toDateString()
-      }
+    // indexed for searching
+    tags: {
+      createdBy: 'YOUR-NAME',
+      createdWith: `StorageSnippetsForDocs`,
+      createdOn: (new Date()).toDateString()
     }
-
-    blobs.push(createBlobFromReadStream(containerClient, `${containerName}-${i}.txt`, readableStream, uploadOptions));
   }
-  await Promise.all(blobs);
+
+  await createBlobFromReadStream(containerClient, `${containerName}.txt`, readableStream, uploadOptions);
 
 }
 main(client)
