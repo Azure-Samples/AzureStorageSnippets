@@ -8,18 +8,20 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-async function createBlobFromString(client, blobName, fileContentsAsString, tags) {
-    console.log(`creating blob ${blobName}`);
+async function createBlobFromString(client, blobName, fileContentsAsString) {
+
     const blockBlobClient = await client.getBlockBlobClient(blobName);
-    const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
-    console.log(`upload of ${blobName} success`);
+
+    await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
+    console.log(`created blob ${blobName}`);
 }
 
-async function downloadBlobAsStreamConvertToString(client, blobName) {
-    console.log(`downloading blob ${blobName}`);
+async function downloadBlobToString(client, blobName) {
+
     const blobClient = await client.getBlobClient(blobName);
+
     const downloadResponse = await blobClient.download();
-    console.log(`download of ${blobName} success`);
+
     const downloaded = await streamToBuffer(downloadResponse.readableStreamBody);
     console.log("Downloaded blob content:", downloaded.toString());
 }
@@ -64,7 +66,7 @@ async function main(blobServiceClient) {
     await createBlobFromString(containerClient, blobName, blobContent, blobTags);
 
     // download blob to string
-    await downloadBlobAsStreamConvertToString(containerClient, blobName)
+    await downloadBlobToString(containerClient, blobName)
 
 }
 main(client)

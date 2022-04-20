@@ -17,8 +17,6 @@ async function createBlobFromString(client, blobName, fileContentsAsString) {
     await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
     console.log(`created blob ${blobName}`);
 }
-// customer hands SDK a readable stream 
-// SDK doesn't return writable stream
 async function downloadBlobAsStream(client, blobName, writableStream) {
 
     const blobClient = await client.getBlobClient(blobName);
@@ -27,7 +25,6 @@ async function downloadBlobAsStream(client, blobName, writableStream) {
 
     downloadResponse.readableStreamBody.pipe(writableStream);
     console.log(`download of ${blobName} succeeded`);
-
 }
 
 async function main(blobServiceClient) {

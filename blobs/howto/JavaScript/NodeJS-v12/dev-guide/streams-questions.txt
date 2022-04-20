@@ -74,3 +74,7 @@ append to blob - is supposed to get the full content at each append,
 not optimized for streams
 how do I see that an append blob has been set to read-only in portal
 is that a one way action
+
+why would I copy instead of upload/blocks of size? 
+why would I copy/abort instead of copy/cancel?
+how do you list mulitple virtual hierarchical folders with blobs? 
