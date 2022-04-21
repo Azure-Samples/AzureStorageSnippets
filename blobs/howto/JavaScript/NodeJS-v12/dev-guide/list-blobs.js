@@ -44,18 +44,8 @@ async function listBlobsFlatWithPageMarker(containerClient) {
     console.log(`Flat listing: ${i++}: ${blob.name}`);
   }
 }
-async function listBlobHierarchical0(containerClient){
-  for await (const item of containerClient.listBlobsByHierarchy("/")) {
-    if (item.kind === "prefix") {
-      console.log(`\tBlobPrefix: ${item.name}`);
-    } else {
-      console.log(`\tBlobItem: name - ${item.name}`);
-    }
-  }
-}
-async function listBlobHierarchical(containerClient) {
-
-  const virtualHierarchyDelimiter = "/";
+// Recursively list virtual folders and blobs
+async function listBlobHierarchical(containerClient, virtualHierarchyDelimiter='/') {
 
   // page size
   const maxPageSize = 2;
@@ -69,20 +59,28 @@ async function listBlobHierarchical(containerClient) {
   };
 
   let i = 1;
+  console.log(`Folder ${virtualHierarchyDelimiter}`);
+
   for await (const response of containerClient
     .listBlobsByHierarchy(virtualHierarchyDelimiter, listOptions)
     .byPage({ maxPageSize })) {
 
-    console.log(`Hier listing: Page ${i++}`);
+    console.log(`   Page ${i++}`);
     const segment = response.segment;
 
     if (segment.blobPrefixes) {
-      for (const prefix of segment.blobPrefixes) {
-        console.log(`\tBlobPrefix: ${prefix.name}`);
+
+      // Do something with each virtual folder
+      for await (const prefix of segment.blobPrefixes) {
+
+        // build new virtualHierarchyDelimiter from current and next
+        await listBlobHierarchical(containerClient, `${virtualHierarchyDelimiter}${prefix.name}`);
       }
     }
 
     for (const blob of response.segment.blobItems) {
+
+      // Do something with each blob
       console.log(`\tBlobItem: name - ${blob.name}`);
     }
   }
@@ -233,11 +231,8 @@ async function main(blobServiceClient) {
 
   await listBlobsFlatWithPageMarker(containerClient);
 
-  // simple for loop
-  await listBlobHierarchical0(containerClient);
-
   // paging
-  //await listBlobHierarchical(containerClient);
+  await listBlobHierarchical(containerClient);
 
   //await listBlobVersion(containerClient);
   //await listBlobSnapshot(containerClient);
