@@ -1,0 +1,15 @@
+{
+    "name": "blob-quickstart-v12",
+    "version": "1.0.0",
+    "description": "Use the @azure/storage-blob SDK version 12 to interact with Azure Blob storage",
+    "main": "blob-quickstart-v12.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@azure/identity": "^2.0.4",
+        "@azure/storage-blob": "^12.9.0",
+        "dotenv": "^8.6.0"
+    }
+}
