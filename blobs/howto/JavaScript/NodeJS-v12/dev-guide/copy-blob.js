@@ -61,8 +61,8 @@ async function copyThenAbortBlob(
     const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url);
     console.log('start copy from A to C');
 
-    // cancel operation after starting it.
-    // sample file is too small to be canceled.
+    // cancel operation after starting it -
+    // sample file may be too small to be canceled.
     try {
       await copyPoller.cancelOperation();
       console.log('request to cancel copy from A to C');

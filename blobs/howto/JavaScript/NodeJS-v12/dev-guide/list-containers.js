@@ -1,9 +1,9 @@
 // index.js
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config()
 
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 const client = BlobServiceClient.fromConnectionString(connString);
 
@@ -20,14 +20,12 @@ async function listContainers(blobServiceClient, containerNamePrefix) {
   for await (const containerItem of blobServiceClient.listContainers(options)) {
 
     // ContainerItem
-    console.log(`${containerItem.name} last modified on ${containerItem.properties.lastModified}`);
+    console.log(`For-await list: ${containerItem.name}`);
 
     // ContainerClient
     const containerClient = blobServiceClient.getContainerClient(containerItem.name);
 
-    // ContainerProperties
-    const containerProperties = await containerClient.getProperties();
-    console.log(containerProperties);
+    // ... do something with container 
   }
 }
 
@@ -35,7 +33,7 @@ async function listContainers(blobServiceClient, containerNamePrefix) {
 async function listContainersWithPagingMarker(blobServiceClient) {
 
   // add prefix to filter list
-  const containerNamePrefix = "";
+  const containerNamePrefix = '';
 
   // page size
   const maxPageSize = 2;
@@ -46,6 +44,7 @@ async function listContainersWithPagingMarker(blobServiceClient) {
     includeSystem: true,
     prefix: containerNamePrefix
   }
+  
   let i = 1;
   let marker;
   let iterator = blobServiceClient.listContainers(options).byPage({ maxPageSize });
@@ -54,7 +53,7 @@ async function listContainersWithPagingMarker(blobServiceClient) {
   // Prints 2 container names
   if (response.containerItems) {
     for (const container of response.containerItems) {
-      console.log(`Container ${i++}: ${container.name}`);
+      console.log(`IteratorPaged: Container ${i++}: ${container.name}`);
     }
   }
 

@@ -1,17 +1,17 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 const path = require('path');
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-async function createBlobFromString(client, blobName, fileContentsAsString) {
+async function createBlobFromString(containerClient, blobName, fileContentsAsString) {
 
-    const blockBlobClient = await client.getBlockBlobClient(blobName);
+    const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
     await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
     console.log(`created blob ${blobName}`);
@@ -36,7 +36,7 @@ async function main(blobServiceClient) {
     }; 
     const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-    console.log("container creation success");
+    console.log('container creation success');
 
     // create blob
     const blobTags = {
@@ -57,5 +57,5 @@ async function main(blobServiceClient) {
 
 }
 main(client)
-    .then(() => console.log("done"))
+    .then(() => console.log('done'))
     .catch((ex) => console.log(ex.message));

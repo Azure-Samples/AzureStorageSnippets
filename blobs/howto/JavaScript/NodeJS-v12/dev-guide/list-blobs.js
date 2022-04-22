@@ -1,9 +1,9 @@
 // index.js
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config()
 
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 const timestamp = Date.now();
@@ -16,6 +16,7 @@ async function listBlobsFlatWithPageMarker(containerClient) {
   let i = 1;
   let marker;
 
+  // some options for filtering list
   const listOptions = {
     includeMetadata: true,
     includeSnapshots: false,
@@ -36,7 +37,10 @@ async function listBlobsFlatWithPageMarker(containerClient) {
   marker = response.continuationToken;
 
   // Passing next marker as continuationToken    
-  iterator = containerClient.listBlobsFlat().byPage({ continuationToken: marker, maxPageSize: maxPageSize * 2 });
+  iterator = containerClient.listBlobsFlat().byPage({ 
+    continuationToken: marker, 
+    maxPageSize: maxPageSize * 2 
+  });
   response = (await iterator.next()).value;
 
   // Prints next blob names
@@ -47,9 +51,10 @@ async function listBlobsFlatWithPageMarker(containerClient) {
 // Recursively list virtual folders and blobs
 async function listBlobHierarchical(containerClient, virtualHierarchyDelimiter='/') {
 
-  // page size
+  // page size - artificially low as example
   const maxPageSize = 2;
 
+  // some options for filtering list
   const listOptions = {
     includeMetadata: true,
     includeSnapshots: false,
@@ -86,84 +91,6 @@ async function listBlobHierarchical(containerClient, virtualHierarchyDelimiter='
   }
 }
 
-async function listBlobVersion(containerClient) {
-
-  // page size
-  const maxPageSize = 2;
-
-  let i = 1;
-  let marker;
-
-  const listOptions = {
-    includeMetadata: true,
-    includeSnapshots: false,
-    includeTags: true,
-    includeVersions: true,
-    prefix: ''
-  }
-
-  let iterator = containerClient.listBlobsFlat(listOptions).byPage({ maxPageSize });
-  let response = (await iterator.next()).value;
-
-  // Prints 2 blob names
-  for (const blob of response.segment.blobItems) {
-    console.log(`Blob ${i++}: ${blob.name}`);
-  }
-
-  // Gets next marker
-  marker = response.continuationToken;
-
-  // Passing next marker as continuationToken    
-  iterator = containerClient.listBlobsFlat(listOptions).byPage({ continuationToken: marker, maxPageSize: maxPageSize * 2 });
-  response = (await iterator.next()).value;
-
-  // Prints next 4 blob names
-  for (const blob of response.segment.blobItems) {
-    console.log(`Blob ${i++}: ${blob.name}`);
-  }
-}
-
-async function listBlobSnapshot(containerClient) {
-
-  // page size
-  const maxPageSize = 2;
-
-  let i = 1;
-  let marker;
-
-  const listOptions = {
-    includeCopy: false,                 // include metadata from previous copies
-    includeDeleted: false,              // include deleted blobs 
-    includeDeletedWithVersions: false,  // include deleted blobs with versions
-    includeLegalHost: false,            // include legal host id  
-    includeMetadata: true,              // include custom metadata
-    includeSnapshots: true,             // include snapshots
-    includeTags: true,                  // include indexable tags
-    includeUncommittedBlobs: false,     // include uncommitted blobs
-    includeVersions: false,             // include all blob version
-    prefix: ''                          // filter by blob name prefix
-  };
-
-  let iterator = containerClient.listBlobsFlat(listOptions).byPage({ maxPageSize });
-  let response = (await iterator.next()).value;
-
-  // Prints 2 blob names
-  for (const blob of response.segment.blobItems) {
-    console.log(`Blob ${i++}: ${blob.name}`);
-  }
-
-  // Gets next marker
-  marker = response.continuationToken;
-
-  // Passing next marker as continuationToken    
-  iterator = containerClient.listBlobsFlat(listOptions).byPage({ continuationToken: marker, maxPageSize: maxPageSize * 2 });
-  response = (await iterator.next()).value;
-
-  // Prints next 4 blob names
-  for (const blob of response.segment.blobItems) {
-    console.log(`Blob ${i++}: ${blob.name}`);
-  }
-}
 async function createBlobFromString(containerClient, blobName, fileContentsAsString, uploadOptions) {
 
   // Create blob client from container client
@@ -231,11 +158,8 @@ async function main(blobServiceClient) {
 
   await listBlobsFlatWithPageMarker(containerClient);
 
-  // paging
   await listBlobHierarchical(containerClient);
 
-  //await listBlobVersion(containerClient);
-  //await listBlobSnapshot(containerClient);
 }
 
 main(blobServiceClient)

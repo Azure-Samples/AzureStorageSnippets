@@ -1,8 +1,8 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config()
 
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
@@ -24,6 +24,7 @@ properties= {
       blobContentType: 'text/plain',
       blobContentLanguage: 'en-us',
       blobContentEncoding: 'utf-8',
+      // all other http properties are cleared
     }
 */
 async function setHTTPHeaders(blobClient, headers) {
@@ -31,18 +32,17 @@ async function setHTTPHeaders(blobClient, headers) {
   await blobClient.setHTTPHeaders(headers);
 
   console.log(`headers set successfully`);
-
 }
 
 async function getProperties(blobClient) {
 
   const properties = await blobClient.getProperties();
-  console.log(blobClient.name + " properties: ");
+  console.log(blobClient.name + ' properties: ');
 
   for (const property in properties) {
 
     switch (property) {
-      // nested properties should be stringified
+      // nested properties are stringified and returned as strings
       case 'metadata':
       case 'objectReplicationRules':
         console.log(`    ${property}: ${JSON.stringify(properties[property])}`);
@@ -75,7 +75,7 @@ async function main(blobServiceClient) {
 
   // create container
   const timestamp = Date.now();
-  const containerName = `set-properties-and-metadata-${timestamp}`;
+  const containerName = `blob-set-properties-and-metadata-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
   const containerOptions = {
@@ -83,7 +83,7 @@ async function main(blobServiceClient) {
   };
   const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-  console.log("container creation succeeded");
+  console.log('container creation succeeded');
 
   // create blob 
   const blob = {

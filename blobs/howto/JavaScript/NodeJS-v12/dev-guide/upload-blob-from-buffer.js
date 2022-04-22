@@ -1,27 +1,25 @@
 
 const path = require('path');
 const fs = require('fs').promises;
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
 // containerName: string
 // blobName: string, includes file extension if provided
-// readableStream: Node.js Readable stream
+// buffer: blob content
 // uploadOptions: {
 //    blockSize: destination block blob size in bytes,
 //    concurrency: concurrency of parallel uploading - must be greater than or equal to 0,
 //    maxSingleShotSize: blob size threshold in bytes to start concurrency uploading
-//    metadata, 
-//    onProgress: fnUpdater
-//    tags, 
-//    tier: accessTier (hot, cool, archive), 
+//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' },  
+//    tags: {project: 'xyz', owner: 'accounts-payable'} 
 //  }
 async function createBlobFromBuffer(containerClient, blobName, buffer, uploadOptions) {
 
@@ -29,7 +27,7 @@ async function createBlobFromBuffer(containerClient, blobName, buffer, uploadOpt
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // Upload buffer
-  const uploadBlobResponse = await blockBlobClient.uploadData(buffer, uploadOptions);
+  await blockBlobClient.uploadData(buffer, uploadOptions);
 
   // do something with blob
   const getTagsResponse = await blockBlobClient.getTags();
@@ -51,7 +49,7 @@ async function main(blobServiceClient) {
 
   const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-  if (containerCreateResponse.errorCode) console.log("container creation failed");
+  if (containerCreateResponse.errorCode) console.log('container creation failed');
 
   // get fully qualified path of file
   // Create image file in same directory as this file
@@ -85,5 +83,5 @@ async function main(blobServiceClient) {
 
 }
 main(client)
-  .then(() => console.log("done"))
+  .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));

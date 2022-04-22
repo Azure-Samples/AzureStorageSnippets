@@ -1,29 +1,27 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-// containerName: string
+// containerClient: container client
 // blobName: string, includes file extension if provided
 // fileContentsAsString: blob content
 // uploadOptions: {
-//    metadata, 
-//    onProgress: fnUpdater
-//    tags, 
-//    tier: accessTier (hot, cool, archive), 
+//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' }, 
+//    tags: {project: 'xyz', owner: 'accounts-payable'} 
 //  }
-async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions){
+async function createBlobFromString(containerClient, blobName, fileContentsAsString, uploadOptions){
 
   // Create blob client from container client
-  const blockBlobClient = await client.getBlockBlobClient(blobName);
+  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // Upload string
-  const uploadBlobResponse = await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
+  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
 
   // do something with blob
   const getTagsResponse = await blockBlobClient.getTags();
@@ -44,7 +42,7 @@ async function main(blobServiceClient){
   };  
   const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-  console.log("container creation succeeded");
+  console.log('container creation succeeded');
 
   // create 10 blobs with Promise.all
   for (let i=0; i<10; i++){
@@ -70,5 +68,5 @@ async function main(blobServiceClient){
 
 }
 main(client)
-.then(() => console.log("done"))
+.then(() => console.log('done'))
 .catch((ex) => console.log(ex.message));
