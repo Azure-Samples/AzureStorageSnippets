@@ -1,9 +1,9 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
@@ -16,26 +16,26 @@ async function createBlobFromString(client, blobName, fileContentsAsString) {
     console.log(`created blob ${blobName}`);
 }
 
-async function downloadBlobToString(client, blobName) {
+async function downloadBlobToString(containerClient, blobName) {
 
-    const blobClient = await client.getBlobClient(blobName);
+    const blobClient = await containerClient.getBlobClient(blobName);
 
     const downloadResponse = await blobClient.download();
 
     const downloaded = await streamToBuffer(downloadResponse.readableStreamBody);
-    console.log("Downloaded blob content:", downloaded.toString());
+    console.log('Downloaded blob content:', downloaded.toString());
 }
 
 async function streamToBuffer(readableStream) {
     return new Promise((resolve, reject) => {
         const chunks = [];
-        readableStream.on("data", (data) => {
+        readableStream.on('data', (data) => {
             chunks.push(data instanceof Buffer ? data : Buffer.from(data));
         });
-        readableStream.on("end", () => {
+        readableStream.on('end', () => {
             resolve(Buffer.concat(chunks));
         });
-        readableStream.on("error", reject);
+        readableStream.on('error', reject);
     });
 }
 
@@ -50,7 +50,7 @@ async function main(blobServiceClient) {
     }; 
     const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-    console.log("container creation success");
+    console.log('container creation success');
 
     // create blob
     const blobTags = {
@@ -70,5 +70,5 @@ async function main(blobServiceClient) {
 
 }
 main(client)
-    .then(() => console.log("done"))
+    .then(() => console.log('done'))
     .catch((ex) => console.log(ex.message));

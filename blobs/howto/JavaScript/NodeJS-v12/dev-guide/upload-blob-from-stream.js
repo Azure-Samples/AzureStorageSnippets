@@ -2,13 +2,16 @@ const fs = require('fs');
 const path = require('path');
 const { Transform } = require('stream');
 
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
+
+// Client
+const client = BlobServiceClient.fromConnectionString(connString);
 
 // Transform stream
 // Reasons to transform:
@@ -24,17 +27,12 @@ const myTransform = new Transform({
   decodeStrings: false
 });
 
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
-
 // containerName: string
 // blobName: string, includes file extension if provided
 // readableStream: Node.js Readable stream
 // uploadOptions: {
-//    metadata, 
-//    tags, 
-//    tier: accessTier (hot, cool, archive), 
-//    onProgress: fnUpdater
+//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' },  
+//    tags: {project: 'xyz', owner: 'accounts-payable'}, 
 //  }
 async function createBlobFromReadStream(containerClient, blobName, readableStream, uploadOptions) {
 
@@ -70,7 +68,7 @@ async function main(blobServiceClient) {
   console.log(`creating container ${containerName}`);
   const { containerClient } = await blobServiceClient.createContainer(containerName);
 
-  console.log("container creation succeeded");
+  console.log('container creation succeeded');
 
   // get fully qualified path of file
   // Create file `my-local-file.txt` in same directory as this file
@@ -101,5 +99,5 @@ async function main(blobServiceClient) {
 
 }
 main(client)
-  .then(() => console.log("done"))
+  .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));

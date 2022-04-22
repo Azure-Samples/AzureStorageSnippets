@@ -69,7 +69,7 @@ async function undeleteContainer(blobServiceClient, containerName) {
     }
   }
 
-  const { containerClient, containerUndeleteResponse } = await blobServiceClient.undeleteContainer(
+  const containerClient = await blobServiceClient.undeleteContainer(
     containerName,
     containerVersion,
 
@@ -81,8 +81,7 @@ async function undeleteContainer(blobServiceClient, containerName) {
   console.log(`${containerName} is undeleted`);
 
   // do something with containerClient
-  const containerProperties = await containerClient.getProperties();
-  console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
+  // ...
 }
 async function createContainer(blobServiceClient, containerName) {
 
@@ -104,8 +103,8 @@ async function main(blobServiceClient) {
 
   let containers = [];
 
-  // container name prefix must be unique
-  const containerName = 'blob-storage-dev-guide-example';
+  const timestamp = Date.now();
+  const containerName = `create-container-${timestamp}`;
 
   // create containers with Promise.all
   for (let i = 1; i < 9; i++) {
@@ -114,22 +113,22 @@ async function main(blobServiceClient) {
   await Promise.all(containers);
 
   // delete 1 container immediately with BlobServiceClient
-  await deleteContainerImmediately(blobServiceClient, `blob-storage-dev-guide-example-1`);
+  await deleteContainerImmediately(blobServiceClient, `${containerName}-1`);
 
   // soft deletes take 30 seconds - waiting now so that undelete won't throw error
   await sleep(30000);
 
   // soft delete container with ContainerClient
-  const containerClient = blobServiceClient.getContainerClient(`blob-storage-dev-guide-example-2`);
+  const containerClient = blobServiceClient.getContainerClient(`${containerName}-2`);
   await deleteContainerSoft(containerClient);
 
   // delete with prefix and not already deleted
-  await deleteContainersWithPrefix(blobServiceClient, `blob-storage-dev-guide`);
+  await deleteContainersWithPrefix(blobServiceClient, `${containerName}`);
 
   // undelete container
   await undeleteContainer(
     blobServiceClient,
-    `blob-storage-dev-guide-example-1`
+    `${containerName}-1`
   );
 }
 main(blobServiceClient)

@@ -1,9 +1,9 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient } = require('@azure/storage-blob');
 require('dotenv').config();
 
 // Connection string
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+if (!connString) throw Error('Azure Storage Connection string not found');
 
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
@@ -18,7 +18,7 @@ const client = BlobServiceClient.fromConnectionString(connString);
 // const tags = {
 //   project: 'End of month billing summary',
 //   reportOwner: 'John Doe',
-//   reportPreented: 'April 2022'
+//   reportPresented: 'April 2022'
 // }
 async function setTags(containerClient, blobName, tags) {
 
@@ -38,10 +38,10 @@ async function getTags(containerClient, blobName) {
   // Get tags
   const result = await blockBlobClient.getTags();
 
-  console.log(`${blobName} tags = ${JSON.stringify(result.tags)}`);
+  for (const tag in result.tags) {
 
-  // do something with tags
-  // such as find all blobs with same tags
+      console.log(`TAG: ${tag}: ${result.tags[tag]}`);
+  }
 }
 
 async function findBlobsByQuery(blobServiceClient, tagOdataQuery) {
@@ -58,8 +58,6 @@ async function findBlobsByQuery(blobServiceClient, tagOdataQuery) {
     includeTags: true,
     includeVersions: false
   };
-
-  let foundBlobNames = [];
 
   let iterator = blobServiceClient.findBlobsByTags(tagOdataQuery, listOptions).byPage({ maxPageSize });
   let response = (await iterator.next()).value;
@@ -120,7 +118,7 @@ async function main(blobServiceClient) {
   };
   const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
 
-  console.log("container creation succeeded");
+  console.log('container creation succeeded');
 
   // create blob 1
   const blob1 = {
@@ -201,5 +199,5 @@ async function main(blobServiceClient) {
 
 }
 main(client)
-  .then(() => console.log("done"))
+  .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));
