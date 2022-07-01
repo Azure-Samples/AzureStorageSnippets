@@ -1,5 +1,5 @@
 // create-container.js
-const { BlobServiceClient } = require('@azure/storage-blob');
+const { BlobServiceClient, StorageSharedKeyCredential, ContainerSASPermissions, SASProtocol, generateBlobSASQueryParameters } = require('@azure/storage-blob');
 require('dotenv').config();
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
@@ -14,39 +14,23 @@ const blobServiceClient = new BlobServiceClient(
   sharedKeyCredential
 );
 
-async function createContainer(blobServiceClient, containerName){
-
-  // public access at container level
-  const options = {
-    access: 'container'
-  };
-
-  // creating client also creates container
-  const containerClient = await blobServiceClient.createContainer(containerName, options);
-  console.log(`container ${containerName} created`);
-
-  // do something with container
-  // ...
-
-  return containerClient;
-}
-
-async function createContainerSasForExistingContainer(blobServiceClient, containerName, containerPermissions){
+// https://docs.microsoft.com/en-us/javascript/api/@azure/storage-blob/?view=azure-node-latest#@azure-storage-blob-generateblobsasqueryparameters
+async function createContainerSas(blobServiceClient, containerName){
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
-  const exists = await containerClient.exists();
-
-  if (!exists) {
-    throw Error(`Storage container ${containerName} doesn't exist.`);
-  }
-
-
   const sasOptions = {
     containerName: containerClient.containerName,
+    //blobName: blobName,
     startsOn: new Date(),
-    expiresOn: new Date(new Date().valueOf() + (10*60*1000)),
+    expiresOn: new Date(new Date().valueOf() + (10*60*1000)), // 10 minutes
     permissions: ContainerSASPermissions.parse("racwdl"),
+    protocol: SASProtocol.HttpsAndHttp, // Optional
+    //cacheControl: "cache-control-override", // Optional
+    //contentDisposition: "content-disposition-override", // Optional
+    //contentEncoding: "content-encoding-override", // Optional
+    //contentLanguage: "content-language-override", // Optional
+    //contentType: "content-type-override", // Optional    
   };
 
   const sasToken = generateBlobSASQueryParameters(
@@ -55,9 +39,6 @@ async function createContainerSasForExistingContainer(blobServiceClient, contain
   ).toString();
 
   return sasToken;
-}
-
-async function createBlobSas(blobServiceClient, containerName, containerPermissions, blobName, blobPermissions){
 
 }
 
@@ -65,19 +46,13 @@ async function main(blobServiceClient){
 
   // create container
   const timestamp = Date.now();
-  const containerName = `create-container-${timestamp}`;
+  const containerName = `create-sas-for-container-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
   // create containers
-  await createContainer(blobServiceClient, containerName);
-
-  // only 1 $root per blob storage resource
-  const containerRootName = '$root';
-
-  // create root container
-  await createContainer(blobServiceClient, containerRootName);
+  return await createContainerSas(blobServiceClient, containerName);
 
 }
-main(client)
-.then(() => console.log('done'))
+main(blobServiceClient)
+.then((sasToken) => console.log(sasToken))
 .catch((ex) => console.log(ex.message));
