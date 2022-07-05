@@ -41,7 +41,7 @@ async function createAccountSas() {
         permissions: AccountSASPermissions.parse("rwdlacupi"),          // all permissions
         protocol: SASProtocol.Https,
         startsOn: new Date(),
-        expiresOn: new Date(new Date().valueOf() + (60 * 60 * 1000)),   // 1 hour
+        expiresOn: new Date(new Date().valueOf() + (10 * 60 * 1000)),   // 10 minutes
     };
 
     const sasToken = generateAccountSASQueryParameters(
