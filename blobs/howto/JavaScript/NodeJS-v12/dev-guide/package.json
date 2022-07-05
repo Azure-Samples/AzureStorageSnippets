@@ -10,6 +10,7 @@
     "dependencies": {
         "@azure/identity": "^2.0.4",
         "@azure/storage-blob": "^12.9.0",
+        "@azure/storage-file-share": "^12.10.0",
         "dotenv": "^8.6.0"
     }
 }
