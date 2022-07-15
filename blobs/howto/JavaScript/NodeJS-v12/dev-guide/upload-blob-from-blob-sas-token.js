@@ -7,7 +7,7 @@
  * 
  * For local development: add your personal identity on your resource group
  * az role assignment create --assignee "<your-username>" \
- *   --role "Storage Blob Delegator" \
+ *   --role "Blob Data Contributor" \
  *   --resource-group "<your-resource-group-name>"
  **/
 
