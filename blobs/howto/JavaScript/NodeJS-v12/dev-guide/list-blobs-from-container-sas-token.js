@@ -28,7 +28,7 @@ const {
 
 // used for local environment variables
 require('dotenv').config();
-//<Snippet_Dependencies>
+//</Snippet_Dependencies>
 
 //<Snippet_CreateContainerSas>
 // Create User Delegation SAS Token for container
