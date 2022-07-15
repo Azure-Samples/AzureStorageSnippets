@@ -7,7 +7,7 @@
  * 
  * For local development: add your personal identity on your resource group
  * az role assignment create --assignee "<your-username>" \
- *   --role "Storage Blob Data Contributor" \
+ *   --role "Storage Blob Delegator" \
  *   --resource-group "<your-resource-group-name>"
  **/
 
@@ -19,9 +19,9 @@ const {
     DefaultAzureCredential
 } = require('@azure/identity');
 const {
-    ContainerClient,
+    BlockBlobClient,
     BlobServiceClient,
-    ContainerSASPermissions,
+    BlobSASPermissions,
     generateBlobSASQueryParameters,
     SASProtocol
 } = require('@azure/storage-blob');
@@ -30,9 +30,10 @@ const {
 require('dotenv').config();
 //<Snippet_Dependencies>
 
-//<Snippet_CreateContainerSas>
-// Server creates User Delegation SAS Token for container
-async function createContainerSas() {
+
+//<Snippet_CreateBlobSas>
+// Server creates User Delegation SAS Token for blob
+async function createBlobSas(blobName) {
 
     // Get environment variables
     const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
@@ -60,13 +61,14 @@ async function createContainerSas() {
         TEN_MINUTES_AFTER_NOW
     );
 
-    // Need only list permission to list blobs 
-    const containerPermissionsForAnonymousUser = "l";
+    // Need only create/write permission to upload file
+    const blobPermissionsForAnonymousUser = "cw"
 
     // Best practice: SAS options are time-limited
     const sasOptions = {
+        blobName,
         containerName,                                           
-        permissions: ContainerSASPermissions.parse(containerPermissionsForAnonymousUser), 
+        permissions: BlobSASPermissions.parse(blobPermissionsForAnonymousUser), 
         protocol: SASProtocol.HttpsAndHttp,
         startsOn: TEN_MINUTES_BEFORE_NOW,
         expiresOn: TEN_MINUTES_AFTER_NOW
@@ -80,43 +82,40 @@ async function createContainerSas() {
 
     return sasToken;
 }
-//</Snippet_CreateContainerSas>
+//</Snippet_CreateBlobSas>
 
-//<Snippet_ListBlobs>
-// Client or another process uses SAS token to use container
-async function listBlobs(sasToken){
+//<Snippet_UploadToBlob>
+// Client or another process uses SAS token to upload content to blob
+async function uploadStringToBlob(blobName, sasToken, textAsString){
 
     // Get environment variables
     const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
     const containerName = process.env.AZURE_STORAGE_BLOB_CONTAINER_NAME;
-    
-    // Create Url
-    // SAS token is the query string with typical `?` delimiter
-    const sasUrl = `https://${accountName}.blob.core.windows.net/${containerName}?${sasToken}`;
-    console.log(`\nContainerUrl = ${sasUrl}\n`);
 
-    // Create container client from SAS token url
-    const containerClient = new ContainerClient(sasUrl);
+    // Create Url SAS token as query string with typical `?` delimiter
+    const sasUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
+    console.log(`\nBlobUrl = ${sasUrl}\n`);
 
-    let i = 1;
+    // Create blob client from SAS token url
+    const blockBlobClient = new BlockBlobClient(sasUrl);
 
-    // List blobs in container
-    for await (const blob of containerClient.listBlobsFlat()) {
-        console.log(`Blob ${i++}: ${blob.name}`);
-    }    
+    // Upload string
+    await blockBlobClient.upload(textAsString, textAsString.length, undefined);    
 }
-//</Snippet_ListBlobs>
-
+//</Snippet_UploadToBlob>
 
 //<Snippet_Main>
 async function main() {
 
-    // Server creates SAS Token
-    const userDelegationSasForContainer = await createContainerSas();
+    // Create random blob name for text file
+    const blobName = `${(0|Math.random()*9e6).toString(36)}.txt`;
 
-    // Server hands off SAS Token to client to
-    // List blobs
-    await listBlobs(userDelegationSasForContainer);
+    // Server creates SAS Token
+    const userDelegationSasForBlob = await createBlobSas(blobName)
+
+    // Server hands off SAS Token & blobName to client to
+    // Upload content
+    await uploadStringToBlob(blobName, userDelegationSasForBlob, "Hello Blob World");
 }
 
 main()
