@@ -10,6 +10,7 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// <Snippet_UploadBlob>
 // containerName: string
 // blobName: string, includes file extension if provided
 // localFileWithPath: fully qualified path and file name
@@ -26,6 +27,8 @@ async function createBlobFromLocalPath(containerClient, blobName, localFileWithP
   await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
   console.log(`${blobName} succeeded`);
 }
+// </Snippet_UploadBlob>
+
 
 async function main(blobServiceClient){
  
