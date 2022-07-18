@@ -8,6 +8,7 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// <Snippet_UploadBlob>
 // containerClient: container client
 // blobName: string, includes file extension if provided
 // fileContentsAsString: blob content
@@ -27,6 +28,7 @@ async function createBlobFromString(containerClient, blobName, fileContentsAsStr
   const getTagsResponse = await blockBlobClient.getTags();
   console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
 }
+// </Snippet_UploadBlob>
 
 async function main(blobServiceClient){
  

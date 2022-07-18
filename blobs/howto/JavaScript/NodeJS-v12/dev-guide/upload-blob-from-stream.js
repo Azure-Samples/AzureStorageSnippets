@@ -13,6 +13,7 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// <Snippet_Transform>
 // Transform stream
 // Reasons to transform:
 // 1. Sanitize the data - remove PII
@@ -26,7 +27,10 @@ const myTransform = new Transform({
   },
   decodeStrings: false
 });
+// </Snippet_Transform>
 
+
+// <Snippet_UploadBlob>
 // containerName: string
 // blobName: string, includes file extension if provided
 // readableStream: Node.js Readable stream
@@ -59,7 +63,7 @@ async function createBlobFromReadStream(containerClient, blobName, readableStrea
   const getTagsResponse = await blockBlobClient.getTags();
   console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
 }
-
+// </Snippet_UploadBlob>
 async function main(blobServiceClient) {
 
   // create container
