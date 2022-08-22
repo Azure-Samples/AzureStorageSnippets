@@ -225,9 +225,7 @@ public class CRUD_DataLake {
         fileClient.read(targetStream);
 
         targetStream.close();
-
-        fileClient.flush(file.length());
-        
+       
     }
     //</Snippet_DownloadFile>
 
