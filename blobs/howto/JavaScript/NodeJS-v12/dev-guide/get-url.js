@@ -38,6 +38,21 @@ async function main(blobServiceClient) {
     // Display Blob name and its URL 
     console.log(`created blob:\n\tname=${blobName}\n\turl=${blockBlobClient.url}`);
 
+    // In loops, blob is BlobItem
+    // Use BlobItem.name to get BlobClient or BlockBlobClient
+    // The get `url` property
+    for await (const blob of containerClient.listBlobsFlat()) {
+        
+        // blob 
+        console.log("\t", blob.name);
+
+        // Get Blob Client from name, to get the URL
+        const tempBlockBlobClient = containerClient.getBlockBlobClient(blob.name);
+
+        // Display blob name and URL
+        console.log(`\t${blob.name}:\n\t\t${tempBlockBlobClient.url}`);
+    }
+
 // </Storage-GetUrl>
 }
 main(client)
