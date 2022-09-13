@@ -58,7 +58,7 @@ const createContainer = async () => {
     try {
         reportStatus(`Creating container "${containerName}"...`);
         await containerClient.create();
-        reportStatus(`Done.`);
+        reportStatus(`Done. URL:${containerClient.url}`);
     } catch (error) {
         reportStatus(error.message);
     }
@@ -89,6 +89,8 @@ const listFiles = async () => {
         while (!blobItem.done) {
             fileList.size += 1;
             fileList.innerHTML += `<option>${blobItem.value.name}</option>`;
+
+
             blobItem = await iter.next();
         }
         if (fileList.size > 0) {

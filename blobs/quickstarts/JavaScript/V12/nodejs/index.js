@@ -5,8 +5,10 @@ const { v1: uuidv1 } = require("uuid");
 require('dotenv').config()
 // </snippet_ImportLibrary>
 
+
+
 // <snippet_StorageAcctInfo>
-const AZURE_STORAGE_CONNECTION_STRING =
+const AZURE_STORAGE_CONNECTION_STRING = 
   process.env.AZURE_STORAGE_CONNECTION_STRING;
 
 if (!AZURE_STORAGE_CONNECTION_STRING) {
@@ -16,6 +18,21 @@ if (!AZURE_STORAGE_CONNECTION_STRING) {
 
 async function main() {
   console.log("Azure Blob storage v12 - JavaScript quickstart sample");
+
+  // <snippet_StorageAcctInfo_without_secrets>
+  // Connect without secrets to Azure
+  // Learn more: https://www.npmjs.com/package/@azure/identity#DefaultAzureCredential
+  /*
+  const { DefaultAzureCredential } = require('@azure/identity');
+  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  if (!accountName) throw Error('Azure Storage accountName not found');
+
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
+  */
+  // </snippet_StorageAcctInfo_without_secrets>
 
   // <snippet_CreateContainer>
   // Create the BlobServiceClient object which will be used to create a container client
@@ -33,10 +50,7 @@ async function main() {
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // Create the container
   const createContainerResponse = await containerClient.create();
-  console.log(
-    "Container was created successfully. requestId: ",
-    createContainerResponse.requestId
-  );
+  console.log(`Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`);
   // </snippet_CreateContainer>
 
   // <snippet_UploadBlobs>
@@ -46,15 +60,13 @@ async function main() {
   // Get a block blob client
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  console.log("\nUploading to Azure storage as blob:\n\t", blobName);
+  // Display blob name and url
+  console.log(`\nUploading to Azure storage as blob\n\tname: ${blobName}:\n\tURL: ${blockBlobClient.url}`);
 
   // Upload data to the blob
   const data = "Hello, World!";
   const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
-  console.log(
-    "Blob was uploaded successfully. requestId: ",
-    uploadBlobResponse.requestId
-  );
+  console.log(`Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`);
   // </snippet_UploadBlobs>
 
   // <snippet_ListBlobs>
@@ -62,7 +74,12 @@ async function main() {
 
   // List the blob(s) in the container.
   for await (const blob of containerClient.listBlobsFlat()) {
-    console.log("\t", blob.name);
+
+    // Get Blob Client from name, to get the URL
+    const tempBlockBlobClient = containerClient.getBlockBlobClient(blob.name);
+
+    // Display blob name and URL
+    console.log(`\n\tname: ${blob.name}\n\tURL: ${tempBlockBlobClient.url}\n`);
   }
   // </snippet_ListBlobs>
 

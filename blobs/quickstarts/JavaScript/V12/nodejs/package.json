@@ -8,6 +8,7 @@
     },
     "license": "MIT",
     "dependencies": {
+        "@azure/identity": "^2.1.0",
         "@azure/storage-blob": "^12.8.0",
         "@types/dotenv": "^8.2.0"
     }
