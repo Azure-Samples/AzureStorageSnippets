@@ -20,7 +20,7 @@ const client = new BlobServiceClient(
 // const client = BlobServiceClient.fromConnectionString(connString);
 
 async function main(blobServiceClient) {
-// <Storage_GetUrl>
+// <Snippet_GetUrl>
 
     // create container
     const containerName = `con1-${Date.now()}`;
@@ -53,7 +53,7 @@ async function main(blobServiceClient) {
         console.log(`\t${blob.name}:\n\t\t${tempBlockBlobClient.url}`);
     }
 
-// </Storage_GetUrl>
+// </Snippet_GetUrl>
 }
 main(client)
     .then(() => console.log('done'))
