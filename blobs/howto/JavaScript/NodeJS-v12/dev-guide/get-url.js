@@ -1,5 +1,6 @@
+// Get container and blob URLs from their client objects.
+
 const { BlobServiceClient } = require('@azure/storage-blob');
-const path = require('path');
 require('dotenv').config();
 
 // Connect without secrets to Azure
@@ -18,52 +19,26 @@ const client = new BlobServiceClient(
 // if (!connString) throw Error('Azure Storage Connection string not found');
 // const client = BlobServiceClient.fromConnectionString(connString);
 
-async function createBlobFromString(containerClient, blobName, fileContentsAsString) {
-
-    const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
-
-    await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
-    console.log(`created blob:\n\tname=${blobName}\n\turl=${blockBlobClient.url}`);
-}
-
-async function downloadBlobToFile(containerClient, blobName, fileNameWithPath) {
-
-    const blobClient = await containerClient.getBlobClient(blobName);
-    
-    await blobClient.downloadToFile(fileNameWithPath);
-    console.log(`download of ${blobName} success`);
-}
-
 async function main(blobServiceClient) {
+// <Storage-GetUrl>
 
     // create container
-    const timestamp = Date.now();
-    const containerName = `download-blob-to-file-${timestamp}`;
-    console.log(`creating container ${containerName}`);
-    const containerOptions = {
-        access: 'container'
-    }; 
-    const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
+    const containerName = `con1-${Date.now()}`;
+    const { containerClient } = await blobServiceClient.createContainer(containerName, {access: 'container'});
 
+    // Display container name and its URL
     console.log(`created container:\n\tname=${containerClient.containerName}\n\turl=${containerClient.url}`);
 
-    // create blob
-    const blobTags = {
-        createdBy: 'YOUR-NAME',
-        createdWith: `StorageSnippetsForDocs-${timestamp}`,
-        createdOn: (new Date()).toDateString()
-    }
-
+    // create blob from string
     const blobName = `${containerName}-from-string.txt`;
     const blobContent = `Hello from a string`;
-    const newFileNameAndPath = path.join(__dirname, `${containerName}-downloaded-to-file.txt`);
+    const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.upload(blobContent, blobContent.length);
 
-    // create blob from string
-    await createBlobFromString(containerClient, blobName, blobContent, blobTags);
+    // Display Blob name and its URL 
+    console.log(`created blob:\n\tname=${blobName}\n\turl=${blockBlobClient.url}`);
 
-    // download blob to string
-    await downloadBlobToFile(containerClient, blobName, newFileNameAndPath)
-
+// </Storage-GetUrl>
 }
 main(client)
     .then(() => console.log('done'))
