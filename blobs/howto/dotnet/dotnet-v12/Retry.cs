@@ -186,7 +186,6 @@ namespace dotnet_v12
             Console.Write("\r\nSelect an option: ");
 
             const string accountName = Constants.accountName;
-            StorageSharedKeyCredential sharedKeyCredential = new StorageSharedKeyCredential(Constants.accountName, Constants.accountKey);
             Uri accountUri = new Uri($"https://{accountName}.blob.core.windows.net/");
 
             BlobServiceClient blobServiceClient = null;
