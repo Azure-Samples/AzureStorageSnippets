@@ -177,6 +177,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Retry scenarios.
+        //----------------------------------------------- 
+        static bool Retry()
+        {
+            Retry retry = new Retry();
+
+            while (retry.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -205,6 +217,7 @@ namespace dotnet_v12
             Console.WriteLine("11) Access Control Lists (ACL) for accounts with a hierarchical namespace");
             Console.WriteLine("12) Parallel file transfers");
             Console.WriteLine("13) Manage access tiers");
+            Console.WriteLine("14) Configure retry policy");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -248,6 +261,9 @@ namespace dotnet_v12
 
                 case "13":
                     return AccessTiers();
+
+                case "14":
+                    return Retry();
 
                 case "x":
                 case "X":
