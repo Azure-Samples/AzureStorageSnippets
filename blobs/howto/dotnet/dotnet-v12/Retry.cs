@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 
 // TESTING NOTES
 // To simulate a data center failure and test the retry policy, see https://docs.microsoft.com/en-us/azure/storage/blobs/simulate-primary-region-failure.
-// Fiddler is recommended. Watching the Fiddler traffic capture is helpful in understanding how the retry requests are handled.
+// Fiddler is recommended. Watching the Fiddler traffic capture window is helpful in understanding how the retry requests are handled.
 
 namespace dotnet_v12
 {
