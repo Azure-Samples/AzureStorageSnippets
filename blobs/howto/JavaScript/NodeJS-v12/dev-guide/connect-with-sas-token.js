@@ -15,8 +15,21 @@ const blobServiceClient = new BlobServiceClient(
 );
 
 async function main(){
-  const serviceGetPropertiesResponse = await blobServiceClient.getProperties();
-  console.log(`${JSON.stringify(serviceGetPropertiesResponse)}`);
+  
+  const containerName = `container${Date.now()}`;
+  console.log(containerName);
+
+  // public access at container level
+  const options = {
+    access: 'container'
+  };
+
+  // creating client also creates container
+  const containerClient = await blobServiceClient.createContainer(containerName, options);
+  console.log(`container ${containerName} created`);
+
+  // do something with containerClient
+  // ...
 }
 
 main()

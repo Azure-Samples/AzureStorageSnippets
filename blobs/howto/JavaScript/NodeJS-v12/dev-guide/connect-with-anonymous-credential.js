@@ -14,12 +14,20 @@ const blobServiceClient = new BlobServiceClient(
 
 async function getContainerProperties(){
 
-  // Access level: "container"
-  const containerName = `blob-storage-dev-guide-1`;
+  const containerName = `container${Date.now()}`;
+  console.log(containerName);
 
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-  const containerProperties = await containerClient.getProperties();
-  console.log(JSON.stringify(containerProperties));
+  // public access at container level
+  const options = {
+    access: 'container'
+  };
+
+  // creating client also creates container
+  const containerClient = await blobServiceClient.createContainer(containerName, options);
+  console.log(`container ${containerName} created`);
+
+  // do something with containerClient
+  // ...
 
 }
 
