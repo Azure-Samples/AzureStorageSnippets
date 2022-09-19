@@ -16,20 +16,19 @@ const blobServiceClient = new BlobServiceClient(
 
 async function main() {
 
-  const containerName = `container${Date.now()}`;
-  console.log(containerName);
+  const containerName = 'REPLACE-WITH-EXISTING-CONTAINER-NAME';
+  const blobName = 'REPLACE-WITH-EXISTING-BLOB-NAME';
 
-  // public access at container level
-  const options = {
-    access: 'container'
-  };
+  const timestamp = Date.now();
+  const fileName = `my-new-file-${timestamp}.txt`;
 
-  // creating client also creates container
-  const containerClient = await blobServiceClient.createContainer(containerName, options);
-  console.log(`container ${containerName} created`);
+  // creating container client
+  const containerClient = await blobServiceClient.getContainerClient(containerName);
 
-  // do something with containerClient
-  // ...
+  const blobClient = await containerClient.getBlockBlobClient(blobName);
+  const blobFile = blobClient.downloadToFile(fileName)
+
+  console.log(`${fileName} downloaded`);
 
 }
 
