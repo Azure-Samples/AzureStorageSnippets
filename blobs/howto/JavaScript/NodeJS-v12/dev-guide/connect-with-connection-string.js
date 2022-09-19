@@ -15,11 +15,14 @@ async function main(){
   const timestamp = Date.now();
   const fileName = `my-new-file-${timestamp}.txt`;
 
-  // creating container client
+  // create container client
   const containerClient = await blobServiceClient.getContainerClient(containerName);
 
+  // create blob client
   const blobClient = await containerClient.getBlockBlobClient(blobName);
-  const blobFile = blobClient.downloadToFile(fileName)
+
+  // download file
+  await blobClient.downloadToFile(fileName);
 
   console.log(`${fileName} downloaded`);
   
