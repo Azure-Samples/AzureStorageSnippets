@@ -78,11 +78,11 @@ try:
     # Download the blob to a local file
     # Add 'DOWNLOAD' before the .txt extension so you can see both files in the data directory
     download_file_path = os.path.join(local_path, str.replace(local_file_name ,'.txt', 'DOWNLOAD.txt'))
-    blob_client = blob_service_client.get_container_client(container= container_name) 
+    container_client = blob_service_client.get_container_client(container= container_name) 
     print("\nDownloading blob to \n\t" + download_file_path)
 
     with open(download_file_path, "wb") as download_file:
-     download_file.write(blob_client.download_blob(blob.name).readall())
+     download_file.write(container_client.download_blob(blob.name).readall())
 
     #</Snippet_DownloadBlobs>
 
