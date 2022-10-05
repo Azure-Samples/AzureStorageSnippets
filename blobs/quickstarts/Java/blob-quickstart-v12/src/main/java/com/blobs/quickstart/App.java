@@ -11,6 +11,7 @@ import java.io.*;
 
 public class App
 {
+    // <Snippet_MainFunction>
     public static void main( String[] args ) throws IOException
     {
         // Create a local file in the ./data/ directory for uploading and downloading
@@ -32,6 +33,7 @@ public class App
 
         deleteContainer(blobContainerClient, localPath, fileName);
     }
+    // </Snippet_MainFunction>
 
     // <Snippet_CreateServiceClientDAC>
     /**
@@ -43,7 +45,7 @@ public class App
 
         // Azure SDK client builders accept the credential as a parameter
         BlobServiceClient client = new BlobServiceClientBuilder()
-                .endpoint("https://pjstorageaccounttest.blob.core.windows.net/")
+                .endpoint("https://YOURSTORAGEACCOUNTNAME.blob.core.windows.net/")
                 .credential(defaultCredential)
                 .buildClient();
 
