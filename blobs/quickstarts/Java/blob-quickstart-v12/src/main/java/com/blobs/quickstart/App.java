@@ -11,79 +11,39 @@ import java.io.*;
 
 public class App
 {
-    // <Snippet_MainFunction>
     public static void main( String[] args ) throws IOException
     {
-        // Create a local file in the ./data/ directory for uploading and downloading
-        String localPath = "./data/";
-        String fileName = "quickstart" + java.util.UUID.randomUUID() + ".txt";
-
-        BlobServiceClient blobServiceClient = createServiceClient();
-
-        BlobContainerClient blobContainerClient = createContainer(blobServiceClient);
-
-        // Get a reference to a blob
-        BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
-
-        uploadBlob(blobClient, localPath, fileName);
-
-        listBlobs(blobContainerClient);
-
-        downloadBlob(blobClient, localPath, fileName);
-
-        deleteContainer(blobContainerClient, localPath, fileName);
-    }
-    // </Snippet_MainFunction>
-
-    // <Snippet_CreateServiceClientDAC>
-    /**
-     * The default credential first checks environment variables for configuration.
-     * If environment configuration is incomplete, it will try managed identity.
-     */
-    public static BlobServiceClient createServiceClient() {
+        // <Snippet_CreateServiceClientDAC>
+        /*
+         * The default credential first checks environment variables for configuration
+         * If environment configuration is incomplete, it will try managed identity
+         */
         DefaultAzureCredential defaultCredential = new DefaultAzureCredentialBuilder().build();
 
         // Azure SDK client builders accept the credential as a parameter
-        BlobServiceClient client = new BlobServiceClientBuilder()
-                .endpoint("https://YOURSTORAGEACCOUNTNAME.blob.core.windows.net/")
+        // TODO: Replace <storage-account-name> with your actual storage account name
+        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                .endpoint("https://<storage-account-name>.blob.core.windows.net/")
                 .credential(defaultCredential)
                 .buildClient();
+        // </Snippet_CreateServiceClientDAC>
 
-        return client;
-    }
-    // </Snippet_CreateServiceClientDAC>
-
-    // <Snippet_CreateServiceClientConnectionString>
-    public static BlobServiceClient createServiceClientConnectionString() {
-        // Retrieve the connection string for use with the application. The storage
-        // connection string is stored in an environment variable on the machine
-        // running the application called AZURE_STORAGE_CONNECTION_STRING. If the
-        // environment variable is created after the application is launched in a console or with
-        // Visual Studio, the shell or application needs to be closed and reloaded
-        // to take the environment variable into account.
-        String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
-
-        // Create a BlobServiceClient object using a connection string
-        BlobServiceClient client = new BlobServiceClientBuilder().connectionString(connectStr).buildClient();
-
-        return client;
-    }
-    // </Snippet_CreateServiceClientConnectionString>
-
-    // <Snippet_CreateContainer>
-    public static BlobContainerClient createContainer(BlobServiceClient blobServiceClient) {
+        // <Snippet_CreateContainer>
         // Create a unique name for the container
         String containerName = "quickstartblobs" + java.util.UUID.randomUUID();
 
         // Create the container and return a container client object
-        BlobContainerClient containerClient = blobServiceClient.createBlobContainer(containerName);
+        BlobContainerClient blobContainerClient = blobServiceClient.createBlobContainer(containerName);
+        // </Snippet_CreateContainer>
 
-        return containerClient;
-    }
-    // </Snippet_CreateContainer>
+        // <Snippet_UploadBlobFromFile>
+        // Create a local file in the ./data/ directory for uploading and downloading
+        String localPath = "./data/";
+        String fileName = "quickstart" + java.util.UUID.randomUUID() + ".txt";
 
-    // <Snippet_UploadBlobFromFile>
-    public static void uploadBlob(BlobClient blobClient, String localPath, String fileName) {
+        // Get a reference to a blob
+        BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
+
         // Write text to the file
         FileWriter writer = null;
         try
@@ -101,36 +61,29 @@ public class App
 
         // Upload the blob
         blobClient.uploadFromFile(localPath + fileName);
-    }
-    // </Snippet_UploadBlobFromFile>
+        // </Snippet_UploadBlobFromFile>
 
-    // <Snippet_ListBlobs>
-    public static void listBlobs(BlobContainerClient blobContainerClient) {
+        // <Snippet_ListBlobs>
         System.out.println("\nListing blobs...");
 
         // List the blob(s) in the container.
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             System.out.println("\t" + blobItem.getName());
         }
-    }
-    // </Snippet_ListBlobs>
+        // </Snippet_ListBlobs>
 
-    // <Snippet_DownloadBlob>
-    public static void downloadBlob(BlobClient blobClient, String localPath, String fileName) {
+        // <Snippet_DownloadBlob>
         // Download the blob to a local file
-        // Append the string "DOWNLOAD" before the .txt extension so that you can see
-        // both files.
+
+        // Append the string "DOWNLOAD" before the .txt extension for comparison purposes
         String downloadFileName = fileName.replace(".txt", "DOWNLOAD.txt");
 
         System.out.println("\nDownloading blob to\n\t " + localPath + downloadFileName);
 
         blobClient.downloadToFile(localPath + downloadFileName);
-    }
-    // </Snippet_DownloadBlob>
+        // </Snippet_DownloadBlob>
 
-    // <Snippet_DeleteContainer>
-    public static void deleteContainer(BlobContainerClient blobContainerClient, String localPath, String fileName) {
-        String downloadFileName = fileName.replace(".txt", "DOWNLOAD.txt");
+        // <Snippet_DeleteContainer>
         File downloadedFile = new File(localPath + downloadFileName);
         File localFile = new File(localPath + fileName);
 
@@ -146,7 +99,6 @@ public class App
         downloadedFile.delete();
 
         System.out.println("Done");
+        // </Snippet_DeleteContainer>
     }
-    // </Snippet_DeleteContainer>
 }
-
