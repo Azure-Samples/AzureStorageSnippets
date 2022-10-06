@@ -23,7 +23,7 @@ public class App
         // Azure SDK client builders accept the credential as a parameter
         // TODO: Replace <storage-account-name> with your actual storage account name
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                .endpoint("https://<storage-account-name>.blob.core.windows.net/")
+                .endpoint("https://pjstorageaccounttest.blob.core.windows.net/")
                 .credential(defaultCredential)
                 .buildClient();
         // </Snippet_CreateServiceClientDAC>
