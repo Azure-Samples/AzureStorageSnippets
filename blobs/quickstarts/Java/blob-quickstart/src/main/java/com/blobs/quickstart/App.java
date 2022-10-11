@@ -1,7 +1,7 @@
 package com.blobs.quickstart;
 
 /**
- * Azure blob storage v12 SDK quickstart
+ * Azure blob storage SDK quickstart
  */
 import com.azure.core.*;
 import com.azure.identity.*;
