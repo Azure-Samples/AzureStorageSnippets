@@ -15,19 +15,19 @@
 #----------------------------------------------------------------------------------
 
 import os, uuid
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 try:
     print("Azure Blob Storage Python quickstart sample")
 
-    #<Snippet_DAC>
+    #<Snippet_CreateServiceClientDAC>
     account_url = "https://<storageaccountname>.blob.core.windows.net"
     default_credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
     blob_service_client = BlobServiceClient(account_url, credential=default_credential)
-    #</Snippet_DAC>
+    #</Snippet_CreateServiceClientDAC>
 
     #<Snippet_CreateContainer>
     # Create a unique name for the container

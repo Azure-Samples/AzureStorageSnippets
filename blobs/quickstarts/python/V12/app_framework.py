@@ -1,8 +1,9 @@
 import os, uuid
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 try:
-    print("Azure Blob Storage v" + __version__ + " - Python quickstart sample")
+    print("Azure Blob Storage Python quickstart sample")
 
     # Quick start code goes here
 
