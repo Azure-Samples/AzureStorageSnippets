@@ -15,7 +15,12 @@
 //----------------------------------------------------------------------------------
 
 using Azure;
+using Azure.Core;
+using Azure.Core.Cryptography;
 using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Keys.Cryptography;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -156,7 +161,6 @@ namespace dotnet_v12
 
         #endregion
 
-
         //-------------------------------------------------
         // Security menu (Can call asynchronous and synchronous methods)
         //-------------------------------------------------
@@ -170,6 +174,7 @@ namespace dotnet_v12
             Console.WriteLine("3) Reference a container anonymously");
             Console.WriteLine("4) Reference a blob anonymously");
             Console.WriteLine("5) Pass an encryption key on the request");
+            Console.WriteLine("6) Pass an encryption key from Key Vault on the request");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
@@ -226,6 +231,52 @@ namespace dotnet_v12
                     await UploadBlobWithClientKey(new BlobUriBuilder(blobUri5),
                                                   new MemoryStream(buffer), 
                                                   keyAes.Key);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "6":
+                    Uri blobUri = new Uri(string.Format($"https://{Constants.accountName}.blob.core.windows.net"));
+
+                    var keyName = "key-1";
+                    var keyVaultName = Environment.GetEnvironmentVariable("KEY_VAULT_NAME");
+                    var kvUri = $"https://testcontoso-vault2.vault.azure.net/keys/{keyName}";
+
+                    TokenCredential tokenCredential = new DefaultAzureCredential(); 
+
+                    // Your key and key resolver instances through Azure Key Vault library
+                    CryptographyClient cryptoClient = new CryptographyClient(new Uri(kvUri), tokenCredential);
+                    KeyResolver keyResolver = new KeyResolver(tokenCredential);
+
+                    // Configure the encryption options to be used for upload and download.
+                    ClientSideEncryptionOptions encryptionOptions = new ClientSideEncryptionOptions(ClientSideEncryptionVersion.V2_0)
+                    {
+                        KeyEncryptionKey = cryptoClient,
+                        KeyResolver = keyResolver,
+                        // String value that the client library will use when calling IKeyEncryptionKey.WrapKey()
+                        KeyWrapAlgorithm = "RSA-OAEP"
+                    };
+
+                    // Set the encryption options on the client options.
+                    BlobClientOptions options = new SpecializedBlobClientOptions() { ClientSideEncryption = encryptionOptions };
+
+                    // Create a blob client with client-side encryption enabled.
+                    // Client-side encryption options are passed from service clients to container clients, 
+                    // and from container clients to blob clients.
+                    // Attempting to construct a BlockBlobClient, PageBlobClient, or AppendBlobClient from a BlobContainerClient
+                    // with client-side encryption options present will throw, as this functionality is only supported with BlobClient.
+                    BlobClient blob = new BlobServiceClient(blobUri, tokenCredential, options).GetBlobContainerClient("my-container").GetBlobClient("myBlob");
+
+                    // Upload the encrypted contents to the blob.
+                    Stream blobContent = BinaryData.FromString("Ready for encryption, Captain.").ToStream();
+                    await blob.UploadAsync(blobContent);
+
+                    // Download and decrypt the encrypted contents from the blob.
+                    MemoryStream outputStream = new MemoryStream();
+                    blob.DownloadTo(outputStream);
+
+                    Console.WriteLine($"{outputStream}");
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
