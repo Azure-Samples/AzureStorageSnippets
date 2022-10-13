@@ -22,7 +22,7 @@ try:
     print("Azure Blob Storage Python quickstart sample")
 
     #<Snippet_DAC>
-    account_url = "https://mystorageacct.blob.core.windows.net"
+    account_url = "https://<storageaccountname>.blob.core.windows.net"
     default_credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
