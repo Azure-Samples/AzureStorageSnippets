@@ -16,9 +16,7 @@
 
 using Azure;
 using Azure.Core;
-using Azure.Core.Cryptography;
 using Azure.Identity;
-using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Azure.Storage;
 using Azure.Storage.Blobs;
