@@ -17,6 +17,7 @@
 using Azure;
 using Azure.Core;
 using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Azure.Storage;
 using Azure.Storage.Blobs;
@@ -237,17 +238,28 @@ namespace dotnet_v12
                 case "6":
                     Uri blobUri = new Uri(string.Format($"https://{Constants.accountName}.blob.core.windows.net"));
 
-                    var keyName = "key-1";
+                    var keyName = "myKey";
                     var keyVaultName = Environment.GetEnvironmentVariable("KEY_VAULT_NAME");
-                    var kvUri = $"https://testcontoso-vault2.vault.azure.net/keys/{keyName}";
 
-                    TokenCredential tokenCredential = new DefaultAzureCredential(); 
+                    // URI for the key vault resource
+                    var keyVaultUri = $"https://{keyVaultName}.vault.azure.net";
 
-                    // Your key and key resolver instances through Azure Key Vault library
-                    CryptographyClient cryptoClient = new CryptographyClient(new Uri(kvUri), tokenCredential);
+                    TokenCredential tokenCredential = new DefaultAzureCredential();
+
+                    // Create a KeyClient object
+                    var keyVaultClient = new KeyClient(new Uri(keyVaultUri), tokenCredential);
+
+                    // Add a key to the key vault
+                    var key = await keyVaultClient.CreateKeyAsync(keyName, KeyType.Rsa);
+
+                    // URI for the key created above
+                    var keyVaultKeyUri = $"https://{keyVaultName}.vault.azure.net/keys/{keyName}";
+
+                    // Key and key resolver instances using Azure Key Vault client library
+                    CryptographyClient cryptoClient = new CryptographyClient(new Uri(keyVaultKeyUri), tokenCredential);
                     KeyResolver keyResolver = new KeyResolver(tokenCredential);
 
-                    // Configure the encryption options to be used for upload and download.
+                    // Configure the encryption options to be used for upload and download
                     ClientSideEncryptionOptions encryptionOptions = new ClientSideEncryptionOptions(ClientSideEncryptionVersion.V2_0)
                     {
                         KeyEncryptionKey = cryptoClient,
