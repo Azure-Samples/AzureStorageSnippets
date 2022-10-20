@@ -236,9 +236,9 @@ namespace dotnet_v12
                     return true;
 
                 case "6":
-                    Uri blobUri = new Uri(string.Format($"https://{Constants.accountName}.blob.core.windows.net"));
+                    var accountName = Constants.accountName;
 
-                    var keyName = "myKey";
+                    var keyName = "TestRSAKey";
                     var keyVaultName = Environment.GetEnvironmentVariable("KEY_VAULT_NAME");
 
                     // URI for the key vault resource
@@ -252,11 +252,12 @@ namespace dotnet_v12
                     // Add a key to the key vault
                     var key = await keyVaultClient.CreateKeyAsync(keyName, KeyType.Rsa);
 
-                    // URI for the key created above
-                    var keyVaultKeyUri = $"https://{keyVaultName}.vault.azure.net/keys/{keyName}";
+                    // URI for the key if one already exists
+                    //var keyVaultKeyUri = $"https://{keyVaultName}.vault.azure.net/keys/{keyName}";
+                    //CryptographyClient cryptoClient = new CryptographyClient(new Uri(keyVaultKeyUri), tokenCredential);
 
-                    // Key and key resolver instances using Azure Key Vault client library
-                    CryptographyClient cryptoClient = new CryptographyClient(new Uri(keyVaultKeyUri), tokenCredential);
+                    // Cryptography client and key resolver instances using Azure Key Vault client library
+                    CryptographyClient cryptoClient = keyVaultClient.GetCryptographyClient(key.Value.Name, key.Value.Properties.Version);
                     KeyResolver keyResolver = new KeyResolver(tokenCredential);
 
                     // Configure the encryption options to be used for upload and download
@@ -276,17 +277,18 @@ namespace dotnet_v12
                     // and from container clients to blob clients.
                     // Attempting to construct a BlockBlobClient, PageBlobClient, or AppendBlobClient from a BlobContainerClient
                     // with client-side encryption options present will throw, as this functionality is only supported with BlobClient.
+                    Uri blobUri = new Uri(string.Format($"https://{accountName}.blob.core.windows.net"));
                     BlobClient blob = new BlobServiceClient(blobUri, tokenCredential, options).GetBlobContainerClient("my-container").GetBlobClient("myBlob");
 
-                    // Upload the encrypted contents to the blob.
+                    // Upload the encrypted contents to the blob
                     Stream blobContent = BinaryData.FromString("Ready for encryption, Captain.").ToStream();
                     await blob.UploadAsync(blobContent);
 
-                    // Download and decrypt the encrypted contents from the blob.
-                    MemoryStream outputStream = new MemoryStream();
-                    blob.DownloadTo(outputStream);
+                    // Download and decrypt the encrypted contents from the blob
+                    Response<BlobDownloadInfo>  response = await blob.DownloadAsync();
+                    BlobDownloadInfo downloadInfo = response.Value;
 
-                    Console.WriteLine($"{outputStream}");
+                    Console.WriteLine((await BinaryData.FromStreamAsync(downloadInfo.Content)).ToString());
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
