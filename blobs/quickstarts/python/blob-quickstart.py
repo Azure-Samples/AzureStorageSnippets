@@ -47,7 +47,7 @@ try:
     upload_file_path = os.path.join(local_path, local_file_name)
 
     # Write text to the file
-    file = open(upload_file_path, 'w')
+    file = open(file=upload_file_path, mode='w')
     file.write("Hello, World!")
     file.close()
 
@@ -57,7 +57,7 @@ try:
     print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
 
     # Upload the created file
-    with open(upload_file_path, "rb") as data:
+    with open(file=upload_file_path, mode="rb") as data:
         blob_client.upload_blob(data)
     #</Snippet_UploadBlobs>
 
@@ -77,7 +77,7 @@ try:
     container_client = blob_service_client.get_container_client(container= container_name) 
     print("\nDownloading blob to \n\t" + download_file_path)
 
-    with open(download_file_path, "wb") as download_file:
+    with open(file=download_file_path, mode="wb") as download_file:
      download_file.write(container_client.download_blob(blob.name).readall())
 
     #</Snippet_DownloadBlobs>
