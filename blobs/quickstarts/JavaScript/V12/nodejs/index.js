@@ -33,7 +33,7 @@ async function main() {
       `https://${accountName}.blob.core.windows.net`,
       new DefaultAzureCredential()
     );
-    // <snippet_StorageAcctInfo_create_client>
+    // </snippet_StorageAcctInfo_create_client>
     
 
     console.log('Azure Blob storage v12 - JavaScript quickstart sample');
