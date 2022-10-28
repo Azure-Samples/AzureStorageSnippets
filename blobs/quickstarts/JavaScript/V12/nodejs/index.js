@@ -5,41 +5,39 @@ const { v1: uuidv1 } = require("uuid");
 require('dotenv').config()
 // </snippet_ImportLibrary>
 
-
-
-// <snippet_StorageAcctInfo>
-const AZURE_STORAGE_CONNECTION_STRING = 
+// <snippet_StorageAcctInfo__with_secrets>
+/* const AZURE_STORAGE_CONNECTION_STRING = 
   process.env.AZURE_STORAGE_CONNECTION_STRING;
 
 if (!AZURE_STORAGE_CONNECTION_STRING) {
   throw Error("Azure Storage Connection string not found");
-}
-// </snippet_StorageAcctInfo>
+
+// Create the BlobServiceClient object with connection string
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  AZURE_STORAGE_CONNECTION_STRING
+);
+
+*/
+// </snippet_StorageAcctInfo__with_secrets>
+
+// <snippet_StorageAcctInfo_without_secrets>
+// Connect without secrets to Azure
+// Learn more: https://www.npmjs.com/package/@azure/identity#DefaultAzureCredential
+const { DefaultAzureCredential } = require('@azure/identity');
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+if (!accountName) throw Error('Azure Storage accountName not found');
+
+const blobServiceClient = new BlobServiceClient(
+  `https://${accountName}.blob.core.windows.net`,
+  new DefaultAzureCredential()
+);
+// </snippet_StorageAcctInfo_without_secrets>
+
 
 async function main() {
   console.log("Azure Blob storage v12 - JavaScript quickstart sample");
 
-  // <snippet_StorageAcctInfo_without_secrets>
-  // Connect without secrets to Azure
-  // Learn more: https://www.npmjs.com/package/@azure/identity#DefaultAzureCredential
-  /*
-  const { DefaultAzureCredential } = require('@azure/identity');
-  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-  if (!accountName) throw Error('Azure Storage accountName not found');
-
-  const blobServiceClient = new BlobServiceClient(
-    `https://${accountName}.blob.core.windows.net`,
-    new DefaultAzureCredential()
-  );
-  */
-  // </snippet_StorageAcctInfo_without_secrets>
-
   // <snippet_CreateContainer>
-  // Create the BlobServiceClient object which will be used to create a container client
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    AZURE_STORAGE_CONNECTION_STRING
-  );
-
   // Create a unique name for the container
   const containerName = "quickstart" + uuidv1();
 
