@@ -7,8 +7,9 @@ require('dotenv').config();
 
 async function main() {
   try {
+    /* 
     // <snippet_StorageAcctInfo__with_secrets>
-    /* const AZURE_STORAGE_CONNECTION_STRING = 
+    const AZURE_STORAGE_CONNECTION_STRING = 
       process.env.AZURE_STORAGE_CONNECTION_STRING;
 
     if (!AZURE_STORAGE_CONNECTION_STRING) {
@@ -18,8 +19,8 @@ async function main() {
     const blobServiceClient = BlobServiceClient.fromConnectionString(
       AZURE_STORAGE_CONNECTION_STRING
     );
-    */
     // </snippet_StorageAcctInfo__with_secrets>
+    */
 
     // <snippet_StorageAcctInfo_without_secrets>
     const { DefaultAzureCredential } = require('@azure/identity');
