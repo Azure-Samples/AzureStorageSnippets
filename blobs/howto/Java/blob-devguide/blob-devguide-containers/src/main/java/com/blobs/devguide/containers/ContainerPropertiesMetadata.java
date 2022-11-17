@@ -6,8 +6,8 @@ import java.util.*;
 
 public class ContainerPropertiesMetadata {
     // <Snippet_GetContainerProperties>
-    public void getContainerProperties(BlobContainerClient sampleBlobContainerClient) {
-        BlobContainerProperties properties = sampleBlobContainerClient.getProperties();
+    public void getContainerProperties(BlobContainerClient blobContainerClient) {
+        BlobContainerProperties properties = blobContainerClient.getProperties();
         System.out.printf("Public Access Type: %s, Legal Hold? %b, Immutable? %b%n",
                 properties.getBlobPublicAccess(),
                 properties.hasLegalHold(),
@@ -16,13 +16,13 @@ public class ContainerPropertiesMetadata {
     // </Snippet_GetContainerProperties>
 
     // <Snippet_AddContainerMetadata>
-    public void addContainerMetadata(BlobContainerClient sampleBlobContainerClient) {
+    public void addContainerMetadata(BlobContainerClient blobContainerClient) {
         Map<String, String> metadata = new HashMap<String, String>();
         metadata.put("docType", "text");
         metadata.put("category", "reference");
 
         try {
-            sampleBlobContainerClient.setMetadata(metadata);
+            blobContainerClient.setMetadata(metadata);
             System.out.printf("Set metadata completed %n");
         } catch (UnsupportedOperationException error) {
             System.out.printf("Failure while setting metadata %n");
@@ -31,8 +31,8 @@ public class ContainerPropertiesMetadata {
     // </Snippet_AddContainerMetadata>
 
     // <Snippet_ReadContainerMetadata>
-    public void readContainerMetadata(BlobContainerClient sampleBlobContainerClient) {
-        BlobContainerProperties properties = sampleBlobContainerClient.getProperties();
+    public void readContainerMetadata(BlobContainerClient blobContainerClient) {
+        BlobContainerProperties properties = blobContainerClient.getProperties();
 
         System.out.printf("Container metadata: %n");
         properties.getMetadata().entrySet().forEach(metadataItem -> {
