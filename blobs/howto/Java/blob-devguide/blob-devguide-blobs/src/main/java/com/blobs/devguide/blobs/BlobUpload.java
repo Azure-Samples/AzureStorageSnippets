@@ -53,7 +53,7 @@ public class BlobUpload {
 
         Map<String, String> tags = new HashMap<String, String>();
         tags.put("Content", "image");
-        tags.put("Date", "2099-01-01");
+        tags.put("Date", "2022-01-01");
 
         Duration timeout = Duration.ofSeconds(10);
 

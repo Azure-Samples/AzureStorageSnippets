@@ -68,7 +68,7 @@ public class BlobPropertiesMetadataTags {
         Map<String, String> tags = new HashMap<String, String>();
         tags.put("Sealed", "false");
         tags.put("Content", "image");
-        tags.put("Date", "2099-01-01");
+        tags.put("Date", "2022-01-01");
 
         blobClient.setTags(tags);
     }
