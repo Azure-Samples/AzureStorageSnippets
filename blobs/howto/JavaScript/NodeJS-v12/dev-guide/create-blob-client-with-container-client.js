@@ -34,6 +34,7 @@ const containerClient = new ContainerClient(
 async function main() {
   try {
   
+    // Create BlobClient object
     const blobClient = containerClient.getBlobClient(blobName);
 
     // do something with blobClient...
