@@ -1,42 +1,42 @@
+// Azure Storage dependency
 const {
   StorageSharedKeyCredential,
-  ContainerClient,
   BlockBlobClient,
 } = require("@azure/storage-blob");
+
+// For development environment - include environment variables from .env
 require("dotenv").config();
 
+// Azure Storage resource name
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 if (!accountName) throw Error("Azure Storage accountName not found");
+
+// Azure Storage resource key
+const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 if (!accountKey) throw Error("Azure Storage accountKey not found");
 
+// Create credential
 const sharedKeyCredential = new StorageSharedKeyCredential(
   accountName,
   accountKey
 );
 
-const timeStamp = Date.now();
 const baseUrl = `https://${accountName}.blob.core.windows.net`;
-const containerName = `${timeStamp}-my-container`;
-const blobName = `${timeStamp}-my-blob`;
+const containerName = `my-container`;
+const blobName = `my-blob`;
 
 const fileContentsAsString = "Hello there.";
 
 async function main() {
   try {
-    // create container from ContainerClient
-    const containerClient = new ContainerClient(
-      `${baseUrl}/${containerName}`,
-      sharedKeyCredential
-    );    
-    await containerClient.createIfNotExists(containerName);
-    console.log(`container ${containerClient.url} created`);
 
     // create blob from BlockBlobClient
     const blockBlobClient = new BlockBlobClient(
       `${baseUrl}/${containerName}/${blobName}`,
       sharedKeyCredential
     );
+
+    // Upload data to the blob  
     await blockBlobClient.upload(
       fileContentsAsString,
       fileContentsAsString.length
