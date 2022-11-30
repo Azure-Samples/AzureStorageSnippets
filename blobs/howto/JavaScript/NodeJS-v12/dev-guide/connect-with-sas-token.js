@@ -9,8 +9,9 @@ if (!sasToken) throw Error('Azure Storage accountKey not found');
 
 const blobServiceUri = `https://${accountName}.blob.core.windows.net`;
 
+// https://YOUR-RESOURCE-NAME.blob.core.windows.net?YOUR-SAS-TOKEN
 const blobServiceClient = new BlobServiceClient(
-  `${blobServiceUri}${sasToken}`,
+  `${blobServiceUri}?${sasToken}`,
   null
 );
 
