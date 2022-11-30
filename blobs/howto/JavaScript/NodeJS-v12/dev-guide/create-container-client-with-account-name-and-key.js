@@ -1,12 +1,18 @@
+// Azure Storage dependency
 const {
   StorageSharedKeyCredential,
   ContainerClient
 } = require("@azure/storage-blob");
+
+// For development environment - include environment variables from .env
 require("dotenv").config();
 
+// Azure Storage resource name
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 if (!accountName) throw Error("Azure Storage accountName not found");
+
+// Azure Storage resource key
+const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 if (!accountKey) throw Error("Azure Storage accountKey not found");
 
 const sharedKeyCredential = new StorageSharedKeyCredential(
@@ -14,9 +20,8 @@ const sharedKeyCredential = new StorageSharedKeyCredential(
   accountKey
 );
 
-const timeStamp = Date.now();
 const baseUrl = `https://${accountName}.blob.core.windows.net`;
-const containerName = `${timeStamp}-my-container`;
+const containerName = `my-container`;
 
 async function main() {
   try {
