@@ -34,6 +34,7 @@ public class App {
 
         ContainerList listHelper = new ContainerList();
         listHelper.listContainers(blobServiceClient);
+        listHelper.listContainersWithPaging(blobServiceClient);
 
         ContainerDelete deleteHelper = new ContainerDelete();
         deleteHelper.deleteContainer(blobServiceClient, containerName);
