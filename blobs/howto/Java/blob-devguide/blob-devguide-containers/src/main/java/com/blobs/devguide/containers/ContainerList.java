@@ -1,5 +1,6 @@
 package com.blobs.devguide.containers;
 
+import com.azure.core.http.rest.*;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 
@@ -16,4 +17,23 @@ public class ContainerList {
         }
     }
     // </Snippet_ListContainers>
+
+    // <Snippet_ListContainersWithPaging>
+    public void listContainersWithPaging(BlobServiceClient blobServiceClient) {
+        // Set a prefix to filter results and specify a page limit
+        ListBlobContainersOptions options = new ListBlobContainersOptions()
+                .setMaxResultsPerPage(2)  // Low number for demonstration purposes
+                .setPrefix("container-");
+
+        int i = 0;
+        Iterable<PagedResponse<BlobContainerItem>> blobContainerPages = blobServiceClient
+                .listBlobContainers(options, null).iterableByPage();
+        for (PagedResponse<BlobContainerItem> page : blobContainerPages) {
+            System.out.printf("Page %d%n", ++i);
+            page.getElements().forEach(container -> {
+                System.out.printf("Name: %s%n", container.getName());
+            });
+        }
+    }
+    // </Snippet_ListContainersWithPaging>
 }
