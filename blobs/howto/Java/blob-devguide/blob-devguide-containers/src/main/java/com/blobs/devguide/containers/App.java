@@ -2,6 +2,7 @@ package com.blobs.devguide.containers;
 
 import com.azure.identity.*;
 import com.azure.storage.blob.*;
+import com.azure.storage.blob.specialized.BlobLeaseClient;
 
 public class App {
     public static void main(String[] args) {
@@ -35,6 +36,10 @@ public class App {
         ContainerList listHelper = new ContainerList();
         listHelper.listContainers(blobServiceClient);
         listHelper.listContainersWithPaging(blobServiceClient);
+
+        ContainerLease leaseHelper = new ContainerLease();
+        BlobLeaseClient leaseClient =  leaseHelper.acquireContainerLease(blobContainerClient);
+        leaseHelper.releaseContainerLease(leaseClient);
 
         ContainerDelete deleteHelper = new ContainerDelete();
         deleteHelper.deleteContainer(blobServiceClient, containerName);
