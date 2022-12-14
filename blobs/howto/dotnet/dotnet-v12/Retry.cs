@@ -52,20 +52,10 @@ namespace dotnet_v12
             BlobClientOptions blobOptions = new BlobClientOptions()
             {
                 Retry = {
-                    // The delay between retry attempts for a fixed approach or the delay on which to base 
-                    //calculations for a backoff-based approach
                     Delay = TimeSpan.FromSeconds(2),
-
-                    // The maximum number of retry attempts before giving up
                     MaxRetries = 5,
-
-                    // The approach to use for calculating retry delays (Fixed or Exponential)
                     Mode = RetryMode.Exponential,
-
-                    // The maximum permissible delay between retry attempts
                     MaxDelay = TimeSpan.FromSeconds(10),
-
-                    // The timeout applied to individual network operations
                     NetworkTimeout = TimeSpan.FromSeconds(100)
                 },
             };
