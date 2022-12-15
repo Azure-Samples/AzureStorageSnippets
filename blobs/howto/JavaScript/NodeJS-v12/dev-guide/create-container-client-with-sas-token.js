@@ -6,11 +6,10 @@ const {
 // For development environment - include environment variables
 require("dotenv").config();
 
-//const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 if (!accountName) throw Error("Azure Storage accountName not found");
 
 // Container must exist prior to running this script
-//const containerName = `list-versions`;
 const containerName = `test`;
 
 // SAS token must have LIST permissions on container that haven't expired
