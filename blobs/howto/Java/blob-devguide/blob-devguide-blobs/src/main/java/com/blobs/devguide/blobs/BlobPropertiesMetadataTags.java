@@ -73,7 +73,7 @@ public class BlobPropertiesMetadataTags {
         tags.put("Content", "image");
         tags.put("Date", "2022-01-01");
 
-        // setTags will replace existing tags with the map contents we pass in
+        // setTags will replace existing tags with the map entries we pass in
         blobClient.setTags(tags);
     }
     // </Snippet_SetBLobTags>
