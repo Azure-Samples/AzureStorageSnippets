@@ -65,11 +65,15 @@ public class BlobPropertiesMetadataTags {
 
     // <Snippet_SetBLobTags>
     public void setBlobTags(BlobClient blobClient) {
-        Map<String, String> tags = new HashMap<String, String>();
+        // Get any existing tags for the blob if they need to be preserved
+        Map<String, String> tags = blobClient.getTags();
+
+        // Add or modify tags
         tags.put("Sealed", "false");
         tags.put("Content", "image");
         tags.put("Date", "2022-01-01");
 
+        // setTags will replace existing tags with the map entries we pass in
         blobClient.setTags(tags);
     }
     // </Snippet_SetBLobTags>
