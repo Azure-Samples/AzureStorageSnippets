@@ -63,7 +63,8 @@ class ContainerSamples(object):
         lease_client.break_lease()
     # </Snippet_break_container_lease>
 
-    def container_properties_metadata(self, blob_service_client: BlobServiceClient, container_name):
+    # <Snippet_get_container_properties>
+    def get_properties(self, blob_service_client: BlobServiceClient, container_name):
         container_client = blob_service_client.get_container_client(container=container_name)
 
         properties = container_client.get_container_properties()
@@ -72,6 +73,32 @@ class ContainerSamples(object):
         print(f"Lease status: {properties.lease.status}")
         print(f"Lease state: {properties.lease.state}")
         print(f"Has immutability policy: {properties.has_immutability_policy}")
+    # <Snippet_get_container_properties>
+
+    # <Snippet_set_container_metadata>
+    def set_metadata(self, blob_service_client: BlobServiceClient, container_name):
+        container_client = blob_service_client.get_container_client(container=container_name)
+
+        # Retrieve existing metadata, if desired
+        metadata = dict(container_client.get_container_properties().metadata)
+
+        more_metadata = {'docType': 'text', 'docCategory': 'reference'}
+        metadata.update(more_metadata)
+
+        # Set metadata on the container
+        container_client.set_container_metadata(metadata=metadata)
+    # <Snippet_set_container_metadata>
+
+    # <Snippet_get_container_metadata>
+    def get_metadata(self, blob_service_client: BlobServiceClient, container_name):
+        container_client = blob_service_client.get_container_client(container=container_name)
+
+        # Retrieve existing metadata, if desired
+        metadata = container_client.get_container_properties().metadata
+
+        for key, value in metadata.items():
+            print(key, value)
+    # <Snippet_get_container_metadata>
 
     # <Snippet_delete_container>
     def delete_container(self, blob_service_client: BlobServiceClient, container_name):
@@ -103,20 +130,22 @@ class ContainerSamples(object):
 
 if __name__ == '__main__':
     # TODO: Replace <storage-account-name> with your actual storage account name
-    account_url = "https://<storage-account-name>.blob.core.windows.net"
+    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
     credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
     blob_service_client = BlobServiceClient(account_url, credential=credential)
 
     sample = ContainerSamples()
-    sample.create_blob_container(blob_service_client, "sample-container")
+    #sample.create_blob_container(blob_service_client, "sample-container")
     sample.list_containers(blob_service_client)
-    sample.list_containers_prefix(blob_service_client)
-    lease_client = sample.acquire_container_lease(blob_service_client, "sample-container")
-    sample.renew_container_lease(lease_client)
-    sample.release_container_lease(lease_client)
-    sample.break_container_lease(lease_client)
-    sample.container_properties_metadata(blob_service_client, "sample-container")
-    sample.delete_container(blob_service_client, "sample-container")
+    #sample.list_containers_prefix(blob_service_client)
+    #lease_client = sample.acquire_container_lease(blob_service_client, "sample-container")
+    #sample.renew_container_lease(lease_client)
+    #sample.release_container_lease(lease_client)
+    #sample.break_container_lease(lease_client)
+    #sample.get_properties(blob_service_client, "sample-container")
+    #sample.set_metadata(blob_service_client, "sample-container")
+    #sample.get_metadata(blob_service_client, "sample-container")
+    #sample.delete_container(blob_service_client, "sample-container")
     #sample.restore_deleted_container(blob_service_client, "sample-container")
