@@ -42,8 +42,21 @@ class AuthSamples(object):
         return blob_service_client
     # </Snippet_get_service_client_account_key>
 
+    # <Snippet_get_service_client_connection_string>
+    def get_blob_service_client_connection_string(self):
+        # TODO: Replace <storage-account-name> with your actual storage account name
+        account_url = "https://<storage-account-name>.blob.core.windows.net"
+        connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+
+        # Create the BlobServiceClient object
+        blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+
+        return blob_service_client
+    # </Snippet_get_service_client_connection_string>
+
 if __name__ == '__main__':
     sample = AuthSamples()
     blob_service_client = sample.get_blob_service_client_token_credential()
     #blob_service_client = sample.get_blob_service_client_sas(sas_token=<sas_token_str>)
     blob_service_client = sample.get_blob_service_client_account_key()
+    blob_service_client = sample.get_blob_service_client_connection_string()

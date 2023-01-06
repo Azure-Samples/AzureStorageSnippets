@@ -14,6 +14,12 @@ class ContainerSamples(object):
             print('A container with this name already exists')
     # </Snippet_create_container>
 
+    # <Snippet_create_root_container>
+    def create_blob_root_container(self, blob_service_client: BlobServiceClient):
+        container_client = blob_service_client.get_container_client(name="$root")
+        container_client.create_container()
+    # </Snippet_create_root_container>
+
     # <Snippet_list_containers>
     def list_containers(self, blob_service_client: BlobServiceClient):
         all_containers = blob_service_client.list_containers(include_metadata=True)
@@ -72,6 +78,17 @@ class ContainerSamples(object):
         container_client = blob_service_client.get_container_client(container=container_name)
         container_client.delete_container()
     # </Snippet_delete_container>
+
+    # <Snippet_delete_container_prefix>
+    def delete_container(self, blob_service_client: BlobServiceClient):
+        container_list = list(blob_service_client.list_containers(name_starts_with="test-"))
+        assert len(container_list) >= 1
+
+        for container in container_list:
+            # Find containers with the specified prefix and delete
+            container_client = blob_service_client.get_container_client(container=container.name)
+            container_client.delete_container()
+    # </Snippet_delete_container_prefix>
 
     # <Snippet_restore_container>
     def restore_deleted_container(self, blob_service_client: BlobServiceClient, container_name):
