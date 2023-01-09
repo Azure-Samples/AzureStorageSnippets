@@ -73,7 +73,7 @@ class ContainerSamples(object):
         print(f"Lease status: {properties.lease.status}")
         print(f"Lease state: {properties.lease.state}")
         print(f"Has immutability policy: {properties.has_immutability_policy}")
-    # <Snippet_get_container_properties>
+    # </Snippet_get_container_properties>
 
     # <Snippet_set_container_metadata>
     def set_metadata(self, blob_service_client: BlobServiceClient, container_name):
@@ -87,7 +87,7 @@ class ContainerSamples(object):
 
         # Set metadata on the container
         container_client.set_container_metadata(metadata=metadata)
-    # <Snippet_set_container_metadata>
+    # </Snippet_set_container_metadata>
 
     # <Snippet_get_container_metadata>
     def get_metadata(self, blob_service_client: BlobServiceClient, container_name):
@@ -98,7 +98,7 @@ class ContainerSamples(object):
 
         for key, value in metadata.items():
             print(key, value)
-    # <Snippet_get_container_metadata>
+    # </Snippet_get_container_metadata>
 
     # <Snippet_delete_container>
     def delete_container(self, blob_service_client: BlobServiceClient, container_name):
