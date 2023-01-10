@@ -16,28 +16,35 @@ class ContainerSamples(object):
 
     # <Snippet_create_root_container>
     def create_blob_root_container(self, blob_service_client: BlobServiceClient):
-        container_client = blob_service_client.get_container_client(name="$root")
-        container_client.create_container()
+        container_client = blob_service_client.get_container_client(container="$root")
+
+        # Create the root container if it doesn't already exist
+        if not container_client.exists():
+            container_client.create_container()
     # </Snippet_create_root_container>
 
     # <Snippet_list_containers>
     def list_containers(self, blob_service_client: BlobServiceClient):
-        all_containers = blob_service_client.list_containers(include_metadata=True)
-        for container in all_containers:
-            print(container['name'], container['metadata'])
+        i=0
+        all_pages = blob_service_client.list_containers(include_metadata=True, results_per_page=5).by_page()
+        for container_page in all_pages:
+            i += 1
+            print(f"Page {i}")
+            for container in container_page:
+                print(container['name'], container['metadata'])
     # </Snippet_list_containers>
 
     # <Snippet_list_containers_prefix>
     def list_containers_prefix(self, blob_service_client: BlobServiceClient):
         containers = blob_service_client.list_containers(name_starts_with='test-')
         for container in containers:
-            print(container['name'], container['metadata'])
+            print(container['name'])
     # </Snippet_list_containers_prefix>
 
     # <Snippet_acquire_container_lease>
     def acquire_container_lease(self, blob_service_client: BlobServiceClient, container_name):
         # Instantiate a ContainerClient
-        container_client = blob_service_client.get_container_client(container_name)
+        container_client = blob_service_client.get_container_client(container=container_name)
 
         # Acquire a 30-second lease on the container
         lease_client = container_client.acquire_lease(30)
@@ -107,7 +114,7 @@ class ContainerSamples(object):
     # </Snippet_delete_container>
 
     # <Snippet_delete_container_prefix>
-    def delete_container(self, blob_service_client: BlobServiceClient):
+    def delete_container_prefix(self, blob_service_client: BlobServiceClient):
         container_list = list(blob_service_client.list_containers(name_starts_with="test-"))
         assert len(container_list) >= 1
 
@@ -130,22 +137,24 @@ class ContainerSamples(object):
 
 if __name__ == '__main__':
     # TODO: Replace <storage-account-name> with your actual storage account name
-    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
+    account_url = "https://<storage-account-name>.blob.core.windows.net"
     credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
     blob_service_client = BlobServiceClient(account_url, credential=credential)
 
     sample = ContainerSamples()
-    #sample.create_blob_container(blob_service_client, "sample-container")
+    sample.create_blob_container(blob_service_client, "sample-container")
+    #sample.create_blob_root_container(blob_service_client)
     sample.list_containers(blob_service_client)
-    #sample.list_containers_prefix(blob_service_client)
-    #lease_client = sample.acquire_container_lease(blob_service_client, "sample-container")
-    #sample.renew_container_lease(lease_client)
-    #sample.release_container_lease(lease_client)
-    #sample.break_container_lease(lease_client)
-    #sample.get_properties(blob_service_client, "sample-container")
-    #sample.set_metadata(blob_service_client, "sample-container")
-    #sample.get_metadata(blob_service_client, "sample-container")
-    #sample.delete_container(blob_service_client, "sample-container")
+    sample.list_containers_prefix(blob_service_client)
+    lease_client = sample.acquire_container_lease(blob_service_client, "sample-container")
+    sample.renew_container_lease(lease_client)
+    sample.release_container_lease(lease_client)
+    sample.break_container_lease(lease_client)
+    sample.get_properties(blob_service_client, "sample-container")
+    sample.set_metadata(blob_service_client, "sample-container")
+    sample.get_metadata(blob_service_client, "sample-container")
+    sample.delete_container(blob_service_client, "sample-container")
+    #sample.delete_container(blob_service_client, "$root")
     #sample.restore_deleted_container(blob_service_client, "sample-container")
