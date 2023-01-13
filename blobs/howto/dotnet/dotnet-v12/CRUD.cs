@@ -47,7 +47,7 @@ namespace dotnet_v12
                     .AsPages(default, segmentSize);
 
                 // Enumerate the blobs returned for each page.
-                await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
+                await foreach (Page<BlobItem> blobPage in resultSegment)
                 {
                     foreach (BlobItem blobItem in blobPage.Values)
                     {
@@ -86,7 +86,7 @@ namespace dotnet_v12
                     .AsPages(default, segmentSize);
 
                 // Enumerate the blobs returned for each page.
-                await foreach (Azure.Page<BlobHierarchyItem> blobPage in resultSegment)
+                await foreach (Page<BlobHierarchyItem> blobPage in resultSegment)
                 {
                     // A hierarchical listing may return both virtual directories and blobs.
                     foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
