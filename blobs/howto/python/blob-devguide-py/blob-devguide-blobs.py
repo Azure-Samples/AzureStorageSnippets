@@ -1,3 +1,4 @@
+import io
 import os, uuid
 import time
 from azure.core.exceptions import HttpResponseError, ResourceExistsError
@@ -6,22 +7,34 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, B
 
 class BlobSamples(object):
 
-    # <Snippet_create_container>
-    def create_blob_container(self, blob_service_client: BlobServiceClient, container_name):
-        try:
-            container_client = blob_service_client.create_container(name=container_name)
-        except ResourceExistsError:
-            print('A container with this name already exists')
-    # </Snippet_create_container>
+    # <Snippet_upload_blob_data>
+    def upload_blob_data(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        data = "Sample data for blob"
+        blob_client.upload_blob(data, blob_type="BlockBlob")
+    # </Snippet_upload_blob_data>
 
-    # <Snippet_create_root_container>
-    def create_blob_root_container(self, blob_service_client: BlobServiceClient):
-        container_client = blob_service_client.get_container_client(container="$root")
+    # <Snippet_upload_blob_stream>
+    def upload_blob_stream(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        input_stream = io.BytesIO(self._get_random_bytes(15))
+        blob_client.upload_blob(input_stream, blob_type="BlockBlob")
+    # </Snippet_upload_blob_stream>
 
-        # Create the root container if it doesn't already exist
-        if not container_client.exists():
-            container_client.create_container()
-    # </Snippet_create_root_container>
+    # <Snippet_upload_blob_file>
+    def upload_blob_file(self, blob_service_client: BlobServiceClient, container_name):
+        container_client = blob_service_client.get_container_client(container=container_name)
+        with open(file="filepath/local-file.png", mode="rb") as data:
+            blob_client = container_client.upload_blob(name="sample-blob.txt", data=data)
+    # </Snippet_upload_blob_file>
+
+    # <Snippet_upload_blob_tags>
+    def upload_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
+        container_client = blob_service_client.get_container_client(container=container_name)
+        sample_tags = {"Content": "image", "Date": "2022-01-01"}
+        with open(file="filepath/local-file.png", mode="rb") as data:
+            blob_client = container_client.upload_blob(name="sample-blob.txt", data=data, tags=sample_tags)
+    # </Snippet_upload_blob_tags>
 
     # <Snippet_list_containers>
     def list_containers(self, blob_service_client: BlobServiceClient):
