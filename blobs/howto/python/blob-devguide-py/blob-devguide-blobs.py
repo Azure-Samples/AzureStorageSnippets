@@ -4,7 +4,7 @@ import random
 import time
 from azure.core.exceptions import HttpResponseError, ResourceExistsError
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient, ContentSettings
 
 class BlobSamples(object):
 
@@ -70,7 +70,7 @@ class BlobSamples(object):
     def download_blob_to_stream(self, blob_service_client: BlobServiceClient, container_name):
         blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
 
-        # readinto() downloads the blob contents to a stream and returns the number of bytes
+        # readinto() downloads the blob contents to a stream and returns the number of bytes read
         stream = io.BytesIO()
         num_bytes = blob_client.download_blob().readinto(stream)
         print(f"Number of bytes: {num_bytes}")
@@ -80,7 +80,7 @@ class BlobSamples(object):
     def download_blob_to_string(self, blob_service_client: BlobServiceClient, container_name):
         blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
 
-        # content_as_text() downloads the blob contents and decodes as text - default values are shown as parameters
+        # content_as_text() downloads the blob contents and decodes as text - default values are shown for parameters
         blob_text = blob_client.download_blob().content_as_text(max_concurrency=1, encoding='UTF-8')
         print(f"Blob contents: {blob_text}")
     # </Snippet_download_blob_text>
@@ -132,42 +132,59 @@ class BlobSamples(object):
         lease_client.break_lease()
     # </Snippet_break_blob_lease>
 
-    # <Snippet_get_container_properties>
+    # <Snippet_get_blob_properties>
     def get_properties(self, blob_service_client: BlobServiceClient, container_name):
-        container_client = blob_service_client.get_container_client(container=container_name)
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
 
-        properties = container_client.get_container_properties()
+        properties = blob_client.get_blob_properties()
 
-        print(f"Public access type: {properties.public_access}")
-        print(f"Lease status: {properties.lease.status}")
-        print(f"Lease state: {properties.lease.state}")
-        print(f"Has immutability policy: {properties.has_immutability_policy}")
-    # </Snippet_get_container_properties>
+        print(f"Blob type: {properties.blob_type}")
+        print(f"Blob size: {properties.size}")
+        print(f"Content type: {properties.content_settings.content_type}")
+        print(f"Content language: {properties.content_settings.content_language}")
+    # </Snippet_set_blob_properties>
 
-    # <Snippet_set_container_metadata>
+    # <Snippet_set_blob_properties>
+    def set_properties(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+
+        properties = blob_client.get_blob_properties()
+
+        # Set the content_type and content_language headers, and populate the remaining headers from the existing properties
+        blob_headers = ContentSettings(content_type="text/plain",
+                                       content_encoding=properties.content_settings.content_encoding,
+                                       content_language="en-US",
+                                       content_disposition=properties.content_settings.content_disposition,
+                                       cache_control=properties.content_settings.cache_control,
+                                       content_md5=properties.content_settings.content_md5)
+        
+        blob_client.set_http_headers(blob_headers)
+    # </Snippet_set_blob_properties>
+
+    # <Snippet_set_blob_metadata>
     def set_metadata(self, blob_service_client: BlobServiceClient, container_name):
-        container_client = blob_service_client.get_container_client(container=container_name)
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
 
         # Retrieve existing metadata, if desired
-        metadata = dict(container_client.get_container_properties().metadata)
+        metadata = dict(blob_client.get_blob_properties().metadata)
 
         more_metadata = {'docType': 'text', 'docCategory': 'reference'}
         metadata.update(more_metadata)
 
-        # Set metadata on the container
-        container_client.set_container_metadata(metadata=metadata)
-    # </Snippet_set_container_metadata>
+        # Set metadata on the blob
+        blob_client.set_blob_metadata(metadata=metadata)
+    # </Snippet_set_blob_metadata>
 
-    # <Snippet_get_container_metadata>
+    # <Snippet_get_blob_metadata>
     def get_metadata(self, blob_service_client: BlobServiceClient, container_name):
-        container_client = blob_service_client.get_container_client(container=container_name)
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
 
         # Retrieve existing metadata, if desired
-        metadata = container_client.get_container_properties().metadata
+        metadata = dict(blob_client.get_blob_properties().metadata)
 
         for key, value in metadata.items():
             print(key, value)
-    # </Snippet_get_container_metadata>
+    # </Snippet_get_blob_metadata>
 
     # <Snippet_delete_container>
     def delete_container(self, blob_service_client: BlobServiceClient, container_name):
