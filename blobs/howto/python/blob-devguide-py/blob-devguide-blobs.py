@@ -4,7 +4,7 @@ import random
 import time
 from azure.core.exceptions import HttpResponseError, ResourceExistsError
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient, ContentSettings
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient, BlobPrefix, ContentSettings
 
 class BlobSamples(object):
 
@@ -186,37 +186,128 @@ class BlobSamples(object):
             print(key, value)
     # </Snippet_get_blob_metadata>
 
-    # <Snippet_delete_container>
-    def delete_container(self, blob_service_client: BlobServiceClient, container_name):
+    # <Snippet_list_blobs_flat>
+    def list_blobs_flat(self, blob_service_client: BlobServiceClient, container_name):
         container_client = blob_service_client.get_container_client(container=container_name)
-        container_client.delete_container()
-    # </Snippet_delete_container>
 
-    # <Snippet_delete_container_prefix>
-    def delete_container_prefix(self, blob_service_client: BlobServiceClient):
-        container_list = list(blob_service_client.list_containers(name_starts_with="test-"))
-        assert len(container_list) >= 1
+        blob_list = container_client.list_blobs()
 
-        for container in container_list:
-            # Find containers with the specified prefix and delete
-            container_client = blob_service_client.get_container_client(container=container.name)
-            container_client.delete_container()
-    # </Snippet_delete_container_prefix>
+        for blob in blob_list:
+            print(f"Name: {blob.name}")
+    # </Snippet_list_blobs_flat>
 
-    # <Snippet_restore_container>
-    def restore_deleted_container(self, blob_service_client: BlobServiceClient, container_name):
-        container_list = list(blob_service_client.list_containers(include_deleted=True))
-        assert len(container_list) >= 1
+    # <Snippet_list_blobs_flat_options>
+    def list_blobs_flat_options(self, blob_service_client: BlobServiceClient, container_name):
+        container_client = blob_service_client.get_container_client(container=container_name)
 
-        for container in container_list:
-            # Find the deleted container and restore it
-            if container.deleted and container.name == container_name:
-                restored_container_client = blob_service_client.undelete_container(container.name, container.version)
-    # </Snippet_restore_container>
+        blob_list = container_client.list_blobs(include=['tags'])
+
+        for blob in blob_list:
+            print(f"Name: {blob['name']}, Tags: {blob['tags']}")
+    # </Snippet_list_blobs_flat_options> 
+
+    # <Snippet_list_blobs_hierarchical>
+    depth = 0
+    indent = "  "
+    def list_blobs_hierarchical(self, container_client: ContainerClient, prefix):
+        for blob in container_client.walk_blobs(name_starts_with=prefix, delimiter='/'):
+            if isinstance(blob, BlobPrefix):
+                # Indentation is only added to show nesting in the output
+                print(f"{self.indent * self.depth}{blob.name}")
+                self.depth += 1
+                self.list_blobs_hierarchical(container_client, prefix=blob.name)
+                self.depth -= 1
+            else:
+                print(f"{self.indent * self.depth}{blob.name}")
+    # </Snippet_list_blobs_hierarchical> 
+
+    # <Snippet_set_blob_tags>
+    def set_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+
+        # Get any existing tags for the blob if they need to be preserved
+        tags = blob_client.get_blob_tags()
+
+        # Add or modify tags
+        updated_tags = {'Sealed': 'false', 'Content': 'image', 'Date': '2022-01-01'}
+        tags.update(updated_tags)
+
+        blob_client.set_blob_tags(tags)
+    # </Snippet_set_blob_tags>
+
+    # <Snippet_get_blob_tags>
+    def get_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+
+        tags = blob_client.get_blob_tags()
+        print("Blob tags: ")
+        for k, v in tags.items():
+            print(k, v)
+    # </Snippet_get_blob_tags>
+
+    # <Snippet_clear_blob_tags>
+    def clear_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+
+        tags = dict()
+        blob_client.set_blob_tags(tags)
+    # </Snippet_clear_blob_tags>
+
+    # <Snippet_find_blobs_by_tags>
+    def find_blobs_by_tags(self, blob_service_client: BlobServiceClient, container_name):
+        container_client = blob_service_client.get_container_client(container=container_name)
+
+        query = "\"Content\"='image'"
+        blob_list = container_client.find_blobs_by_tags(filter_expression=query)
+        
+        print("Blobs tagged as images")
+        for blob in blob_list:
+            print(blob.name)
+    # </Snippet_find_blobs_by_tags>
+
+    # <Snippet_delete_blob>
+    def delete_blob(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client.delete_blob()
+    # </Snippet_delete_blob>
+
+    # <Snippet_delete_blob_snapshots
+    def delete_blob_snapshots(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client.delete_blob(delete_snapshots="include")
+    # </Snippet_delete_blob_snapshots>
+
+    # <Snippet_restore_blob>
+    def restore_deleted_blob(self, blob_service_client: BlobServiceClient, container_name):
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client.undelete_blob()
+    # </Snippet_restore_blob>
+
+    # <Snippet_restore_blob_version>
+    def restore_deleted_blob_version(self, blob_service_client: BlobServiceClient, container_name):
+        blob_name = "sample-blob.txt"
+        container_client = blob_service_client.get_container_client(container=container_name)
+        blob_client = container_client.get_blob_client(blob_name)
+
+        blob_list = container_client.list_blobs(name_starts_with=blob_name, include=['deleted','versions'])
+
+        blob_versions = []
+        for blob in blob_list:
+            blob_versions.append(blob.version_id)
+        
+        blob_versions.sort(reverse=True)
+        latest_version = blob_versions[0]
+
+        versioned_blob_properties = blob_client.get_blob_properties(version_id=latest_version)
+        versioned_blob_url = container_client.get_blob_client(versioned_blob_properties).primary_endpoint
+
+        # Restore the latest version by copying it to the base blob
+        blob_client.start_copy_from_url(versioned_blob_url)
+    # </Snippet_restore_blob_version>
 
 if __name__ == '__main__':
     # TODO: Replace <storage-account-name> with your actual storage account name
-    account_url = "https://<storage-account-name>.blob.core.windows.net"
+    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
     credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
@@ -234,22 +325,26 @@ if __name__ == '__main__':
     #sample.download_blob_to_stream(blob_service_client, "sample-container")
     #sample.download_blob_to_string(blob_service_client, "sample-container")
 
-    #sample.list_blobs_flat(blob_service_client)
-    #sample.list_blobs_flat_options(blob_service_client)
-    #sample.list_blobs_hierarchical(blob_service_client)
+    #sample.list_blobs_flat(blob_service_client, "sample-container")
+    #sample.list_blobs_flat_options(blob_service_client, "sample-container")
+
+    #container_client = blob_service_client.get_container_client(container="sample-container")
+    #sample.list_blobs_hierarchical(container_client, "")
 
     #lease_client = sample.acquire_blob_lease(blob_service_client, "sample-container")
     #sample.renew_blob_lease(lease_client)
     #sample.release_blob_lease(lease_client)
     #sample.break_blob_lease(lease_client)
 
-    sample.get_properties(blob_service_client, "sample-container")
-    sample.set_metadata(blob_service_client, "sample-container")
-    sample.get_metadata(blob_service_client, "sample-container")
+    #sample.set_properties(blob_service_client, "sample-container")
+    #sample.get_properties(blob_service_client, "sample-container")
+    #sample.set_metadata(blob_service_client, "sample-container")
+    #sample.get_metadata(blob_service_client, "sample-container")
 
-    #sample.set_blob_tags(blob_service_client, "sample-container")
-    #sample.get_blob_tags(blob_service_client, "sample-container")
-    #sample.clear_blob_tags(blob_service_client, "sample-container")
+    sample.set_blob_tags(blob_service_client, "sample-container")
+    sample.get_blob_tags(blob_service_client, "sample-container")
+    sample.clear_blob_tags(blob_service_client, "sample-container")
+    sample.find_blobs_by_tags(blob_service_client, "sample-container")
 
     #sample.copy_blob(blob_service_client, "sample-container")
 
