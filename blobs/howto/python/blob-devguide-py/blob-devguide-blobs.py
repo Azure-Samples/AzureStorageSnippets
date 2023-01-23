@@ -10,7 +10,7 @@ class BlobSamples(object):
 
     # <Snippet_upload_blob_data>
     def upload_blob_data(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
         data = "Sample data for blob"
         blob_client.upload_blob(data, blob_type="BlockBlob")
     # </Snippet_upload_blob_data>
@@ -24,7 +24,7 @@ class BlobSamples(object):
         return bytes(result)
         
     def upload_blob_stream(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
         input_stream = io.BytesIO(self.get_random_bytes(15))
         blob_client.upload_blob(input_stream, blob_type="BlockBlob")
     # </Snippet_upload_blob_stream>
@@ -46,7 +46,7 @@ class BlobSamples(object):
 
     # <Snippet_download_blob_file>
     def download_blob_to_file(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
         with open(file=os.path.join('filepath', 'filename'), mode="wb") as sample_blob:
             download_stream = blob_client.download_blob()
             sample_blob.write(download_stream.readall())
@@ -54,7 +54,7 @@ class BlobSamples(object):
 
     # <Snippet_download_blob_chunks>
     def download_blob_chunks(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # This returns a StorageStreamDownloader
         stream = blob_client.download_blob()
@@ -68,7 +68,7 @@ class BlobSamples(object):
 
     # <Snippet_download_blob_stream>
     def download_blob_to_stream(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # readinto() downloads the blob contents to a stream and returns the number of bytes read
         stream = io.BytesIO()
@@ -78,7 +78,7 @@ class BlobSamples(object):
 
     # <Snippet_download_blob_text>
     def download_blob_to_string(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # content_as_text() downloads the blob contents and decodes as text - default values are shown for parameters
         blob_text = blob_client.download_blob().content_as_text(max_concurrency=1, encoding='UTF-8')
@@ -106,7 +106,7 @@ class BlobSamples(object):
     # <Snippet_acquire_blob_lease>
     def acquire_blob_lease(self, blob_service_client: BlobServiceClient, container_name):
         # Instantiate a ContainerClient
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # Acquire a 30-second lease on the container
         lease_client = blob_client.acquire_lease(30)
@@ -134,7 +134,7 @@ class BlobSamples(object):
 
     # <Snippet_get_blob_properties>
     def get_properties(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         properties = blob_client.get_blob_properties()
 
@@ -146,8 +146,9 @@ class BlobSamples(object):
 
     # <Snippet_set_blob_properties>
     def set_properties(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
+        # Get the existing blob properties
         properties = blob_client.get_blob_properties()
 
         # Set the content_type and content_language headers, and populate the remaining headers from the existing properties
@@ -163,7 +164,7 @@ class BlobSamples(object):
 
     # <Snippet_set_blob_metadata>
     def set_metadata(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # Retrieve existing metadata, if desired
         metadata = dict(blob_client.get_blob_properties().metadata)
@@ -177,13 +178,13 @@ class BlobSamples(object):
 
     # <Snippet_get_blob_metadata>
     def get_metadata(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # Retrieve existing metadata, if desired
         metadata = dict(blob_client.get_blob_properties().metadata)
 
-        for key, value in metadata.items():
-            print(key, value)
+        for k, v in metadata.items():
+            print(k, v)
     # </Snippet_get_blob_metadata>
 
     # <Snippet_list_blobs_flat>
@@ -223,7 +224,7 @@ class BlobSamples(object):
 
     # <Snippet_set_blob_tags>
     def set_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         # Get any existing tags for the blob if they need to be preserved
         tags = blob_client.get_blob_tags()
@@ -237,7 +238,7 @@ class BlobSamples(object):
 
     # <Snippet_get_blob_tags>
     def get_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
         tags = blob_client.get_blob_tags()
         print("Blob tags: ")
@@ -247,8 +248,9 @@ class BlobSamples(object):
 
     # <Snippet_clear_blob_tags>
     def clear_blob_tags(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
 
+        # Pass in empty dict object to clear tags
         tags = dict()
         blob_client.set_blob_tags(tags)
     # </Snippet_clear_blob_tags>
@@ -265,41 +267,93 @@ class BlobSamples(object):
             print(blob.name)
     # </Snippet_find_blobs_by_tags>
 
+    # <Snippet_copy_blob>
+    def copy_blob(self, blob_service_client: BlobServiceClient):
+        source_blob = blob_service_client.get_container_client(container="source-container").get_blob_client(blob="sample-blob.txt")
+
+        # Make sure the source blob exists before attempting to copy
+        if source_blob.exists:
+            # Lease the source blob during copy to prevent other clients from modifying it
+            lease = BlobLeaseClient(client=source_blob)
+
+            # Create an infinite lease by passing -1
+            # We'll break the lease after the copy operation finishes
+            lease.acquire(-1)
+
+            # Get the source blob properties
+            source_blob_properties = source_blob.get_blob_properties()
+            print(f"Source blob lease state: {source_blob_properties.lease.state}")
+
+            # Identify the destination blob and begin the copy operation
+            destination_blob = blob_service_client.get_container_client(container="destination-container").get_blob_client(blob="sample-blob.txt")
+            destination_blob.start_copy_from_url(source_url=source_blob.url)
+
+            # Get the destination blob properties
+            destination_blob_properties = destination_blob.get_blob_properties()
+            print(f"Copy status: {destination_blob_properties.copy.status}")
+            print(f"Copy progress: {destination_blob_properties.copy.progress}")
+            print(f"Copy completion time: {destination_blob_properties.copy.completion_time}")
+            print(f"Total bytes copied: {destination_blob_properties.size}")
+
+            # Break the lease on the source blob
+            if source_blob_properties.lease.state == "leased":
+                lease.break_lease()
+
+                # Display updated lease state
+                source_blob_properties = source_blob.get_blob_properties()
+                print(f"Source blob lease state: {source_blob_properties.lease.state}")
+        else:
+            print("Source blob does not exist")
+    # </Snippet_copy_blob>
+
+    # <Snippet_abort_copy>
+    def abort_copy(self, blob_service_client: BlobServiceClient):
+        # Get the destination blob and its properties
+        destination_blob = blob_service_client.get_container_client(container="destination-container").get_blob_client(blob="sample-blob.txt")
+        destination_blob_properties = destination_blob.get_blob_properties()
+
+        # Check the copy status and abort if pending
+        if destination_blob_properties.copy.status == 'pending':
+            destination_blob.abort_copy(destination_blob_properties.copy.id)
+            print(f"Copy operation {destination_blob_properties.copy.id} has been aborted")
+    # </Snippet_abort_copy>
+
     # <Snippet_delete_blob>
     def delete_blob(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
         blob_client.delete_blob()
     # </Snippet_delete_blob>
 
     # <Snippet_delete_blob_snapshots
     def delete_blob_snapshots(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client(blob="sample-blob.txt")
         blob_client.delete_blob(delete_snapshots="include")
     # </Snippet_delete_blob_snapshots>
 
     # <Snippet_restore_blob>
     def restore_deleted_blob(self, blob_service_client: BlobServiceClient, container_name):
-        blob_client = blob_service_client.get_container_client(container=container_name).get_blob_client("sample-blob.txt")
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
         blob_client.undelete_blob()
     # </Snippet_restore_blob>
 
     # <Snippet_restore_blob_version>
     def restore_deleted_blob_version(self, blob_service_client: BlobServiceClient, container_name):
-        blob_name = "sample-blob.txt"
+        blob_name = "file1.txt"
         container_client = blob_service_client.get_container_client(container=container_name)
-        blob_client = container_client.get_blob_client(blob_name)
 
+        # Get a reference to the soft-deleted base blob and list all the blob versions
+        blob_client = container_client.get_blob_client(blob=blob_name)
         blob_list = container_client.list_blobs(name_starts_with=blob_name, include=['deleted','versions'])
-
         blob_versions = []
         for blob in blob_list:
             blob_versions.append(blob.version_id)
         
+        # Get the latest version of the soft-deleted blob
         blob_versions.sort(reverse=True)
         latest_version = blob_versions[0]
 
-        versioned_blob_properties = blob_client.get_blob_properties(version_id=latest_version)
-        versioned_blob_url = container_client.get_blob_client(versioned_blob_properties).primary_endpoint
+        # Build the blob URI and add the version ID as a query string
+        versioned_blob_url = f"{blob_client.url}?versionId={latest_version}"
 
         # Restore the latest version by copying it to the base blob
         blob_client.start_copy_from_url(versioned_blob_url)
@@ -307,7 +361,7 @@ class BlobSamples(object):
 
 if __name__ == '__main__':
     # TODO: Replace <storage-account-name> with your actual storage account name
-    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
+    account_url = "https://<storage-account-name>.blob.core.windows.net"
     credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
@@ -315,37 +369,40 @@ if __name__ == '__main__':
 
     sample = BlobSamples()
 
-    #sample.upload_blob_data(blob_service_client, "sample-container")
-    #sample.upload_blob_stream(blob_service_client, "sample-container")
-    #sample.upload_blob_file(blob_service_client, "sample-container")
-    #sample.upload_blob_tags(blob_service_client, "sample-container")
+    sample.upload_blob_data(blob_service_client, "sample-container")
+    sample.upload_blob_stream(blob_service_client, "sample-container")
+    sample.upload_blob_file(blob_service_client, "sample-container")
+    sample.upload_blob_tags(blob_service_client, "sample-container")
 
-    #sample.download_blob_to_file(blob_service_client, "sample-container")
-    #sample.download_blob_chunks(blob_service_client, "sample-container")
-    #sample.download_blob_to_stream(blob_service_client, "sample-container")
-    #sample.download_blob_to_string(blob_service_client, "sample-container")
+    sample.download_blob_to_file(blob_service_client, "sample-container")
+    sample.download_blob_chunks(blob_service_client, "sample-container")
+    sample.download_blob_to_stream(blob_service_client, "sample-container")
+    sample.download_blob_to_string(blob_service_client, "sample-container")
 
-    #sample.list_blobs_flat(blob_service_client, "sample-container")
-    #sample.list_blobs_flat_options(blob_service_client, "sample-container")
+    sample.list_blobs_flat(blob_service_client, "sample-container")
+    sample.list_blobs_flat_options(blob_service_client, "sample-container")
 
-    #container_client = blob_service_client.get_container_client(container="sample-container")
-    #sample.list_blobs_hierarchical(container_client, "")
+    container_client = blob_service_client.get_container_client(container="sample-container")
+    sample.list_blobs_hierarchical(container_client, "")
 
-    #lease_client = sample.acquire_blob_lease(blob_service_client, "sample-container")
-    #sample.renew_blob_lease(lease_client)
-    #sample.release_blob_lease(lease_client)
-    #sample.break_blob_lease(lease_client)
+    lease_client = sample.acquire_blob_lease(blob_service_client, "sample-container")
+    sample.renew_blob_lease(lease_client)
+    sample.release_blob_lease(lease_client)
+    sample.break_blob_lease(lease_client)
 
-    #sample.set_properties(blob_service_client, "sample-container")
-    #sample.get_properties(blob_service_client, "sample-container")
-    #sample.set_metadata(blob_service_client, "sample-container")
-    #sample.get_metadata(blob_service_client, "sample-container")
+    sample.set_properties(blob_service_client, "sample-container")
+    sample.get_properties(blob_service_client, "sample-container")
+    sample.set_metadata(blob_service_client, "sample-container")
+    sample.get_metadata(blob_service_client, "sample-container")
 
     sample.set_blob_tags(blob_service_client, "sample-container")
     sample.get_blob_tags(blob_service_client, "sample-container")
-    sample.clear_blob_tags(blob_service_client, "sample-container")
+    #sample.clear_blob_tags(blob_service_client, "sample-container")
     sample.find_blobs_by_tags(blob_service_client, "sample-container")
 
-    #sample.copy_blob(blob_service_client, "sample-container")
+    sample.copy_blob(blob_service_client)
+    #sample.abort_copy(blob_service_client)
 
     #sample.delete_blob(blob_service_client, "sample-container")
+    #sample.restore_deleted_blob(blob_service_client, "sample-container")
+    #sample.restore_deleted_blob_version(blob_service_client, "source-container")
