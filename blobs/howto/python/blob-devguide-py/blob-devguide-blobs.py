@@ -1,7 +1,5 @@
 import io
-import os, uuid
-import random
-import time
+import os
 from azure.core.exceptions import HttpResponseError, ResourceExistsError
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient, BlobPrefix, ContentSettings
@@ -11,23 +9,16 @@ class BlobSamples(object):
     # <Snippet_upload_blob_data>
     def upload_blob_data(self, blob_service_client: BlobServiceClient, container_name):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
-        data = "Sample data for blob"
+        data = b"Sample data for blob"
 
         # Upload the blob data - default blob type is BlockBlob
         blob_client.upload_blob(data, blob_type="BlockBlob")
     # </Snippet_upload_blob_data>
 
-    # <Snippet_upload_blob_stream>
-    def get_random_bytes(self, size):
-        rand = random.Random()
-        result = bytearray(size)
-        for i in range(size):
-            result[i] = rand.randint(0, 255)
-        return bytes(result)
-        
+    # <Snippet_upload_blob_stream>        
     def upload_blob_stream(self, blob_service_client: BlobServiceClient, container_name):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
-        input_stream = io.BytesIO(self.get_random_bytes(15))
+        input_stream = io.BytesIO(os.urandom(15))
         blob_client.upload_blob(input_stream, blob_type="BlockBlob")
     # </Snippet_upload_blob_stream>
 
@@ -64,7 +55,7 @@ class BlobSamples(object):
 
         # Read data in chunks to avoid loading all into memory at once
         for chunk in stream.chunks():
-            # Process your data (anything can be done here - `chunk` is a byte array)
+            # Process your data (anything can be done here - 'chunk' is a byte array)
             chunk_list.append(chunk)
     # </Snippet_download_blob_chunks>
 
@@ -82,28 +73,11 @@ class BlobSamples(object):
     def download_blob_to_string(self, blob_service_client: BlobServiceClient, container_name):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
 
-        # content_as_text() downloads the blob contents and decodes as text - default values are shown for parameters
-        blob_text = blob_client.download_blob().content_as_text(max_concurrency=1, encoding='UTF-8')
+        # encoding param is necessary for readall() to return str, otherwise it returns bytes
+        downloader = blob_client.download_blob(max_concurrency=1, encoding='UTF-8')
+        blob_text = downloader.readall()
         print(f"Blob contents: {blob_text}")
     # </Snippet_download_blob_text>
-
-    # <Snippet_list_containers>
-    def list_containers(self, blob_service_client: BlobServiceClient):
-        i=0
-        all_pages = blob_service_client.list_containers(include_metadata=True, results_per_page=5).by_page()
-        for container_page in all_pages:
-            i += 1
-            print(f"Page {i}")
-            for container in container_page:
-                print(container['name'], container['metadata'])
-    # </Snippet_list_containers>
-
-    # <Snippet_list_containers_prefix>
-    def list_containers_prefix(self, blob_service_client: BlobServiceClient):
-        containers = blob_service_client.list_containers(name_starts_with='test-')
-        for container in containers:
-            print(container['name'])
-    # </Snippet_list_containers_prefix>
 
     # <Snippet_acquire_blob_lease>
     def acquire_blob_lease(self, blob_service_client: BlobServiceClient, container_name):
@@ -169,7 +143,7 @@ class BlobSamples(object):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
 
         # Retrieve existing metadata, if desired
-        metadata = dict(blob_client.get_blob_properties().metadata)
+        metadata = blob_client.get_blob_properties().metadata
 
         more_metadata = {'docType': 'text', 'docCategory': 'reference'}
         metadata.update(more_metadata)
@@ -183,7 +157,7 @@ class BlobSamples(object):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
 
         # Retrieve existing metadata, if desired
-        metadata = dict(blob_client.get_blob_properties().metadata)
+        metadata = blob_client.get_blob_properties().metadata
 
         for k, v in metadata.items():
             print(k, v)
@@ -274,7 +248,7 @@ class BlobSamples(object):
         source_blob = blob_service_client.get_blob_client(container="source-container", blob="sample-blob.txt")
 
         # Make sure the source blob exists before attempting to copy
-        if source_blob.exists:
+        if source_blob.exists():
             # Lease the source blob during copy to prevent other clients from modifying it
             lease = BlobLeaseClient(client=source_blob)
 
