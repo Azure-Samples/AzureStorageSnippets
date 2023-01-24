@@ -300,7 +300,7 @@ class BlobSamples(object):
         blob_client.delete_blob()
     # </Snippet_delete_blob>
 
-    # <Snippet_delete_blob_snapshots
+    # <Snippet_delete_blob_snapshots>
     def delete_blob_snapshots(self, blob_service_client: BlobServiceClient, container_name):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
         blob_client.delete_blob(delete_snapshots="include")
