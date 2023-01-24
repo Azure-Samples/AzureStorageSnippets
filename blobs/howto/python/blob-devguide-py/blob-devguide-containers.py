@@ -26,12 +26,9 @@ class ContainerSamples(object):
     # <Snippet_list_containers>
     def list_containers(self, blob_service_client: BlobServiceClient):
         i=0
-        all_pages = blob_service_client.list_containers(include_metadata=True, results_per_page=5).by_page()
-        for container_page in all_pages:
-            i += 1
-            print(f"Page {i}")
-            for container in container_page:
-                print(container['name'], container['metadata'])
+        containers = blob_service_client.list_containers(include_metadata=True)
+        for container in containers:
+            print(container['name'], container['metadata'])
     # </Snippet_list_containers>
 
     # <Snippet_list_containers_prefix>
@@ -40,6 +37,17 @@ class ContainerSamples(object):
         for container in containers:
             print(container['name'])
     # </Snippet_list_containers_prefix>
+
+    # <Snippet_list_containers_pages>
+    def list_containers_pages(self, blob_service_client: BlobServiceClient):
+        i=0
+        all_pages = blob_service_client.list_containers(results_per_page=5).by_page()
+        for container_page in all_pages:
+            i += 1
+            print(f"Page {i}")
+            for container in container_page:
+                print(container['name'])
+    # </Snippet_list_containers_pages>
 
     # <Snippet_acquire_container_lease>
     def acquire_container_lease(self, blob_service_client: BlobServiceClient, container_name):
@@ -87,7 +95,7 @@ class ContainerSamples(object):
         container_client = blob_service_client.get_container_client(container=container_name)
 
         # Retrieve existing metadata, if desired
-        metadata = dict(container_client.get_container_properties().metadata)
+        metadata = container_client.get_container_properties().metadata
 
         more_metadata = {'docType': 'text', 'docCategory': 'reference'}
         metadata.update(more_metadata)
@@ -103,8 +111,8 @@ class ContainerSamples(object):
         # Retrieve existing metadata, if desired
         metadata = container_client.get_container_properties().metadata
 
-        for key, value in metadata.items():
-            print(key, value)
+        for k, v in metadata.items():
+            print(k, v)
     # </Snippet_get_container_metadata>
 
     # <Snippet_delete_container>
@@ -126,13 +134,15 @@ class ContainerSamples(object):
 
     # <Snippet_restore_container>
     def restore_deleted_container(self, blob_service_client: BlobServiceClient, container_name):
-        container_list = list(blob_service_client.list_containers(include_deleted=True))
+        container_list = list(
+            blob_service_client.list_containers(include_deleted=True))
         assert len(container_list) >= 1
 
         for container in container_list:
             # Find the deleted container and restore it
             if container.deleted and container.name == container_name:
-                restored_container_client = blob_service_client.undelete_container(container.name, container.version)
+                restored_container_client = blob_service_client.undelete_container(
+                    deleted_container_name=container.name, deleted_container_version=container.version)
     # </Snippet_restore_container>
 
 if __name__ == '__main__':
@@ -148,6 +158,7 @@ if __name__ == '__main__':
     #sample.create_blob_root_container(blob_service_client)
     sample.list_containers(blob_service_client)
     sample.list_containers_prefix(blob_service_client)
+    sample.list_containers_pages(blob_service_client)
     lease_client = sample.acquire_container_lease(blob_service_client, "sample-container")
     sample.renew_container_lease(lease_client)
     sample.release_container_lease(lease_client)
