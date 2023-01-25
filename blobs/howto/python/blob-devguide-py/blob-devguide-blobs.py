@@ -118,7 +118,7 @@ class BlobSamples(object):
         print(f"Blob size: {properties.size}")
         print(f"Content type: {properties.content_settings.content_type}")
         print(f"Content language: {properties.content_settings.content_language}")
-    # </Snippet_set_blob_properties>
+    # </Snippet_get_blob_properties>
 
     # <Snippet_set_blob_properties>
     def set_properties(self, blob_service_client: BlobServiceClient, container_name):
