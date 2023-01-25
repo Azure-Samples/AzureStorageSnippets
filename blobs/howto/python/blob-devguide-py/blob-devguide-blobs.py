@@ -143,13 +143,13 @@ class BlobSamples(object):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
 
         # Retrieve existing metadata, if desired
-        metadata = blob_client.get_blob_properties().metadata
+        blob_metadata = blob_client.get_blob_properties().metadata
 
-        more_metadata = {'docType': 'text', 'docCategory': 'reference'}
-        metadata.update(more_metadata)
+        more_blob_metadata = {'docType': 'text', 'docCategory': 'reference'}
+        blob_metadata.update(more_blob_metadata)
 
         # Set metadata on the blob
-        blob_client.set_blob_metadata(metadata=metadata)
+        blob_client.set_blob_metadata(metadata=blob_metadata)
     # </Snippet_set_blob_metadata>
 
     # <Snippet_get_blob_metadata>
@@ -157,9 +157,9 @@ class BlobSamples(object):
         blob_client = blob_service_client.get_blob_client(container=container_name, blob="sample-blob.txt")
 
         # Retrieve existing metadata, if desired
-        metadata = blob_client.get_blob_properties().metadata
+        blob_metadata = blob_client.get_blob_properties().metadata
 
-        for k, v in metadata.items():
+        for k, v in blob_metadata.items():
             print(k, v)
     # </Snippet_get_blob_metadata>
 
