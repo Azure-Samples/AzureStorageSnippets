@@ -38,14 +38,10 @@ public class Authorize_DataLake {
 
         String endpoint = "https://" + accountName + ".dfs.core.windows.net";
         
-        ClientSecretCredential clientSecretCredential = new ClientSecretCredentialBuilder()
-        .clientId(clientId)
-        .clientSecret(ClientSecret)
-        .tenantId(tenantID)
-        .build();
-           
+        DefaultAzureCredential defaultCredential = new DefaultAzureCredentialBuilder().build();
+
         DataLakeServiceClientBuilder builder = new DataLakeServiceClientBuilder();
-        return builder.credential(clientSecretCredential).endpoint(endpoint).buildClient();
+        return builder.credential(defaultCredential).endpoint(endpoint).buildClient();
     } 
     //</Snippet_AuthorizeWithAzureAD> 
     

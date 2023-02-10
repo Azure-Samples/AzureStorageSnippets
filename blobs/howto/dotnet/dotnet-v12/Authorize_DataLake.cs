@@ -34,15 +34,12 @@ namespace dotnet_v12
 
         // <Snippet_AuthorizeWithAAD>
         public static void GetDataLakeServiceClient(ref DataLakeServiceClient dataLakeServiceClient,
-            String accountName, String clientID, string clientSecret, string tenantID)
+            String accountName)
         {
-
-            TokenCredential credential = new ClientSecretCredential(
-                tenantID, clientID, clientSecret, new TokenCredentialOptions());
-
             string dfsUri = "https://" + accountName + ".dfs.core.windows.net";
 
-            dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), credential);
+            dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
+                                    new DefaultAzureCredential());
         }
         // </Snippet_AuthorizeWithAAD>
     }

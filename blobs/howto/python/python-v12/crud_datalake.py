@@ -121,15 +121,15 @@ def initialize_storage_account(storage_account_name, storage_account_key):
 # -------------------------------------------------
 
 # <Snippet_AuthorizeWithAAD>
-def initialize_storage_account_ad(storage_account_name, client_id, client_secret, tenant_id):
+def initialize_storage_account_ad(storage_account_name):
     
     try:  
         global service_client
 
-        credential = ClientSecretCredential(tenant_id, client_id, client_secret)
+        default_credential = DefaultAzureCredential()
 
         service_client = DataLakeServiceClient(account_url="{}://{}.dfs.core.windows.net".format(
-            "https", storage_account_name), credential=credential)
+            "https", storage_account_name), credential=default_credential)
     
     except Exception as e:
         print(e)
