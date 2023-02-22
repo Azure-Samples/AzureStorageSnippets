@@ -42,7 +42,7 @@ async function main(blockBlobClient) {
     { rehydratePriority }
   );
 
-  if(result?.errorCode == undefined){
+  if (result?.errorCode == undefined) {
     console.log(`Change to access was successful`);
   } else {
     console.log(result);

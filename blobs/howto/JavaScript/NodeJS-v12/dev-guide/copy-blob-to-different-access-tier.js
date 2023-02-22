@@ -29,21 +29,21 @@ const containerClient = new ContainerClient(
 //<Snippet_CopyWithAccessTier>
 async function copyBlobWithDifferentAccessTier(containerClient) {
 
-      // create blob clients
-      const sourceBlobClient = await containerClient.getBlobClient(originalBlob);
-      const destinationBlobClient = await containerClient.getBlobClient(copyBlob);
-  
-    // start copy, access tiers include `Hot`, `Cool`, `Archive`
-    const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url, { tier: 'Hot'});
-    console.log('start copy from original to copy');
+  // create blob clients
+  const sourceBlobClient = await containerClient.getBlobClient(originalBlob);
+  const destinationBlobClient = await containerClient.getBlobClient(copyBlob);
 
-    // wait until done
-    await copyPoller.pollUntilDone();
-    console.log('copy finished')
+  // start copy, access tiers include `Hot`, `Cool`, `Archive`
+  const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url, { tier: 'Hot' });
+  console.log('start copy from original to copy');
+
+  // wait until done
+  await copyPoller.pollUntilDone();
+  console.log('copy finished')
 }
 //</Snippet_CopyWithAccessTier>
 copyBlobWithDifferentAccessTier(containerClient)
-    .then(() => console.log('done'))
-    // Error message for blob currently in rehydration process:
-    // `There is currently a pending copy operation.`
-    .catch((ex) => console.log(`Exception: ${ex.message}`));
+  .then(() => console.log('done'))
+  // Error message for blob currently in rehydration process:
+  // `There is currently a pending copy operation.`
+  .catch((ex) => console.log(`Exception: ${ex.message}`));
