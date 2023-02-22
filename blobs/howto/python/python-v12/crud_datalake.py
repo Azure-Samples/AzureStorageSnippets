@@ -136,6 +136,24 @@ def initialize_storage_account_ad(storage_account_name):
 # </Snippet_AuthorizeWithAAD>
 
 # -------------------------------------------------
+# Connect to account - Azure AD
+# -------------------------------------------------
+
+# <Snippet_AuthorizeWithSAS>
+def initialize_storage_account_sas(storage_account_name, sas_token: str):
+    
+    try:  
+        global service_client
+
+        # The SAS token string can be passed in as credential param or appended to the account URL
+        service_client = DataLakeServiceClient(account_url="{}://{}.dfs.core.windows.net".format(
+            "https", storage_account_name), credential=sas_token)
+    
+    except Exception as e:
+        print(e)
+# </Snippet_AuthorizeWithSAS>
+
+# -------------------------------------------------
 # Create a file system
 # -------------------------------------------------
 
