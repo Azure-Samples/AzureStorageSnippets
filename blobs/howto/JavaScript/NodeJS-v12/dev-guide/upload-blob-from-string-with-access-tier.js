@@ -9,7 +9,7 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 const client = BlobServiceClient.fromConnectionString(connString);
 
 //<Snippet_UploadAccessTier>
-async function uploadWithAccessTier(containerClient){
+async function uploadWithAccessTier(containerClient) {
 
   // Create blob
   const timestamp = Date.now();
@@ -23,7 +23,7 @@ async function uploadWithAccessTier(containerClient){
 
     // access tier setting
     // 'Hot', 'Cool', or 'Archive'
-    tier: 'Cool', 
+    tier: 'Cool',
 
     // other properties
     metadata: undefined,
