@@ -32,12 +32,8 @@ const containerClient = new ContainerClient(
   sharedKeyCredential
 );
 
-// Prep array
-const blockBlobCount = 3;
-const blockBlobClients = new Array(blockBlobCount);
-
-// Craete container, add blobs with default `Hot` tier
-async function prepContainer() {
+// Create container, add blobs with default `Hot` tier
+async function prepContainer(containerClient, blockBlobCount, blockBlobClients) {
 
   // Create container
   await containerClient.create();
@@ -60,10 +56,15 @@ async function prepContainer() {
   }
 }
 
-async function main() {
+//<Snippet_BatchChangeAccessTier>
+async function main(containerClient) {
+
+  // Prep array
+  const blockBlobCount = 3;
+  const blockBlobClients = new Array(blockBlobCount);
 
   // Create container and blobs in `Hot` tier
-  await prepContainer();
+  await prepContainer(containerClient, blockBlobCount, blockBlobClients);
 
   // Blob batch client and batch
   const containerScopedBatchClient = containerClient.getBlobBatchClient();
@@ -86,6 +87,7 @@ async function main() {
     console.log(`[${i}] access tier ${resp2.accessTier}, status ${resp.subResponses[i].status}, message ${resp.subResponses[i].statusMessage}`)
   }
 }
-main()
+//</Snippet_BatchChangeAccessTier>
+main(containerClient)
   .then(() => console.log('done'))
   .catch((ex) => console.log(`Exception: ${ex.message}`));

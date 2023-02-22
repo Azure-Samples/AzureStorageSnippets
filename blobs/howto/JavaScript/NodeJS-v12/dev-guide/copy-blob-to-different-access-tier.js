@@ -26,8 +26,8 @@ const containerClient = new ContainerClient(
   `${baseUrl}/${containerName}`,
   sharedKeyCredential
 );
-
-async function main() {
+//<Snippet_CopyWithAccessTier>
+async function copyBlobWithDifferentAccessTier(containerClient) {
 
       // create blob clients
       const sourceBlobClient = await containerClient.getBlobClient(originalBlob);
@@ -41,7 +41,8 @@ async function main() {
     await copyPoller.pollUntilDone();
     console.log('copy finished')
 }
-main()
+//</Snippet_CopyWithAccessTier>
+copyBlobWithDifferentAccessTier(containerClient)
     .then(() => console.log('done'))
     // Error message for blob currently in rehydration process:
     // `There is currently a pending copy operation.`
