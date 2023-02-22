@@ -24,8 +24,8 @@ const blockBlobClient = new BlockBlobClient(
   `${baseUrl}/${containerName}/${blobName}`,
   sharedKeyCredential
 );
-
-async function main() {
+//<Snippet_BatchChangeAccessTier>
+async function main(blockBlobClient) {
 
   // Get current access tier
   const { accessTier } = await blockBlobClient.getProperties();
@@ -47,9 +47,8 @@ async function main() {
   } else {
     console.log(result);
   }
-  
-
 }
-main()
+//</Snippet_BatchChangeAccessTier>
+main(blockBlobClient)
   .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));
