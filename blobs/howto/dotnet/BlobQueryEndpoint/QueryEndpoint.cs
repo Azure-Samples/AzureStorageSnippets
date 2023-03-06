@@ -7,6 +7,7 @@ namespace ManagementTasks
 {
     public static class AccountProperties
     {
+        // <Snippet_QueryEndpoint>
         public static async Task<string> GetBlobServiceEndpoint(string storageAccountName, TokenCredential credential)
         {
             // You can locate your subscription ID on the Subscriptions blade of the Azure Portal (https://portal.azure.com)
@@ -39,5 +40,6 @@ namespace ManagementTasks
 
             return endpoint;
         }
+        // </Snippet_QueryEndpoint>
     }
 }
