@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Azure.ResourceManager;
+﻿using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 using Azure.ResourceManager.Storage;
 

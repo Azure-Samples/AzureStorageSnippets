@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+﻿global using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 
