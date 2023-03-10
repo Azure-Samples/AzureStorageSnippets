@@ -7,7 +7,7 @@ namespace ManagementTasks
     public static class AccountProperties
     {
         // <Snippet_QueryEndpoint>
-        public static async Task<string> GetBlobServiceEndpoint(string storageAccountName, TokenCredential credential)
+        public static async Task<Uri> GetBlobServiceEndpoint(string storageAccountName, TokenCredential credential)
         {
             // TODO: replace with your subscription ID and resource group name
             // You can locate your subscription ID on the Subscriptions blade of the Azure Portal (https://portal.azure.com)
@@ -33,10 +33,8 @@ namespace ManagementTasks
             // Get the properties for the specified storage account
             StorageAccountResource storageAccount = await accountCollection.GetAsync(storageAccountName);
 
-            // Get the primary endpoint for the blob service
-            string endpoint = storageAccount.Data.PrimaryEndpoints.BlobUri.ToString();
-
-            return endpoint;
+            // Return the primary endpoint for the blob service
+            return storageAccount.Data.PrimaryEndpoints.BlobUri;
         }
         // </Snippet_QueryEndpoint>
     }

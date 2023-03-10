@@ -12,11 +12,11 @@ TokenCredential credential = new DefaultAzureCredential();
 string storageAccountName = "<storage-account-name>";
 
 // Call out to our function that retrieves the blob service endpoint for the given storage account
-string endpoint = await AccountProperties.GetBlobServiceEndpoint(storageAccountName, credential);
-Console.WriteLine($"URI: {endpoint}");
+Uri blobURI = await AccountProperties.GetBlobServiceEndpoint(storageAccountName, credential);
+Console.WriteLine($"URI: {blobURI}");
 
 // Now that we know the endpoint, create the client object
-BlobServiceClient blobServiceClient = new(new Uri(endpoint), credential);
+BlobServiceClient blobServiceClient = new(blobURI, credential);
 
 // Do something with the storage account or its resources ...
 // </Snippet_CreateClientWithEndpoint>
