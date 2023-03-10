@@ -15,6 +15,8 @@ class BlobEndpointSample(object):
             credential=credential,
             subscription_id=subscription_id
         )
+
+        # Register the Storage resource provider in the subscription
         resource_mgmt_client.providers.register('Microsoft.Storage')
 
         storage_mgmt_client = StorageManagementClient(
@@ -22,7 +24,7 @@ class BlobEndpointSample(object):
             subscription_id=subscription_id
         )
         
-        # Get storage account
+        # Get the properties for the specified storage account
         storage_account = storage_mgmt_client.storage_accounts.get_properties(
             resource_group_name=rg_name,
             account_name=storage_account_name
@@ -40,10 +42,12 @@ if __name__ == '__main__':
     credential = DefaultAzureCredential()
 
     sample = BlobEndpointSample()
+
+    # Call out to our function that retrieves the blob service endpoint for a storage account
     endpoint = sample.get_blob_service_endpoint(storage_account_name, credential)
     print(f"URL: {endpoint}")
 
-    # Create the BlobServiceClient object
+    # Now that we know the endpoint, create the client object
     blob_service_client = BlobServiceClient(account_url=endpoint, credential=credential)
 
     # Do something with the storage account or its resources ...
