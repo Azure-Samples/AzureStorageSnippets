@@ -1,6 +1,7 @@
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
+from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.storage import StorageManagementClient
 
 class BlobEndpointSample(object):
@@ -10,13 +11,19 @@ class BlobEndpointSample(object):
         subscription_id = "<subscription-id>"
         rg_name = "<resource-group-name>"
 
-        mgmt_client = StorageManagementClient(
+        resource_mgmt_client = ResourceManagementClient(
+            credential=credential,
+            subscription_id=subscription_id
+        )
+        resource_mgmt_client.providers.register('Microsoft.Storage')
+
+        storage_mgmt_client = StorageManagementClient(
             credential=credential,
             subscription_id=subscription_id
         )
         
         # Get storage account
-        storage_account = mgmt_client.storage_accounts.get_properties(
+        storage_account = storage_mgmt_client.storage_accounts.get_properties(
             resource_group_name=rg_name,
             account_name=storage_account_name
         )
