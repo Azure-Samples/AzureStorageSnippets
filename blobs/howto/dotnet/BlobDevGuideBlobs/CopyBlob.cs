@@ -75,16 +75,8 @@ namespace BlobDevGuide
             {
                 if (value == "pending")
                 {
-                    try
-                    {
-                        await destinationBlob.AbortCopyFromUriAsync(copyOperation.Id);
-                        Console.WriteLine($"Copy operation {copyOperation.Id} aborted");
-                    }
-
-                    catch (RequestFailedException ex)
-                    {
-                        // Handle the exception
-                    }
+                    await destinationBlob.AbortCopyFromUriAsync(copyOperation.Id);
+                    Console.WriteLine($"Copy operation {copyOperation.Id} aborted");
                 }
             }
         }
