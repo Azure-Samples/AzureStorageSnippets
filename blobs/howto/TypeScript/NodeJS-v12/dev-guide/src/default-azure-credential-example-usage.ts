@@ -1,0 +1,22 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+// Get BlobServiceClient without secrets
+import { getBlobServiceClient } from './default-azure-credential';
+
+async function main() {
+  // get client
+  const client = getBlobServiceClient;
+
+  // use client
+  const serviceGetPropertiesResponse = await client.getProperties();
+  console.log(`${JSON.stringify(serviceGetPropertiesResponse)}`);
+}
+
+main()
+  .then(() => console.log(`done`))
+  .catch((err: unknown) => {
+    if (err instanceof Error) {
+      console.log(err.message);
+    }
+  });
