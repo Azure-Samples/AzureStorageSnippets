@@ -20,6 +20,7 @@ namespace BlobDevGuide
             if (response.Headers.TryGetValue("x-ms-copy-status", out string value))
                 Console.WriteLine($"Copy status: {value}");
         }
+        // </Snippet_CheckStatusCopyBlob>
         //-------------------------------------------------
         // Copy a blob
         //-------------------------------------------------
