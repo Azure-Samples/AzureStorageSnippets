@@ -33,28 +33,28 @@ namespace BlobDevGuide
             BlobClient destinationBlob = blobServiceClient
                 .GetBlobContainerClient("destination-container")
                 .GetBlobClient("sample-blob.txt");
+
+            // Lease the source blob for the copy operation 
+            // to prevent another client from modifying it
+            BlobLeaseClient lease = sourceBlob.GetBlobLeaseClient();
+
             try
             {
-                // Lease the source blob for the copy operation 
-                // to prevent another client from modifying it
-                BlobLeaseClient lease = sourceBlob.GetBlobLeaseClient();
-
-                // Specifying -1 for the lease interval creates an infinite lease
-                await lease.AcquireAsync(TimeSpan.FromSeconds(-1));
+                // Acquire an infinite lease on the source blob
+                await lease.AcquireAsync(BlobLeaseClient.InfiniteLeaseDuration);
 
                 // Start the copy operation and wait for it to complete
                 CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
-                await AbortBlobCopyAsync(copyOperation, destinationBlob);
                 await copyOperation.WaitForCompletionAsync();
-
-                // Release the lease on the source blob
-                await lease.ReleaseAsync();
             }
             catch (RequestFailedException ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.ReadLine();
-                throw;
+                // Handle the exception
+            }
+            finally
+            {
+                // Release the lease on the source blob
+                await lease.ReleaseAsync();
             }
         }
         // </Snippet_CopyBlob>
@@ -83,9 +83,7 @@ namespace BlobDevGuide
 
                     catch (RequestFailedException ex)
                     {
-                        Console.WriteLine(ex.Message);
-                        Console.ReadLine();
-                        throw;
+                        // Handle the exception
                     }
                 }
             }
