@@ -109,7 +109,7 @@ async function streamToText(readable) {
 
 // <snippet_CallMain>
 main()
-  .then(() => console.log('Done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

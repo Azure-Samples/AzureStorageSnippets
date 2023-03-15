@@ -83,8 +83,8 @@ async function main(blobServiceClient) {
   console.log('container creation succeeded');
 
   // get fully qualified path of file
-  // Create file `my-local-file.txt` in same directory as this file
-  const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
+  // Create file `my-local-file.txt` in `./files` directory as this file
+  const localFileWithPath = path.join(__dirname, `../files/my-blob`);
 
   // highWaterMark: artificially low value to demonstrate appendBlob
   // encoding: just to see the chunk as it goes by
@@ -115,7 +115,7 @@ async function main(blobServiceClient) {
   );
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

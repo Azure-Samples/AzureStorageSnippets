@@ -34,7 +34,7 @@ dotenv.config();
 async function createContainerSas() {
   // Get environment variables
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
-  const containerName = process.env.AZURE_STORAGE_BLOB_CONTAINER_NAME as string;
+  const containerName = 'my-container';
 
   // Best practice: create time limits
   const TEN_MINUTES = 10 * 60 * 1000;
@@ -87,7 +87,7 @@ async function createContainerSas() {
 async function listBlobs(sasToken) {
   // Get environment variables
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
-  const containerName = process.env.AZURE_STORAGE_BLOB_CONTAINER_NAME as string;
+  const containerName = 'my-container';
 
   // Create Url
   // SAS token is the query string with typical `?` delimiter
@@ -118,7 +118,7 @@ async function main() {
 
 main()
   .then(() => {
-    console.log(`\nDone`);
+    console.log(`success`);
   })
   .catch((err: unknown) => {
     if (err instanceof Error) {

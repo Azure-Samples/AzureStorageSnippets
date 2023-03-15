@@ -10,8 +10,8 @@ if (!accountName) throw Error('Azure Storage accountName not found');
 
 // Container and blob must exist prior to running this script
 // SAS token must have READ permissions on blob that haven't expired
-const containerName = `test`;
-const blobName = `my-text-file.txt`;
+const containerName = `my-container`;
+const blobName = `my-blob`;
 
 // Create SAS URL
 const sasToken = process.env.AZURE_STORAGE_SAS_TOKEN as string;
@@ -45,12 +45,12 @@ async function main() {
 
   // Get results
   if (content) {
-    return content.toString();
+    console.log(content.toString());
   }
 }
 
 main()
-  .then((result) => console.log(result))
+  .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

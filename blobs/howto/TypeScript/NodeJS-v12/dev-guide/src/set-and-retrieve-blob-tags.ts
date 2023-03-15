@@ -224,7 +224,7 @@ async function main(blobServiceClient) {
   await findBlobsByQuery(blobServiceClient, odataTagQuery4);
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

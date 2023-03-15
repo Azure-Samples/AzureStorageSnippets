@@ -85,7 +85,7 @@ async function main(blobServiceClient) {
   await downloadBlobToString(containerClient, blobName);
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

@@ -52,8 +52,8 @@ async function main(blobServiceClient) {
   console.log('container creation succeeded');
 
   // get fully qualified path of file
-  // Create file `my-local-file.txt` in same directory as this file
-  const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
+  // Create file `my-blob` in `./files` directory as this file
+  const localFileWithPath = path.join(__dirname, `../files/my-blob`);
 
   // create 10 blobs with Promise.all
   for (let i = 0; i < 10; i++) {
@@ -83,7 +83,7 @@ async function main(blobServiceClient) {
   await Promise.all(blobs);
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

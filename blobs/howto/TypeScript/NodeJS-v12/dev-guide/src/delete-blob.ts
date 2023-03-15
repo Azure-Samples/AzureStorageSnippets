@@ -77,7 +77,7 @@ async function main(blobServiceClient) {
 
   // create container
   const timestamp = Date.now();
-  const containerName = `delete-string-${timestamp}`;
+  const containerName = `delete-blob-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
   const containerOptions = {
@@ -115,7 +115,7 @@ async function main(blobServiceClient) {
   await undeleteBlob(containerClient, `${containerName}-1.txt`);
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

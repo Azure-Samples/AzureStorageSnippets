@@ -63,7 +63,7 @@ async function main(blobServiceClient) {
   // </Snippet_GetUrl>
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

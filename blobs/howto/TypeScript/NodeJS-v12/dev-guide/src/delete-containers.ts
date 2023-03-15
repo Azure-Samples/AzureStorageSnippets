@@ -138,7 +138,7 @@ async function main(blobServiceClient) {
   await undeleteContainer(blobServiceClient, `${containerName}-1`);
 }
 main(blobServiceClient)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

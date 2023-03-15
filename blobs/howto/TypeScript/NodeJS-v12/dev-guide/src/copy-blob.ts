@@ -147,7 +147,7 @@ async function main(blobServiceClient) {
   );
 }
 main(client)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

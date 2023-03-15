@@ -4,7 +4,7 @@ import path from 'path';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-// Connection string
+// Connection string - do not use hierarchical namespace account
 const connString = process.env.AZURE_STORAGE_CONNECTION_STRING as string;
 if (!connString) throw Error('Azure Storage Connection string not found');
 
@@ -13,7 +13,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
 async function appendToBlob(containerClient, timestamp) {
   // name of blob
-  const blobName = `append-blob-${timestamp}`;
+  const blobName = `append-blob-transform-${timestamp}`;
 
   // add metadata to blob
   const options = {
@@ -32,22 +32,26 @@ async function appendToBlob(containerClient, timestamp) {
 
   // fetch log as stream
   // get fully qualified path of file
-  // Create file `my-local-file.txt` in same directory as this file
-  const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
+  // Create file `my-local-file.txt` in `./files` directory as this file
+  const localFileWithPath = path.join(__dirname, `../files/my-local-file.txt`);
+  console.log(`localFileWithPath ${localFileWithPath}`);
 
   // read file
   const contents = await fs.readFile(localFileWithPath, 'utf8');
+  console.log(`contents ${contents}`);
 
   // send content to appendBlob
   // such as a log file on hourly basis
   await appendBlobClient.appendBlock(contents, contents.length);
+  console.log(`appendBlock finished`);
 
   // add more iterations of appendBlob to continue adding
   // to same blob
   // ...await appendBlobClient.appendBlock(contents, contents.length);
 
   // when done, seal a day's log to read-only
-  await appendBlobClient.seal();
+  // doesn't work on hierarchical namespace account
+  await appendBlobClient.seal({});
   console.log(`Sealed appendBlob ${blobName}`);
 }
 
@@ -70,7 +74,7 @@ async function main(blobServiceClient) {
   await appendToBlob(containerClient, timestamp);
 }
 main(blobServiceClient)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

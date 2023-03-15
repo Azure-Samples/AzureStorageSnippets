@@ -9,7 +9,7 @@ const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
 if (!accountName) throw Error('Azure Storage accountName not found');
 
 // Container must exist prior to running this script
-const containerName = `test`;
+const containerName = `my-container`;
 
 // SAS token must have LIST permissions on container that haven't expired
 const sasToken = process.env.AZURE_STORAGE_SAS_TOKEN as string;
@@ -36,7 +36,7 @@ async function main() {
 }
 
 main()
-  .then(() => console.log(`done`))
+  .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

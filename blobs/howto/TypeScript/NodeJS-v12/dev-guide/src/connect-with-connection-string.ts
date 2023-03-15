@@ -9,8 +9,8 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
 async function main() {
-  const containerName = 'REPLACE-WITH-EXISTING-CONTAINER-NAME';
-  const blobName = 'REPLACE-WITH-EXISTING-BLOB-NAME';
+  const containerName = 'my-container';
+  const blobName = 'my-blob';
 
   const timestamp = Date.now();
   const fileName = `my-new-file-${timestamp}.txt`;
@@ -30,7 +30,7 @@ async function main() {
 }
 
 main()
-  .then(() => console.log(`done`))
+  .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

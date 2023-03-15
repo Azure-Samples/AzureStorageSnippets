@@ -74,7 +74,7 @@ async function main() {
 
 main()
   .then(() => {
-    console.log(`done`);
+    console.log(`success`);
   })
   .catch((err: unknown) => {
     if (err instanceof Error) {

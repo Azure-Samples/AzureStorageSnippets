@@ -17,7 +17,7 @@ const baseUrl = `https://${accountName}.blob.core.windows.net`;
 
 // Unique container name
 const timeStamp = Date.now();
-const containerName = `test`;
+const containerName = `my-container`;
 
 async function main() {
   try {
@@ -41,7 +41,7 @@ async function main() {
 }
 
 main()
-  .then(() => console.log(`done`))
+  .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

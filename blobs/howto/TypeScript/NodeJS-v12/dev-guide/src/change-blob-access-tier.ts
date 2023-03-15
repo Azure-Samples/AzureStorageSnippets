@@ -18,7 +18,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(
   accountKey
 );
 
-// Set resource names
+// Set resource names - must already exist
 const containerName = `my-container`;
 const blobName = `my-blob`;
 const baseUrl = `https://${accountName}.blob.core.windows.net`;
@@ -52,7 +52,7 @@ async function main(blockBlobClient) {
 }
 //</Snippet_BatchChangeAccessTier>
 main(blockBlobClient)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

@@ -36,7 +36,7 @@ async function main(blobServiceClient) {
   const { containerClient, containerCreateResponse } =
     await blobServiceClient.createContainer(containerName, containerOptions);
 
-  const blobName = `append-blob-${timestamp}`;
+  const blobName = `append-blob-for-await-${timestamp}`;
   const options = {
     metadata: {
       owner: 'YOUR-NAME',
@@ -48,14 +48,14 @@ async function main(blobServiceClient) {
   const appendBlobClient = containerClient.getAppendBlobClient(blobName);
 
   // create blob to save logs
-  const response = await appendBlobClient.createIfNotExists(options);
-
+  await appendBlobClient.createIfNotExists(options);
   console.log(`Created appendBlob`);
 
   // fetch log as stream
   // get fully qualified path of file
-  // Create file `my-local-file.txt` in same directory as this file
-  const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
+  // Create file `my-local-file.txt` in `./files` directory
+  const localFileWithPath = path.join(__dirname, `../files/my-local-file.txt`);
+  console.log(`localFileWithPath: ${localFileWithPath}`);
 
   // highWaterMark: artificially low value to demonstrate appendBlob
   // encoding: just to see the chunk as it goes by
@@ -72,7 +72,7 @@ async function main(blobServiceClient) {
   await appendBlob(appendBlobClient, readableStream);
 }
 main(blobServiceClient)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

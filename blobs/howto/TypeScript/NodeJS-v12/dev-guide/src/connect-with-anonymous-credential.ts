@@ -1,4 +1,5 @@
 // connect-with-anonymous-credential.js
+// Requires public access to service, container and blob
 import { BlobServiceClient, AnonymousCredential } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -14,8 +15,8 @@ const blobServiceClient = new BlobServiceClient(
 );
 
 async function getContainerProperties() {
-  const containerName = 'REPLACE-WITH-EXISTING-CONTAINER-NAME';
-  const blobName = 'REPLACE-WITH-EXISTING-BLOB-NAME';
+  const containerName = 'my-container';
+  const blobName = 'my-blob';
 
   const timestamp = Date.now();
   const fileName = `my-new-file-${timestamp}.txt`;
@@ -35,7 +36,7 @@ async function getContainerProperties() {
 }
 
 getContainerProperties()
-  .then(() => console.log(`done`))
+  .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

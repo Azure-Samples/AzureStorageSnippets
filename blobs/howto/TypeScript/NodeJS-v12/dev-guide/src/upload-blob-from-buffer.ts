@@ -59,11 +59,11 @@ async function main(blobServiceClient) {
     console.log('container creation failed');
 
   // get fully qualified path of file
-  // Create image file in same directory as this file
-  const localFileWithPath = path.join(__dirname, `daisies.jpg`);
+  // Create image file in `./files` directory as this file
+  const localFileWithPath = path.join(__dirname, `../files/leaves.jpg`);
 
   // because no type is passed, open file as buffer
-  const buffer = await fs.readFile(localFileWithPath, { encoding: 'utf-8' });
+  const buffer = await fs.readFile(localFileWithPath);
 
   // create blobs with Promise.all
   // include the file extension

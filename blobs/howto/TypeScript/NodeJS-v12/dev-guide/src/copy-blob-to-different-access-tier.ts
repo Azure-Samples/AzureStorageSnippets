@@ -20,7 +20,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(
 
 // Set resource names
 const containerName = `my-container`;
-const originalBlob = `my-blob-2`;
+const originalBlob = `my-blob`;
 const copyBlob = `my-blob-copy`;
 const baseUrl = `https://${accountName}.blob.core.windows.net`;
 
@@ -49,7 +49,7 @@ async function copyBlobWithDifferentAccessTier(containerClient) {
 }
 //</Snippet_CopyWithAccessTier>
 copyBlobWithDifferentAccessTier(containerClient)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   // Error message for blob currently in rehydration process:
   // `There is currently a pending copy operation.`
   .catch((err: unknown) => {

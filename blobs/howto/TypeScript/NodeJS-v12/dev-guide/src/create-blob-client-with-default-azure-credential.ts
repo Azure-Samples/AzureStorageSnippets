@@ -16,7 +16,7 @@ if (!accountName) throw Error('Azure Storage accountName not found');
 const baseUrl = `https://${accountName}.blob.core.windows.net`;
 
 // Container must exist prior to running this script
-const containerName = `test`;
+const containerName = `my-container`;
 
 // Random blob name and contents
 const timeStamp = Date.now();
@@ -44,7 +44,10 @@ async function main() {
 }
 
 main()
-  .then((result) => console.log(result))
+  .then((result) => {
+    console.log(result);
+    console.log(`success`);
+  })
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);
