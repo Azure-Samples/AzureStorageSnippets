@@ -9,6 +9,8 @@ async function main() {
   const client = getBlobServiceClient;
 
   // use client
+  // RBAC must be set up for your identity with one of the following roles:
+  // Storage Account Contributor
   const serviceGetPropertiesResponse = await client.getProperties();
   console.log(`${JSON.stringify(serviceGetPropertiesResponse)}`);
 }
