@@ -1,14 +1,22 @@
-import { BlobServiceClient } from '@azure/storage-blob';
+import {
+  BlobServiceClient,
+  ContainerClient,
+  ContainerGetPropertiesResponse,
+  ContainerCreateOptions,
+  ContainerCreateResponse,
+  Metadata
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING as string;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// Get BlobServiceClient
+import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
-
-async function getContainerProperties(containerClient) {
-  const properties = await containerClient.getProperties();
+async function getContainerProperties(containerClient: ContainerClient) {
+  const properties: ContainerGetPropertiesResponse =
+    await containerClient.getProperties();
   console.log(containerClient.containerName + ' properties: ');
 
   for (const property in properties) {
@@ -32,28 +40,37 @@ const metadata = {
   reviewer: `johnh`
 }
 */
-async function setContainerMetadata(containerClient, metadata) {
+async function setContainerMetadata(
+  containerClient: ContainerClient,
+  metadata: Metadata
+) {
   await containerClient.setMetadata(metadata);
 }
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient) {
   // create container
   const timestamp = Date.now();
   const containerName = `container-set-properties-and-metadata-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
-  const containerOptions = {
+  const containerOptions: ContainerCreateOptions = {
     access: 'container'
   };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
+  const {
+    containerClient,
+    containerCreateResponse
+  }: {
+    containerClient: ContainerClient;
+    containerCreateResponse: ContainerCreateResponse;
+  } = await blobServiceClient.createContainer(containerName, containerOptions);
+
+  if (containerCreateResponse.errorCode)
+    throw Error(containerCreateResponse.errorCode);
 
   console.log('container creation succeeded');
 
   const currentDate = new Date().toLocaleDateString();
 
-  const containerMetadata = {
+  const containerMetadata: Metadata = {
     // values must be strings
     lastFileReview: currentDate,
     reviewer: `johnh`

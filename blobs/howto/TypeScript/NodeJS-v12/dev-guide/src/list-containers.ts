@@ -1,16 +1,23 @@
 // index.js
-import { BlobServiceClient } from '@azure/storage-blob';
+import {
+  BlobServiceClient,
+  ServiceListContainersOptions,
+  ContainerClient
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING as string;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-const client = BlobServiceClient.fromConnectionString(connString);
+// Get BlobServiceClient
+import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
 
 // return up to 5000 containers
-async function listContainers(blobServiceClient, containerNamePrefix) {
-  const options = {
+async function listContainers(
+  blobServiceClient: BlobServiceClient,
+  containerNamePrefix: string
+) {
+  const options: ServiceListContainersOptions = {
     includeDeleted: false,
     includeMetadata: true,
     includeSystem: true,
@@ -22,22 +29,24 @@ async function listContainers(blobServiceClient, containerNamePrefix) {
     console.log(`For-await list: ${containerItem.name}`);
 
     // ContainerClient
-    const containerClient = blobServiceClient.getContainerClient(
-      containerItem.name
-    );
+    const containerClient: ContainerClient =
+      blobServiceClient.getContainerClient(containerItem.name);
 
     // ... do something with container
+    // containerClient.listBlobsFlat();
   }
 }
 
-async function listContainersWithPagingMarker(blobServiceClient) {
+async function listContainersWithPagingMarker(
+  blobServiceClient: BlobServiceClient
+) {
   // add prefix to filter list
   const containerNamePrefix = '';
 
   // page size
   const maxPageSize = 2;
 
-  const options = {
+  const options: ServiceListContainersOptions = {
     includeDeleted: false,
     includeMetadata: true,
     includeSystem: true,
@@ -76,14 +85,14 @@ async function listContainersWithPagingMarker(blobServiceClient) {
 }
 
 // assumes containers are already in storage
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient) {
   const containerNamePrefix = '';
 
   await listContainers(blobServiceClient, containerNamePrefix);
   await listContainersWithPagingMarker(blobServiceClient);
 }
 
-main(client)
+main(blobServiceClient)
   .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {

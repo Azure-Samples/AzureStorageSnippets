@@ -1,34 +1,41 @@
 // Get container and blob URLs from their client objects.
 
-import { BlobServiceClient } from '@azure/storage-blob';
+import {
+  BlobServiceClient,
+  ContainerClient,
+  ContainerCreateResponse,
+  BlockBlobUploadResponse,
+  BlockBlobClient
+} from '@azure/storage-blob';
+import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-// Connect without secrets to Azure
-// Learn more: https://www.npmjs.com/package/@azure/identity#DefaultAzureCredential
-import { DefaultAzureCredential } from '@azure/identity';
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
-if (!accountName) throw Error('Azure Storage accountName not found');
-
-const client = new BlobServiceClient(
-  `https://${accountName}.blob.core.windows.net`,
-  new DefaultAzureCredential()
-);
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
 
 // Connect with secrets to Azure
 // const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
 // if (!connString) throw Error('Azure Storage Connection string not found');
 // const client = BlobServiceClient.fromConnectionString(connString);
 
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient) {
   // <Snippet_GetUrl>
 
   // create container
   const containerName = `con1-${Date.now()}`;
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    { access: 'container' }
-  );
+  const {
+    containerClient,
+    containerCreateResponse
+  }: {
+    containerClient: ContainerClient;
+    containerCreateResponse: ContainerCreateResponse;
+  } = await blobServiceClient.createContainer(containerName, {
+    access: 'container'
+  });
+
+  if (containerCreateResponse.errorCode)
+    throw Error(containerCreateResponse.errorCode);
 
   // Display container name and its URL
   console.log(
@@ -39,7 +46,11 @@ async function main(blobServiceClient) {
   const blobName = `${containerName}-from-string.txt`;
   const blobContent = `Hello from a string`;
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
-  await blockBlobClient.upload(blobContent, blobContent.length);
+  const blockBlobUploadResponse: BlockBlobUploadResponse =
+    await blockBlobClient.upload(blobContent, blobContent.length);
+
+  if (blockBlobUploadResponse.errorCode)
+    throw Error(blockBlobUploadResponse.errorCode);
 
   // Display Blob name and its URL
   console.log(
@@ -54,7 +65,8 @@ async function main(blobServiceClient) {
     console.log('\t', blob.name);
 
     // Get Blob Client from name, to get the URL
-    const tempBlockBlobClient = containerClient.getBlockBlobClient(blob.name);
+    const tempBlockBlobClient: BlockBlobClient =
+      containerClient.getBlockBlobClient(blob.name);
 
     // Display blob name and URL
     console.log(`\t${blob.name}:\n\t\t${tempBlockBlobClient.url}`);
@@ -62,7 +74,7 @@ async function main(blobServiceClient) {
 
   // </Snippet_GetUrl>
 }
-main(client)
+main(blobServiceClient)
   .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {

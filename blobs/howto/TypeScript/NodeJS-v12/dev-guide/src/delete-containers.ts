@@ -1,28 +1,49 @@
 // delete-containers.js
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import {
+  BlobServiceClient,
+  ContainerClient,
+  ContainerItem,
+  ContainerCreateOptions,
+  ContainerDeleteResponse,
+  ContainerGetPropertiesOptions,
+  ContainerGetPropertiesResponse,
+  ServiceListContainersOptions,
+  ContainerUndeleteResponse,
+  ServiceUndeleteContainerOptions,
+  ContainerDeleteMethodOptions
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING as string;
-if (!connString) throw Error('Azure Storage Connection string not found');
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
+// Get BlobServiceClient
+import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
 
 // soft delete may take up to 30 seconds
 const sleep = (waitTimeInMs) =>
   new Promise((resolve) => setTimeout(resolve, waitTimeInMs));
 
 // delete container immediately on blobServiceClient
-async function deleteContainerImmediately(blobServiceClient, containerName) {
+async function deleteContainerImmediately(
+  blobServiceClient: BlobServiceClient,
+  containerName: string
+): Promise<ContainerDeleteResponse> {
   return await blobServiceClient.deleteContainer(containerName);
 }
 
 // soft delete container on ContainerClient
-async function deleteContainerSoft(containerClient) {
+async function deleteContainerSoft(
+  containerClient: ContainerClient
+): Promise<ContainerDeleteResponse> {
   return await containerClient.delete();
 }
 
-async function deleteContainersWithPrefix(blobServiceClient, prefix) {
-  const containerOptions = {
+async function deleteContainersWithPrefix(
+  blobServiceClient: BlobServiceClient,
+  prefix: string
+) {
+  const containerOptions: ServiceListContainersOptions = {
     // only delete containers not deleted
     includeDeleted: false,
     includeMetadata: false,
@@ -34,11 +55,12 @@ async function deleteContainersWithPrefix(blobServiceClient, prefix) {
     containerOptions
   )) {
     try {
-      const containerClient = blobServiceClient.getContainerClient(
-        containerItem.name
-      );
+      const containerClient: ContainerClient =
+        blobServiceClient.getContainerClient(containerItem.name);
 
-      await containerClient.delete();
+      const containerDeleteMethodOptions: ContainerDeleteMethodOptions = {};
+
+      await containerClient.delete(containerDeleteMethodOptions);
 
       console.log(`deleted ${containerItem.name} container - success`);
     } catch (err: unknown) {
@@ -52,11 +74,14 @@ async function deleteContainersWithPrefix(blobServiceClient, prefix) {
 }
 
 // Undelete specific container - last version
-async function undeleteContainer(blobServiceClient, containerName) {
+async function undeleteContainer(
+  blobServiceClient: BlobServiceClient,
+  containerName: string
+) {
   // version to undelete
-  let containerVersion;
+  let containerVersion: string | undefined;
 
-  const containerOptions = {
+  const containerOptions: ServiceListContainersOptions = {
     includeDeleted: true,
     prefix: containerName
   };
@@ -69,42 +94,70 @@ async function undeleteContainer(blobServiceClient, containerName) {
     // the versions are in asc time order
     // the last version is the most recent
     if (containerItem.name === containerName) {
-      containerVersion = containerItem.version;
+      containerVersion = containerItem.version as string;
     }
   }
 
-  const containerClient = await blobServiceClient.undeleteContainer(
-    containerName,
-    containerVersion
+  if (containerVersion !== undefined) {
+    const serviceUndeleteContainerOptions: ServiceUndeleteContainerOptions = {};
 
-    // optional/new container name - if unused, original container name is used
-    //newContainerName
-  );
+    const {
+      containerClient,
+      containerUndeleteResponse
+    }: {
+      containerClient: ContainerClient;
+      containerUndeleteResponse: ContainerUndeleteResponse;
+    } = await blobServiceClient.undeleteContainer(
+      containerName,
+      containerVersion,
 
-  // undelete was successful
-  console.log(`${containerName} is undeleted`);
+      // optional/new container name - if unused, original container name is used
+      //newContainerName
+      serviceUndeleteContainerOptions
+    );
 
-  // do something with containerClient
-  // ...
+    // Check delete
+    if (containerUndeleteResponse.errorCode)
+      throw Error(containerUndeleteResponse.errorCode);
+
+    // undelete was successful
+    console.log(`${containerName} is undeleted`);
+
+    // do something with containerClient
+    // ...
+    // containerClient.listBlobsFlat();
+  }
 }
-async function createContainer(blobServiceClient, containerName) {
+async function createContainer(
+  blobServiceClient: BlobServiceClient,
+  containerName: string
+) {
   // public access at container level
-  const options = {
+  const containerCreateOptions: ContainerCreateOptions = {
     access: 'container'
   };
 
   // creating client also creates container
   const { containerClient, containerCreateResponse } =
-    await blobServiceClient.createContainer(containerName, options);
+    await blobServiceClient.createContainer(
+      containerName,
+      containerCreateOptions
+    );
+
+  if (containerCreateResponse.errorCode)
+    throw Error(containerCreateResponse.errorCode);
+
+  const containerGetPropertiesOptions: ContainerGetPropertiesOptions = {};
 
   // list container properties
-  const containerProperties = await containerClient.getProperties();
+  const containerProperties: ContainerGetPropertiesResponse =
+    await containerClient.getProperties(containerGetPropertiesOptions);
   console.log(
     `${containerName} lastModified: ${containerProperties.lastModified}`
   );
 }
 
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient) {
   const length = 9;
   const pContainers: Promise<void>[] = new Array(length);
 
@@ -126,9 +179,10 @@ async function main(blobServiceClient) {
   await sleep(30000);
 
   // soft delete container with ContainerClient
-  const containerClient = blobServiceClient.getContainerClient(
+  const containerClient: ContainerClient = blobServiceClient.getContainerClient(
     `${containerName}-2`
   );
+
   await deleteContainerSoft(containerClient);
 
   // delete with prefix and not already deleted
