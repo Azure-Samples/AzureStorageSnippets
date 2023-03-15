@@ -1,9 +1,9 @@
 import {
   BlobServiceClient,
   ContainerClient,
-  ContainerGetPropertiesResponse,
   ContainerCreateOptions,
   ContainerCreateResponse,
+  ContainerGetPropertiesResponse,
   Metadata
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';

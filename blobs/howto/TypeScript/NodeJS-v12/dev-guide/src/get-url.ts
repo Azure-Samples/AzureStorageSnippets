@@ -2,13 +2,13 @@
 
 import {
   BlobServiceClient,
-  ContainerClient,
-  ContainerCreateResponse,
+  BlockBlobClient,
   BlockBlobUploadResponse,
-  BlockBlobClient
+  ContainerClient,
+  ContainerCreateResponse
 } from '@azure/storage-blob';
-import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
 import * as dotenv from 'dotenv';
+import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
 dotenv.config();
 
 const blobServiceClient: BlobServiceClient =

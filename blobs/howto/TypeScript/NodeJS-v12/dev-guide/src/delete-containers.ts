@@ -2,15 +2,14 @@
 import {
   BlobServiceClient,
   ContainerClient,
-  ContainerItem,
   ContainerCreateOptions,
+  ContainerDeleteMethodOptions,
   ContainerDeleteResponse,
   ContainerGetPropertiesOptions,
   ContainerGetPropertiesResponse,
-  ServiceListContainersOptions,
   ContainerUndeleteResponse,
-  ServiceUndeleteContainerOptions,
-  ContainerDeleteMethodOptions
+  ServiceListContainersOptions,
+  ServiceUndeleteContainerOptions
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();

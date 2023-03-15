@@ -1,8 +1,8 @@
 // create-container.js
 import {
   BlobServiceClient,
-  ContainerCreateOptions,
   ContainerClient,
+  ContainerCreateOptions,
   ContainerCreateResponse
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
