@@ -35,6 +35,12 @@ async function registerSRPInSubscription(resourceMgmtClient /*: ResourceManageme
 // </Snippet_register_srp>
 
 async function main() {
+  // Client for resource provider registration
+  //const resourceMgmtClient = new ResourceManagementClient(
+  //  credential,
+  //  subscriptionId
+  //);
+
   // <Snippet_create_client_with_endpoint>
   // For client-side applications running in the browser, use InteractiveBrowserCredential instead of DefaultAzureCredential. 
   // See https://aka.ms/azsdk/js/identity/examples for more details.
