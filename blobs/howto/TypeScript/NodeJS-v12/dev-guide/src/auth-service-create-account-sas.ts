@@ -1,12 +1,12 @@
 //<Snippet_Dependencies>
 import {
+  AccountSASPermissions,
+  AccountSASResourceTypes,
+  AccountSASServices,
   BlobServiceClient,
   generateAccountSASQueryParameters,
-  AccountSASPermissions,
-  AccountSASServices,
-  AccountSASResourceTypes,
-  StorageSharedKeyCredential,
-  SASProtocol
+  SASProtocol,
+  StorageSharedKeyCredential
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();

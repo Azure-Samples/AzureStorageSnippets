@@ -1,16 +1,15 @@
 import {
-  BlobServiceClient,
-  BlobDeleteResponse,
-  BlockBlobClient,
-  BlockBlobUploadOptions,
+  BlobDeleteIfExistsResponse,
   BlobDeleteOptions,
-  ContainerClient,
-  ContainerCreateOptions,
+  BlobDeleteResponse,
+  BlobServiceClient,
   BlobUndeleteOptions,
   BlobUndeleteResponse,
-  BlobDeleteIfExistsResponse,
-  Tags,
-  DeleteSnapshotsOptionType
+  BlockBlobClient,
+  BlockBlobUploadOptions,
+  ContainerClient,
+  ContainerCreateOptions,
+  Tags
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();

@@ -17,8 +17,8 @@
 //<Snippet_Dependencies>
 import { DefaultAzureCredential } from '@azure/identity';
 import {
-  ContainerClient,
   BlobServiceClient,
+  ContainerClient,
   ContainerSASPermissions,
   generateBlobSASQueryParameters,
   SASProtocol

@@ -1,11 +1,10 @@
+import {
+  BlockBlobClient,
+  ContainerClient,
+  StorageSharedKeyCredential
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
-import {
-  StorageSharedKeyCredential,
-  ContainerClient,
-  BlobServiceClient,
-  BlockBlobClient
-} from '@azure/storage-blob';
 
 /**
  * Batch blob requests require authorization on each subrequest.

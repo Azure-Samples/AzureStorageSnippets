@@ -1,14 +1,13 @@
 import {
   BlobServiceClient,
-  ContainerCreateOptions,
   BlockBlobClient,
-  BlobGetTagsResponse,
-  ContainerClient,
   BlockBlobUploadOptions,
+  ContainerClient,
+  ContainerCreateOptions,
   Tags
 } from '@azure/storage-blob';
-import { getBlobTags } from './blob-set-tags';
 import * as dotenv from 'dotenv';
+import { getBlobTags } from './blob-set-tags';
 dotenv.config();
 
 // Get BlobServiceClient

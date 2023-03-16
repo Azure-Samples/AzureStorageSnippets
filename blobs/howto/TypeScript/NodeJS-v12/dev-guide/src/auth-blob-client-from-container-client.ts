@@ -1,11 +1,9 @@
 // Azure Storage dependency
 import {
-  StorageSharedKeyCredential,
-  ContainerClient,
   BlobClient,
+  BlobGetPropertiesResponse,
   BlockBlobClient,
-  ContainerCreateOptions,
-  BlobGetPropertiesResponse
+  ContainerClient
 } from '@azure/storage-blob';
 
 // For development environment - include environment variables from .env

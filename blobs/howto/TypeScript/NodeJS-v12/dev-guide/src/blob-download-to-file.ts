@@ -1,13 +1,13 @@
 import {
   BlobServiceClient,
+  BlockBlobClient,
+  BlockBlobUploadOptions,
   ContainerClient,
   ContainerCreateOptions,
-  BlockBlobUploadOptions,
-  BlockBlobClient,
   Tags
 } from '@azure/storage-blob';
-import path from 'path';
 import * as dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 // Get BlobServiceClient

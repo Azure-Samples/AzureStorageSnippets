@@ -1,10 +1,10 @@
 // index.js
 import {
   BlobServiceClient,
+  BlockBlobUploadOptions,
   ContainerClient,
   ContainerListBlobsOptions,
-  Tags,
-  BlockBlobUploadOptions
+  Tags
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();

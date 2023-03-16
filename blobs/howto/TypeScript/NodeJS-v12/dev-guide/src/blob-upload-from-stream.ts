@@ -1,16 +1,16 @@
 import {
-  BlobServiceClient,
-  ContainerClient,
-  BlockBlobUploadStreamOptions,
-  BlockBlobClient,
   BlobGetTagsResponse,
+  BlobServiceClient,
+  BlockBlobClient,
+  BlockBlobUploadStreamOptions,
+  ContainerClient,
   Tags
 } from '@azure/storage-blob';
+import * as dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import * as dotenv from 'dotenv';
-dotenv.config();
 import { Transform } from 'stream';
+dotenv.config();
 
 // Get BlobServiceClient
 import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-client';

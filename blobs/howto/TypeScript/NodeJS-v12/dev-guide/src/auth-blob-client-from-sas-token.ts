@@ -1,7 +1,7 @@
 // Azure Storage dependency
 import {
-  BlockBlobClient,
-  BlobDownloadResponseParsed
+  BlobDownloadResponseParsed,
+  BlockBlobClient
 } from '@azure/storage-blob';
 import { createAccountSas } from './auth-service-create-account-sas';
 

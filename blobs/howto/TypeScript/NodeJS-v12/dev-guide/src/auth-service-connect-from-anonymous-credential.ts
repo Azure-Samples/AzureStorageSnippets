@@ -1,6 +1,6 @@
 // connect-with-anonymous-credential.js
 // Requires public access to service, container and blob
-import { BlobServiceClient, AnonymousCredential } from '@azure/storage-blob';
+import { AnonymousCredential, BlobServiceClient } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 

@@ -1,10 +1,10 @@
 import {
   BlobGetPropertiesOptions,
   BlobGetPropertiesResponse,
-  BlockBlobClient,
+  BlobItem,
   BlobServiceClient,
-  ContainerClient,
-  BlobItem
+  BlockBlobClient,
+  ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();

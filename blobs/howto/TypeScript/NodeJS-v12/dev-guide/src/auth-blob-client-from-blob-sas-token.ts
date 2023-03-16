@@ -16,15 +16,15 @@
 
 //<Snippet_Dependencies>
 import {
-  BlockBlobClient,
-  BlobServiceClient,
   BlobSASPermissions,
+  BlobSASSignatureValues,
+  BlobServiceClient,
+  BlockBlobClient,
   BlockBlobUploadResponse,
   generateBlobSASQueryParameters,
   SASProtocol,
   SASQueryParameters,
-  ServiceGetUserDelegationKeyResponse,
-  BlobSASSignatureValues
+  ServiceGetUserDelegationKeyResponse
 } from '@azure/storage-blob';
 
 // used for local environment variables

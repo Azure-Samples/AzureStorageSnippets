@@ -2,8 +2,8 @@
 // You must set up RBAC for your identity with one of the following roles:
 // - Storage Blob Data Reader
 // - Storage Blob Data Contributor
-import { BlobServiceClient } from '@azure/storage-blob';
 import { DefaultAzureCredential } from '@azure/identity';
+import { BlobServiceClient } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 

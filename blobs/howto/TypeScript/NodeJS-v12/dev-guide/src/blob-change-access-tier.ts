@@ -1,9 +1,6 @@
-import {
-  StorageSharedKeyCredential,
-  BlockBlobClient
-} from '@azure/storage-blob';
-import { getBlobClientFromAccountAndKey } from './auth-get-client';
+import { BlockBlobClient } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
+import { getBlobClientFromAccountAndKey } from './auth-get-client';
 dotenv.config();
 
 const containerName = `my-container`;

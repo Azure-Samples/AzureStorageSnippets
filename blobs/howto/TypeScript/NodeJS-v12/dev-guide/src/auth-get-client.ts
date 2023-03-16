@@ -2,8 +2,8 @@ import { DefaultAzureCredential } from '@azure/identity';
 import {
   AnonymousCredential,
   BlobServiceClient,
-  ContainerClient,
   BlockBlobClient,
+  ContainerClient,
   StoragePipelineOptions,
   StorageSharedKeyCredential
 } from '@azure/storage-blob';
