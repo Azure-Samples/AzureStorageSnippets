@@ -10,7 +10,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 // Get BlobServiceClient
-import { getBlobServiceClientFromDefaultAzureCredential } from './get-client';
+import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-client';
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
