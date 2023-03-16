@@ -35,6 +35,12 @@ class BlobEndpointSample(object):
     # </Snippet_query_blob_endpoint>
 
 if __name__ == '__main__':
+    # Client for resource provider registration
+    #resource_mgmt_client = ResourceManagementClient(
+    #    credential=credential,
+    #    subscription_id=subscription_id
+    #)
+
     # <Snippet_create_client_with_endpoint>
     storage_account_name = "<storage-account-name>"
     credential = DefaultAzureCredential()
