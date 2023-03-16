@@ -8,14 +8,6 @@ async function getBlobServiceEndpoint(saName, credential) {
   const subscriptionId = "<subscription-id>";
   const rgName = "<resource-group-name>";
 
-  const resourceMgmtClient = new ResourceManagementClient(
-    credential,
-    subscriptionId
-  );
-
-  // Register the Storage resource provider in the subscription
-  resourceMgmtClient.providers.register("Microsoft.Storage");
-
   const storageMgmtClient = new StorageManagementClient(
     credential,
     subscriptionId
@@ -33,6 +25,14 @@ async function getBlobServiceEndpoint(saName, credential) {
   return endpoint;
 }
 // </Snippet_query_blob_endpoint>
+
+// <Snippet_register_srp>
+async function registerSRPInSubscription(resourceMgmtClient /*: ResourceManagementClient*/) {
+  // Check the registration state of the resource provider and register, if needed
+  if (resourceMgmtClient.providers.get("Microsoft.Storage").registrationState == "NotRegistered")
+    resourceMgmtClient.providers.register("Microsoft.Storage");
+}
+// </Snippet_register_srp>
 
 async function main() {
   // <Snippet_create_client_with_endpoint>
