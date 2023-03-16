@@ -6,18 +6,16 @@ from azure.mgmt.storage import StorageManagementClient
 
 class BlobEndpointSample(object):
 
+    # <Snippet_register_srp>
+    def register_srp_in_subscription(self, resource_mgmt_client: ResourceManagementClient):
+        if (resource_mgmt_client.providers.get("Microsoft.Storage").registration_state == "NotRegistered"):
+            resource_mgmt_client.providers.register("Microsoft.Storage")
+    # </Snippet_register_srp>
+
     # <Snippet_query_blob_endpoint>
     def get_blob_service_endpoint(self, storage_account_name, credential: DefaultAzureCredential) -> str:
         subscription_id = "<subscription-id>"
         rg_name = "<resource-group-name>"
-
-        resource_mgmt_client = ResourceManagementClient(
-            credential=credential,
-            subscription_id=subscription_id
-        )
-
-        # Register the Storage resource provider in the subscription
-        resource_mgmt_client.providers.register('Microsoft.Storage')
 
         storage_mgmt_client = StorageManagementClient(
             credential=credential,
@@ -37,6 +35,12 @@ class BlobEndpointSample(object):
     # </Snippet_query_blob_endpoint>
 
 if __name__ == '__main__':
+    # Client for resource provider registration
+    #resource_mgmt_client = ResourceManagementClient(
+    #    credential=credential,
+    #    subscription_id=subscription_id
+    #)
+
     # <Snippet_create_client_with_endpoint>
     storage_account_name = "<storage-account-name>"
     credential = DefaultAzureCredential()
