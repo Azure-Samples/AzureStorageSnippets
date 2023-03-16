@@ -26,4 +26,12 @@ public class AccountProperties {
         return endpoint;
     }
     // </Snippet_QueryEndpoint>
+
+    // <Snippet_RegisterSRP>
+    public void RegisterSRPInSubscription(AzureResourceManager armClient) {
+        // Check the registration state of the resource provider and register, if needed
+        if (armClient.providers().getByName("Microsoft.Storage").registrationState() == "NotRegistered")
+            armClient.providers().register("Microsoft.Storage");
+    }
+    // <Snippet_RegisterSRP>
 }
