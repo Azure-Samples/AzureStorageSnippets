@@ -33,5 +33,5 @@ public class AccountProperties {
         if (armClient.providers().getByName("Microsoft.Storage").registrationState() == "NotRegistered")
             armClient.providers().register("Microsoft.Storage");
     }
-    // <Snippet_RegisterSRP>
+    // </Snippet_RegisterSRP>
 }
