@@ -20,10 +20,6 @@ namespace ManagementTasks
             ResourceIdentifier resourceIdentifier = new($"/subscriptions/{subscriptionId}");
             SubscriptionResource subscription = armClient.GetSubscriptionResource(resourceIdentifier);
 
-            // Register the Storage resource provider in the subscription
-            ResourceProviderResource resourceProvider = await subscription.GetResourceProviderAsync("Microsoft.Storage");
-            resourceProvider.Register();
-
             // Get a resource group
             ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(rgName);
 
@@ -37,5 +33,17 @@ namespace ManagementTasks
             return storageAccount.Data.PrimaryEndpoints.BlobUri;
         }
         // </Snippet_QueryEndpoint>
+
+        // <Snippet_RegisterSRP>
+        public static async Task RegisterSRPInSubscription(SubscriptionResource subscription)
+        {
+            ResourceProviderResource resourceProvider = 
+                await subscription.GetResourceProviderAsync("Microsoft.Storage");
+
+            // Check the registration state of the resource provider and register, if needed
+            if (resourceProvider.Data.RegistrationState == "NotRegistered")
+                resourceProvider.Register();
+        }
+        // </Snippet_RegisterSRP>
     }
 }
