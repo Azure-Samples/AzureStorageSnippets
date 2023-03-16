@@ -1,11 +1,17 @@
-import { BlobServiceClient, BlockBlobUploadOptions } from '@azure/storage-blob';
+import {
+  BlobServiceClient,
+  BlockBlobUploadOptions,
+  BlobGetPropertiesResponse,
+  Metadata,
+  BlobClient
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING as string;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
+// Get BlobServiceClient
+import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-client';
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
 
 /*
 metadata= {
@@ -13,7 +19,7 @@ metadata= {
     releasedBy: 'Jill',
 }
 */
-async function setBlobMetadata(blobClient, metadata) {
+async function setBlobMetadata(blobClient: BlobClient, metadata: Metadata) {
   await blobClient.setMetadata(metadata);
 
   console.log(`metadata set successfully`);
@@ -26,14 +32,15 @@ properties= {
       // all other http properties are cleared
     }
 */
-async function setHTTPHeaders(blobClient, headers) {
+async function setHTTPHeaders(blobClient: BlobClient, headers) {
   await blobClient.setHTTPHeaders(headers);
 
   console.log(`headers set successfully`);
 }
 
-async function getProperties(blobClient) {
-  const properties = await blobClient.getProperties();
+async function getProperties(blobClient: BlobClient) {
+  const properties: BlobGetPropertiesResponse =
+    await blobClient.getProperties();
   console.log(blobClient.name + ' properties: ');
 
   for (const property in properties) {

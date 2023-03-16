@@ -67,7 +67,13 @@ async function main() {
   console.log('\nListing blobs...');
 
   // List the blob(s) in the container.
-  for await (const blob of containerClient.listBlobsFlat()) {
+  for await (const blob of containerClient.listBlobsFlat({
+    includeMetadata: true,
+    includeSnapshots: false,
+    includeTags: true,
+    includeVersions: false,
+    prefix: ''
+  })) {
     console.log('\t', blob.name);
   }
   // </snippet_ListBlobs>
