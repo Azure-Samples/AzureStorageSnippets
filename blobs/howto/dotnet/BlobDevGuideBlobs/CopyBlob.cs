@@ -1,4 +1,6 @@
-﻿using Azure;
+﻿using System.ComponentModel;
+using System.Reflection.Metadata;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -82,5 +84,41 @@ namespace BlobDevGuide
             }
         }
         // </Snippet_AbortBlobCopy>
+
+        //-------------------------------------------------
+        // Copy a snapshot over a base blob
+        //-------------------------------------------------
+        // <Snippet_CopySnapshot>
+        public static async Task<BlobClient> CopySnapshotOverBaseBlobAsync(BlobClient blobClient, string snapshotTimestamp)
+        {
+            // Instantiate BlobClient with identical URI and add snapshot timestamp
+            BlobClient blobSnapshotClient = blobClient.WithSnapshot(snapshotTimestamp);
+
+            // Restore the specified snapshot by copying it over the base blob
+            CopyFromUriOperation copyOperation = await blobClient.StartCopyFromUriAsync(blobSnapshotClient.Uri);
+            await copyOperation.WaitForCompletionAsync();
+
+            // Return the client object after the copy operation
+            return blobClient;
+        }
+        // </Snippet_CopySnapshot>
+
+        //-------------------------------------------------
+        // Copy a previous version over a base blob
+        //-------------------------------------------------
+        // <Snippet_CopyVersion>
+        public static async Task<BlobClient> CopyVersionOverBaseBlobAsync(BlobClient blobClient, string versionTimestamp)
+        {
+            // Instantiate BlobClient with identical URI and add version timestamp
+            BlobClient blobVersionClient = blobClient.WithVersion(versionTimestamp);
+
+            // Restore the specified snapshot by copying it over the base blob
+            CopyFromUriOperation copyOperation = await blobClient.StartCopyFromUriAsync(blobVersionClient.Uri);
+            await copyOperation.WaitForCompletionAsync();
+
+            // Return the client object after the copy operation
+            return blobClient;
+        }
+        // </Snippet_CopyVersion>
     }
 }
