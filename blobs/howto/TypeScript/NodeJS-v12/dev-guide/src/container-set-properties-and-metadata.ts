@@ -14,6 +14,7 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
+// <snippet_getContainerProperties>
 async function getContainerProperties(containerClient: ContainerClient) {
   const properties: ContainerGetPropertiesResponse =
     await containerClient.getProperties();
@@ -32,7 +33,30 @@ async function getContainerProperties(containerClient: ContainerClient) {
     }
   }
 }
-
+/* Example output: 
+{
+    "metadata": {
+        "lastfilereview": "3/20/2023",
+        "reviewer": "johnh"
+    },
+    "etag": "\"0x8DB295348CDCD54\"",
+    "lastModified": "2023-03-20T14:56:28.000Z",
+    "leaseState": "available",
+    "leaseStatus": "unlocked",
+    "clientRequestId": "0bc8c31a-c607-477e-9846-f2121b10297a",
+    "requestId": "1e4ee737-b01e-0042-4e3c-5b2207000000",
+    "version": "2021-12-02",
+    "date": "2023-03-20T14:56:28.000Z",
+    "blobPublicAccess": "container",
+    "hasImmutabilityPolicy": false,
+    "hasLegalHold": false,
+    "defaultEncryptionScope": "$account-encryption-key",
+    "denyEncryptionScopeOverride": false,
+    "isImmutableStorageWithVersioningEnabled": false
+}
+*/
+// </snippet_getContainerProperties>
+// <snippet_setContainerMetadata>
 /*
 const metadata = {
   // values must be strings
@@ -46,6 +70,7 @@ async function setContainerMetadata(
 ) {
   await containerClient.setMetadata(metadata);
 }
+// </snippet_setContainerMetadata>
 async function main(blobServiceClient: BlobServiceClient) {
   // create container
   const timestamp = Date.now();
