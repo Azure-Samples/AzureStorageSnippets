@@ -13,6 +13,7 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
+//<snippet_create_container>
 async function createContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
@@ -46,6 +47,7 @@ async function createContainer(
 
   return containerClient;
 }
+//</snippet_create_container>
 
 async function main(blobServiceClient) {
   // create container

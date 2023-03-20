@@ -19,8 +19,8 @@ const blobServiceClient: BlobServiceClient =
 // if (!connString) throw Error('Azure Storage Connection string not found');
 // const client = BlobServiceClient.fromConnectionString(connString);
 
-async function main(blobServiceClient: BlobServiceClient) {
-  // <Snippet_GetUrl>
+// <Snippet_GetUrl>
+async function getUrls(blobServiceClient: BlobServiceClient) {
 
   // create container
   const containerName = `con1-${Date.now()}`;
@@ -77,10 +77,9 @@ async function main(blobServiceClient: BlobServiceClient) {
     // Display blob name and URL
     console.log(`\t${blob.name}:\n\t\t${tempBlockBlobClient.url}`);
   }
-
-  // </Snippet_GetUrl>
 }
-main(blobServiceClient)
+// </Snippet_GetUrl>
+getUrls(blobServiceClient)
   .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {

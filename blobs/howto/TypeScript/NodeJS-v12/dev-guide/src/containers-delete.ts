@@ -23,6 +23,7 @@ const blobServiceClient: BlobServiceClient =
 const sleep = (waitTimeInMs) =>
   new Promise((resolve) => setTimeout(resolve, waitTimeInMs));
 
+// <snippet_delete_container_immediately>
 // delete container immediately on blobServiceClient
 async function deleteContainerImmediately(
   blobServiceClient: BlobServiceClient,
@@ -30,14 +31,18 @@ async function deleteContainerImmediately(
 ): Promise<ContainerDeleteResponse> {
   return await blobServiceClient.deleteContainer(containerName);
 }
+// </snippet_delete_container_immediately>
 
+// <snippet_delete_container_soft_delete>
 // soft delete container on ContainerClient
 async function deleteContainerSoft(
   containerClient: ContainerClient
 ): Promise<ContainerDeleteResponse> {
   return await containerClient.delete();
 }
+// </snippet_delete_container_soft_delete>
 
+// <snippet_deleteContainersWithPrefix>
 async function deleteContainersWithPrefix(
   blobServiceClient: BlobServiceClient,
   prefix: string
@@ -71,7 +76,9 @@ async function deleteContainersWithPrefix(
     }
   }
 }
+// </snippet_deleteContainersWithPrefix>
 
+// <snippet_undeleteContainer>
 // Undelete specific container - last version
 async function undeleteContainer(
   blobServiceClient: BlobServiceClient,
@@ -131,6 +138,7 @@ async function undeleteContainer(
     // prefix: ''});
   }
 }
+// </snippet_undeleteContainer>
 async function createContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string

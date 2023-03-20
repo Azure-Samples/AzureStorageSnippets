@@ -12,6 +12,7 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
+// <snippet_listContainers>
 // return up to 5000 containers
 async function listContainers(
   blobServiceClient: BlobServiceClient,
@@ -40,7 +41,9 @@ async function listContainers(
     // prefix: ''});
   }
 }
+// </snippet_listContainers>
 
+// <snippet_listContainersWithPagingMarker>
 async function listContainersWithPagingMarker(
   blobServiceClient: BlobServiceClient
 ) {
@@ -87,6 +90,8 @@ async function listContainersWithPagingMarker(
     }
   }
 }
+// </snippet_listContainersWithPagingMarker>
+
 
 // assumes containers are already in storage
 async function main(blobServiceClient: BlobServiceClient) {
