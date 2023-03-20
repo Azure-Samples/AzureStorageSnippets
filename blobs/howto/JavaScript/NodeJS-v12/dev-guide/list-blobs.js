@@ -18,11 +18,17 @@ async function listBlobsFlatWithPageMarker(containerClient) {
 
   // some options for filtering list
   const listOptions = {
-    includeMetadata: true,
-    includeSnapshots: false,
-    includeTags: true,
-    includeVersions: false,
-    prefix: ''
+    includeCopy: false, // include metadata from previous copies
+    includeDeleted: false, // include deleted blobs
+    includeDeletedWithVersions: false, // include deleted blobs with versions
+    includeLegalHold: false, // include legal hold
+    includeMetadata: true, // include custom metadata
+    includeSnapshots: false, // include snapshots
+    includeTags: true, // include indexable tags
+    includeUncommitedBlobs: false, // include uncommitted blobs
+    includeVersions: false, // include all blob version
+    prefix: '' // filter by blob name prefix    
+
   };
 
   let iterator = containerClient.listBlobsFlat(listOptions).byPage({ maxPageSize });
@@ -56,11 +62,16 @@ async function listBlobHierarchical(containerClient, virtualHierarchyDelimiter='
 
   // some options for filtering list
   const listOptions = {
-    includeMetadata: true,
-    includeSnapshots: false,
-    includeTags: true,
-    includeVersions: false,
-    prefix: ''
+    includeCopy: false, // include metadata from previous copies
+    includeDeleted: false, // include deleted blobs
+    includeDeletedWithVersions: false, // include deleted blobs with versions
+    includeLegalHold: false, // include legal hold
+    includeMetadata: true, // include custom metadata
+    includeSnapshots: false, // include snapshots
+    includeTags: true, // include indexable tags
+    includeUncommitedBlobs: false, // include uncommitted blobs
+    includeVersions: false, // include all blob version
+    prefix: '' // filter by blob name prefix    
   };
 
   let i = 1;

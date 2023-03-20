@@ -13,6 +13,7 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
+// <snippet_setBlobMetadata>
 /*
 metadata= {
     reviewedBy: 'Bob',
@@ -24,6 +25,8 @@ async function setBlobMetadata(blobClient: BlobClient, metadata: Metadata) {
 
   console.log(`metadata set successfully`);
 }
+// </snippet_setBlobMetadata>
+// <snippet_setHTTPHeaders>
 /*
 properties= {
       blobContentType: 'text/plain',
@@ -37,7 +40,8 @@ async function setHTTPHeaders(blobClient: BlobClient, headers) {
 
   console.log(`headers set successfully`);
 }
-
+// </snippet_setHTTPHeaders>
+// <snippet_getProperties>
 async function getProperties(blobClient: BlobClient) {
   const properties: BlobGetPropertiesResponse =
     await blobClient.getProperties();
@@ -56,6 +60,53 @@ async function getProperties(blobClient: BlobClient) {
     }
   }
 }
+/*
+my-blob.txt properties:
+    lastModified: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
+    createdOn: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
+    metadata: {"releasedby":"Jill","reviewedby":"Bob"}
+    objectReplicationPolicyId: undefined
+    objectReplicationRules: {}
+    blobType: BlockBlob
+    copyCompletedOn: undefined
+    copyStatusDescription: undefined
+    copyId: undefined
+    copyProgress: undefined
+    copySource: undefined
+    copyStatus: undefined
+    isIncrementalCopy: undefined
+    destinationSnapshot: undefined
+    leaseDuration: undefined
+    leaseState: available
+    leaseStatus: unlocked
+    contentLength: 19
+    contentType: text/plain
+    etag: "0x8DB296D85EED062"
+    contentMD5: undefined
+    isServerEncrypted: true
+    encryptionKeySha256: undefined
+    encryptionScope: undefined
+    accessTier: Hot
+    accessTierInferred: true
+    archiveStatus: undefined
+    accessTierChangedOn: undefined
+    versionId: undefined
+    isCurrentVersion: undefined
+    tagCount: undefined
+    expiresOn: undefined
+    isSealed: undefined
+    rehydratePriority: undefined
+    lastAccessed: undefined
+    immutabilityPolicyExpiresOn: undefined
+    immutabilityPolicyMode: undefined
+    legalHold: undefined
+    errorCode: undefined
+    body: true
+    _response: [object Object]
+    objectReplicationDestinationPolicyId: undefined
+    objectReplicationSourceProperties:
+*/
+// </snippet_getProperties>
 
 // containerName: string
 // blobName: string, includes file extension if provided

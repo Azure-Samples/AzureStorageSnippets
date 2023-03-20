@@ -26,7 +26,7 @@ async function createBlobFromString(
   await blockBlobClient.upload(blobContent, blobContent.length);
   console.log(`created blob ${blobName}`);
 }
-
+// <snippet_copyBlob>
 async function copyBlob(
   blobServiceClient: BlobServiceClient,
   sourceBlobContainer: string,
@@ -57,6 +57,8 @@ async function copyBlob(
   // wait until done
   await copyPoller.pollUntilDone();
 }
+// </snippet_copyBlob>
+// <copyThenAbortBlob>
 async function copyThenAbortBlob(
   blobServiceClient: BlobServiceClient,
   sourceBlobContainer: string,
@@ -96,7 +98,7 @@ async function copyThenAbortBlob(
     }
   }
 }
-
+// </copyThenAbortBlob>
 async function main(blobServiceClient: BlobServiceClient) {
   // create container
   const timestamp = Date.now();

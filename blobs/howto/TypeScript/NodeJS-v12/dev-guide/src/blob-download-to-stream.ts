@@ -33,6 +33,7 @@ async function createBlobFromString(
   );
   console.log(`created blob ${blobName}`);
 }
+// <snippet_downloadBlobAsStream>
 async function downloadBlobAsStream(
   containerClient: ContainerClient,
   blobName,
@@ -47,7 +48,7 @@ async function downloadBlobAsStream(
     console.log(`download of ${blobName} succeeded`);
   }
 }
-
+// </snippet_downloadBlobAsStream>
 async function main(blobServiceClient: BlobServiceClient) {
   // create container
   const timestamp = Date.now();
