@@ -120,5 +120,32 @@ namespace BlobDevGuide
             return blobClient;
         }
         // </Snippet_CopyVersion>
+
+        //-------------------------------------------------
+        // Rehydrate a blob using a copy operation
+        //-------------------------------------------------
+        // <Snippet_RehydrateUsingCopy>
+        public static async Task RehydrateBlobUsingCopyAsync(BlobServiceClient blobServiceClient)
+        {
+            // Instantiate BlobClient for the source blob and destination blob
+            BlobClient sourceBlob = blobServiceClient
+                .GetBlobContainerClient("source-container")
+                .GetBlobClient("sample-blob-archive.txt");
+            BlobClient destinationBlob = blobServiceClient
+                .GetBlobContainerClient("source-container")
+                .GetBlobClient("sample-blob.txt");
+
+            // Configure copy options to specify hot tier and standard priority
+            BlobCopyFromUriOptions copyOptions = new()
+            {
+                AccessTier = AccessTier.Hot,
+                RehydratePriority = RehydratePriority.Standard
+            };
+
+            // Copy source blob from archive tier to destination blob in hot tier
+            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri, copyOptions);
+            await copyOperation.WaitForCompletionAsync();
+        }
+        // </Snippet_RehydrateUsingCopy>
     }
 }

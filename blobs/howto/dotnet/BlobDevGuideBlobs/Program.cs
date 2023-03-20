@@ -8,4 +8,5 @@ var blobServiceClient = new BlobServiceClient(
         new Uri("https://<storage-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
-await CopyBlob.CopyBlobAsync(blobServiceClient);
+//await CopyBlob.CopyBlobAsync(blobServiceClient);
+await CopyBlob.RehydrateBlobUsingCopyAsync(blobServiceClient);
