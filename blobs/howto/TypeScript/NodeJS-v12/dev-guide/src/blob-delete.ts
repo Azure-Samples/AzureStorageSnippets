@@ -19,6 +19,7 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
+// <snippet_deleteBlob>
 async function deleteBlob(containerClient: ContainerClient, blobName) {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient =
@@ -37,6 +38,8 @@ async function deleteBlob(containerClient: ContainerClient, blobName) {
     console.log(`deleted blob ${blobName}`);
   }
 }
+// </snippet_deleteBlob>
+// <snippet_deleteBlobIfExists>
 async function deleteBlobIfItExists(
   containerClient: ContainerClient,
   blobName
@@ -56,6 +59,8 @@ async function deleteBlobIfItExists(
     console.log(`deleted blob ${blobName}`);
   }
 }
+// </snippet_deleteBlobIfExists>
+// <snippet_undeleteBlob>
 async function undeleteBlob(containerClient: ContainerClient, blobName) {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient =
@@ -69,6 +74,7 @@ async function undeleteBlob(containerClient: ContainerClient, blobName) {
     console.log(`undeleted blob ${blobName}`);
   }
 }
+// </snippet_undeleteBlob>
 
 // containerName: string
 // blobName: string, includes file extension if provided

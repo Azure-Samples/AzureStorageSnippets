@@ -31,6 +31,7 @@ async function createBlobFromString(
   console.log(`created blob ${blobName}`);
 }
 
+// <snippet_downloadBlobToString>
 async function downloadBlobToString(
   containerClient: ContainerClient,
   blobName
@@ -45,7 +46,6 @@ async function downloadBlobToString(
     console.log('Downloaded blob content:', downloaded.toString());
   }
 }
-
 async function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -60,6 +60,7 @@ async function streamToBuffer(readableStream) {
     readableStream.on('error', reject);
   });
 }
+// </snippet_downloadBlobToString>
 
 async function main(blobServiceClient: BlobServiceClient) {
   // create container

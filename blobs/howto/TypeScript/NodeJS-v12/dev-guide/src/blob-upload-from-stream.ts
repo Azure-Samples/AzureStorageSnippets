@@ -81,6 +81,7 @@ async function createBlobFromReadStream(
   Object.keys(tags).map((tag) => console.log(`${[tag]}: ${tags[tag]}`));
 }
 // </Snippet_UploadBlob>
+// <Snippet_useUploadStream>
 async function main(blobServiceClient) {
   // create container
   const timestamp = Date.now();
@@ -103,6 +104,13 @@ async function main(blobServiceClient) {
 
   const readableStream = fs.createReadStream(localFileWithPath, streamOptions);
 
+  // Tags: Record<string, string>
+  const tags: Tags = {
+    createdBy: 'YOUR-NAME',
+    createdWith: `StorageSnippetsForDocs`,
+    createdOn: new Date().toDateString()
+  };
+
   const uploadOptions: BlockBlobUploadStreamOptions = {
     // not indexed for searching
     metadata: {
@@ -110,11 +118,7 @@ async function main(blobServiceClient) {
     },
 
     // indexed for searching
-    tags: {
-      createdBy: 'YOUR-NAME',
-      createdWith: `StorageSnippetsForDocs`,
-      createdOn: new Date().toDateString()
-    }
+    tags
   };
 
   await createBlobFromReadStream(
@@ -124,6 +128,7 @@ async function main(blobServiceClient) {
     uploadOptions
   );
 }
+// </Snippet_useUploadStream>
 main(blobServiceClient)
   .then(() => console.log('success'))
   .catch((err: unknown) => {

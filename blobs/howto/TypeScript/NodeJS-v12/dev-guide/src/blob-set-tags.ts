@@ -4,6 +4,7 @@ import {
   Tags
 } from '@azure/storage-blob';
 
+// <Snippet_getTags>
 export async function getBlobTags(
   blockBlobClient: BlockBlobClient
 ): Promise<Tags> {
@@ -21,6 +22,8 @@ export async function getBlobTags(
 
   return tags;
 }
+// </Snippet_getTags>
+// <Snippet_setTags>
 async function setBlobTags(
   blockBlobClient: BlockBlobClient,
   tags: Tags
@@ -31,3 +34,4 @@ async function setBlobTags(
 
   console.log(`tags set for ${blockBlobClient.name}`);
 }
+// </Snippet_setTags>

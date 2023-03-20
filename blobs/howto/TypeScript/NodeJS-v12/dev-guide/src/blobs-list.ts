@@ -16,6 +16,7 @@ const blobServiceClient: BlobServiceClient =
 
 const timestamp = Date.now();
 
+// <snippet_listBlobsFlatWithPageMarker>
 async function listBlobsFlatWithPageMarker(containerClient: ContainerClient) {
   // page size
   const maxPageSize = 2;
@@ -24,11 +25,16 @@ async function listBlobsFlatWithPageMarker(containerClient: ContainerClient) {
 
   // some options for filtering list
   const listOptions: ContainerListBlobsOptions = {
-    includeMetadata: true,
-    includeSnapshots: false,
-    includeTags: true,
-    includeVersions: false,
-    prefix: ''
+    includeCopy: false, // include metadata from previous copies
+    includeDeleted: false, // include deleted blobs
+    includeDeletedWithVersions: false, // include deleted blobs with versions
+    includeLegalHold: false, // include legal hold
+    includeMetadata: true, // include custom metadata
+    includeSnapshots: false, // include snapshots
+    includeTags: true, // include indexable tags
+    includeUncommitedBlobs: false, // include uncommitted blobs
+    includeVersions: false, // include all blob version
+    prefix: '' // filter by blob name prefix
   };
 
   let iterator = containerClient
@@ -64,6 +70,9 @@ async function listBlobsFlatWithPageMarker(containerClient: ContainerClient) {
     console.log(`Flat listing: ${i++}: ${blob.name}`);
   }
 }
+// </snippet_listBlobsFlatWithPageMarker>
+
+// <snippet_listBlobsHierarchicalWithPageMarker>
 // Recursively list virtual folders and blobs
 async function listBlobHierarchical(
   containerClient: ContainerClient,
@@ -74,11 +83,16 @@ async function listBlobHierarchical(
 
   // some options for filtering list
   const listOptions: ContainerListBlobsOptions = {
-    includeMetadata: true,
-    includeSnapshots: false,
-    includeTags: true,
-    includeVersions: false,
-    prefix: ''
+    includeCopy: false, // include metadata from previous copies
+    includeDeleted: false, // include deleted blobs
+    includeDeletedWithVersions: false, // include deleted blobs with versions
+    includeLegalHold: false, // include legal hold
+    includeMetadata: true, // include custom metadata
+    includeSnapshots: false, // include snapshots
+    includeTags: true, // include indexable tags
+    includeUncommitedBlobs: false, // include uncommitted blobs
+    includeVersions: false, // include all blob version
+    prefix: '' // filter by blob name prefix
   };
 
   let i = 1;
@@ -107,7 +121,7 @@ async function listBlobHierarchical(
     }
   }
 }
-
+// </snippet_listBlobsHierarchicalWithPageMarker>
 async function createBlobFromString(
   containerClient: ContainerClient,
   blobName,

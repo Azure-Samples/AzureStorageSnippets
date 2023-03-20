@@ -8,13 +8,14 @@ const sasToken = process.env.AZURE_STORAGE_SAS_TOKEN;
 if (!accountName) throw Error('Azure Storage accountName not found');
 if (!sasToken) throw Error('Azure Storage accountKey not found');
 
-const blobServiceUri = `https://${accountName}.blob.core.windows.net`;
-
 // https://YOUR-RESOURCE-NAME.blob.core.windows.net?YOUR-SAS-TOKEN
-const blobServiceClient = new BlobServiceClient(
-  `${blobServiceUri}?${sasToken}`,
-  undefined
-);
+const blobServiceUri = `https://${accountName}.blob.core.windows.net?${sasToken}`;
+
+// SAS tokens do not require an additional credential because
+// the token is the credential
+const credential = undefined;
+
+const blobServiceClient = new BlobServiceClient(blobServiceUri, credential);
 
 async function main() {
   const containerName = 'my-container';

@@ -10,7 +10,7 @@ const blockBlobClient: BlockBlobClient = getBlobClientFromAccountAndKey(
   blobName
 );
 
-//<Snippet_BatchChangeAccessTier>
+//<Snippet_BlobChangeAccessTier>
 async function main(blockBlobClient) {
   // Get current access tier
   const { accessTier } = await blockBlobClient.getProperties();
@@ -32,7 +32,7 @@ async function main(blockBlobClient) {
     console.log(result);
   }
 }
-//</Snippet_BatchChangeAccessTier>
+//</Snippet_BlobChangeAccessTier>
 main(blockBlobClient)
   .then(() => console.log('success'))
   .catch((err: unknown) => {

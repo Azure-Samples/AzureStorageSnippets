@@ -31,6 +31,7 @@ async function createBlobFromString(
   console.log(`created blob ${blobName}`);
 }
 
+// <snippet_downloadBlobToFile>
 async function downloadBlobToFile(containerClient, blobName, fileNameWithPath) {
   const blobClient: BlockBlobClient = await containerClient.getBlobClient(
     blobName
@@ -39,6 +40,7 @@ async function downloadBlobToFile(containerClient, blobName, fileNameWithPath) {
   await blobClient.downloadToFile(fileNameWithPath);
   console.log(`download of ${blobName} success`);
 }
+// </snippet_downloadBlobToFile>
 
 async function main(blobServiceClient: BlobServiceClient) {
   // create container
