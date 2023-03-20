@@ -8,7 +8,7 @@
         "lint": "eslint src/**/*.ts --fix",
         "build:tsc": "tsc",
         "build": "npm run format && npm run lint && npm run build:tsc",
-        "ts":"ts-node src/append-blob-with-transform.ts"
+        "ts": "ts-node src/append-blob-with-transform.ts"
     },
     "author": "mhopkins",
     "license": "MIT",

@@ -3,6 +3,7 @@ import {
   BlockBlobUploadOptions,
   ContainerClient,
   ContainerCreateOptions,
+  ServiceFindBlobByTagsOptions,
   Tags
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
@@ -34,7 +35,7 @@ async function setTags(containerClient: ContainerClient, blobName, tags: Tags) {
 
   console.log(`uploading blob ${blobName}`);
 }
-async function getTags(containerClient, blobName) {
+async function getTags(containerClient: ContainerClient, blobName) {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
@@ -46,18 +47,16 @@ async function getTags(containerClient, blobName) {
   }
 }
 
-async function findBlobsByQuery(blobServiceClient, tagOdataQuery) {
+async function findBlobsByQuery(
+  blobServiceClient: BlobServiceClient,
+  tagOdataQuery: string
+) {
   // page size
   const maxPageSize = 10;
 
   let i = 1;
 
-  const listOptions = {
-    includeMetadata: true,
-    includeSnapshots: false,
-    includeTags: true,
-    includeVersions: false
-  };
+  const listOptions: ServiceFindBlobByTagsOptions = {};
 
   let iterator = blobServiceClient
     .findBlobsByTags(tagOdataQuery, listOptions)
