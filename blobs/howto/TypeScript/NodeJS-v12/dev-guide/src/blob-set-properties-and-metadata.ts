@@ -1,23 +1,32 @@
-import { BlobServiceClient, BlockBlobUploadOptions } from '@azure/storage-blob';
+import {
+  BlobClient,
+  BlobGetPropertiesResponse,
+  BlobServiceClient,
+  BlockBlobUploadOptions,
+  Metadata
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING as string;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// Get BlobServiceClient
+import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-client';
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
-
+// <snippet_setBlobMetadata>
 /*
 metadata= {
     reviewedBy: 'Bob',
     releasedBy: 'Jill',
 }
 */
-async function setBlobMetadata(blobClient, metadata) {
+async function setBlobMetadata(blobClient: BlobClient, metadata: Metadata) {
   await blobClient.setMetadata(metadata);
 
   console.log(`metadata set successfully`);
 }
+// </snippet_setBlobMetadata>
+// <snippet_setHTTPHeaders>
 /*
 properties= {
       blobContentType: 'text/plain',
@@ -26,14 +35,16 @@ properties= {
       // all other http properties are cleared
     }
 */
-async function setHTTPHeaders(blobClient, headers) {
+async function setHTTPHeaders(blobClient: BlobClient, headers) {
   await blobClient.setHTTPHeaders(headers);
 
   console.log(`headers set successfully`);
 }
-
-async function getProperties(blobClient) {
-  const properties = await blobClient.getProperties();
+// </snippet_setHTTPHeaders>
+// <snippet_getProperties>
+async function getProperties(blobClient: BlobClient) {
+  const properties: BlobGetPropertiesResponse =
+    await blobClient.getProperties();
   console.log(blobClient.name + ' properties: ');
 
   for (const property in properties) {
@@ -49,6 +60,53 @@ async function getProperties(blobClient) {
     }
   }
 }
+/*
+my-blob.txt properties:
+    lastModified: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
+    createdOn: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
+    metadata: {"releasedby":"Jill","reviewedby":"Bob"}
+    objectReplicationPolicyId: undefined
+    objectReplicationRules: {}
+    blobType: BlockBlob
+    copyCompletedOn: undefined
+    copyStatusDescription: undefined
+    copyId: undefined
+    copyProgress: undefined
+    copySource: undefined
+    copyStatus: undefined
+    isIncrementalCopy: undefined
+    destinationSnapshot: undefined
+    leaseDuration: undefined
+    leaseState: available
+    leaseStatus: unlocked
+    contentLength: 19
+    contentType: text/plain
+    etag: "0x8DB296D85EED062"
+    contentMD5: undefined
+    isServerEncrypted: true
+    encryptionKeySha256: undefined
+    encryptionScope: undefined
+    accessTier: Hot
+    accessTierInferred: true
+    archiveStatus: undefined
+    accessTierChangedOn: undefined
+    versionId: undefined
+    isCurrentVersion: undefined
+    tagCount: undefined
+    expiresOn: undefined
+    isSealed: undefined
+    rehydratePriority: undefined
+    lastAccessed: undefined
+    immutabilityPolicyExpiresOn: undefined
+    immutabilityPolicyMode: undefined
+    legalHold: undefined
+    errorCode: undefined
+    body: true
+    _response: [object Object]
+    objectReplicationDestinationPolicyId: undefined
+    objectReplicationSourceProperties:
+*/
+// </snippet_getProperties>
 
 // containerName: string
 // blobName: string, includes file extension if provided
