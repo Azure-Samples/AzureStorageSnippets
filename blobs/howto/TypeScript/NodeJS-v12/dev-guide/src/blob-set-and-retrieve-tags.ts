@@ -46,7 +46,7 @@ async function getTags(containerClient: ContainerClient, blobName) {
     console.log(`TAG: ${tag}: ${result.tags[tag]}`);
   }
 }
-
+// <Snippet_findBlobsByQuery>
 async function findBlobsByQuery(
   blobServiceClient: BlobServiceClient,
   tagOdataQuery: string
@@ -89,7 +89,7 @@ async function findBlobsByQuery(
     }
   }
 }
-
+// </Snippet_findBlobsByQuery>
 // containerName: string
 // blobName: string, includes file extension if provided
 // fileContentsAsString: blob content
