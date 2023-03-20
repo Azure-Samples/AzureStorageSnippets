@@ -92,7 +92,6 @@ async function listContainersWithPagingMarker(
 }
 // </snippet_listContainersWithPagingMarker>
 
-
 // assumes containers are already in storage
 async function main(blobServiceClient: BlobServiceClient) {
   const containerNamePrefix = '';
