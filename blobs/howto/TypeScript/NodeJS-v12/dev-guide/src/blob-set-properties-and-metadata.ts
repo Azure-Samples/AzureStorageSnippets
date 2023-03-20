@@ -14,33 +14,36 @@ const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 // <snippet_setBlobMetadata>
-/*
+async function setBlobMetadata(blobClient: BlobClient, metadata: Metadata) {
+  /*
 metadata= {
     reviewedBy: 'Bob',
     releasedBy: 'Jill',
 }
 */
-async function setBlobMetadata(blobClient: BlobClient, metadata: Metadata) {
   await blobClient.setMetadata(metadata);
 
   console.log(`metadata set successfully`);
 }
 // </snippet_setBlobMetadata>
+
 // <snippet_setHTTPHeaders>
-/*
-properties= {
+async function setHTTPHeaders(blobClient: BlobClient, headers) {
+  /*
+  headers= {
       blobContentType: 'text/plain',
       blobContentLanguage: 'en-us',
       blobContentEncoding: 'utf-8',
       // all other http properties are cleared
     }
-*/
-async function setHTTPHeaders(blobClient: BlobClient, headers) {
+  */
+
   await blobClient.setHTTPHeaders(headers);
 
   console.log(`headers set successfully`);
 }
 // </snippet_setHTTPHeaders>
+
 // <snippet_getProperties>
 async function getProperties(blobClient: BlobClient) {
   const properties: BlobGetPropertiesResponse =
@@ -60,6 +63,8 @@ async function getProperties(blobClient: BlobClient) {
     }
   }
 }
+// </snippet_getProperties>
+
 /*
 my-blob.txt properties:
     lastModified: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
@@ -106,7 +111,6 @@ my-blob.txt properties:
     objectReplicationDestinationPolicyId: undefined
     objectReplicationSourceProperties:
 */
-// </snippet_getProperties>
 
 // containerName: string
 // blobName: string, includes file extension if provided
