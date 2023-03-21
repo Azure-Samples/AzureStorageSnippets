@@ -16,7 +16,9 @@ const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 //<Snippet_UploadAccessTier>
-async function uploadWithAccessTier(containerClient: ContainerClient) {
+async function uploadWithAccessTier(
+  containerClient: ContainerClient
+): Promise<BlockBlobClient> {
   // Create blob
   const timestamp = Date.now();
   const blobName = `myblob-${timestamp}`;
