@@ -1,4 +1,4 @@
-import { BlockBlobClient } from '@azure/storage-blob';
+import { BlobGetPropertiesOptions, BlockBlobClient } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import { getBlobClientFromAccountAndKey } from './auth-get-client';
 dotenv.config();
@@ -11,9 +11,11 @@ const blockBlobClient: BlockBlobClient = getBlobClientFromAccountAndKey(
 );
 
 //<Snippet_BlobChangeAccessTier>
-async function main(blockBlobClient) {
+async function main(blockBlobClient: BlockBlobClient) {
+  const options: BlobGetPropertiesOptions = {};
+
   // Get current access tier
-  const { accessTier } = await blockBlobClient.getProperties();
+  const { accessTier } = await blockBlobClient.getProperties(options);
   console.log(`Current access tier: ${accessTier}`);
 
   // 'Hot', 'Cool', or 'Archive'

@@ -65,7 +65,7 @@ async function prepContainer(
 }
 
 //<Snippet_BatchChangeAccessTier>
-async function main(containerClient: ContainerClient) {
+async function batchChangeAccessTier(containerClient: ContainerClient) {
   // Prep array
   const blockBlobCount = 3;
   const blockBlobClients = new Array(blockBlobCount);
@@ -103,7 +103,7 @@ async function main(containerClient: ContainerClient) {
   }
 }
 //</Snippet_BatchChangeAccessTier>
-main(containerClient)
+batchChangeAccessTier(containerClient)
   .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
