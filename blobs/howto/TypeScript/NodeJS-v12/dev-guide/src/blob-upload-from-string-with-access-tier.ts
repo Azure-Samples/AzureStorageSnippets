@@ -42,18 +42,20 @@ async function uploadWithAccessTier(containerClient: ContainerClient) {
     await containerClient.getBlockBlobClient(blobName);
 
   // Upload string
-  await blockBlobClient.upload(
+  const uploadResult = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length,
     uploadOptions
   );
+
+  if (uploadResult.errorCode) throw Error(uploadResult.errorCode);
 
   // Return client to continue with other operations
   return blockBlobClient;
 }
 //</Snippet_UploadAccessTier>
 
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container name
   const timestamp = Date.now();
   const containerName = `createblobfromstring-${timestamp}`;
@@ -63,10 +65,10 @@ async function main(blobServiceClient: BlobServiceClient) {
   const containerOptions: ContainerCreateOptions = {
     access: 'container' // or 'blob'
   };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
+  const { containerClient, containerCreateResponse } =
+    await blobServiceClient.createContainer(containerName, containerOptions);
+  if (containerCreateResponse.errorCode)
+    throw Error('container creation failed');
   console.log('container creation succeeded');
 
   // upload blob to `hot` access tier

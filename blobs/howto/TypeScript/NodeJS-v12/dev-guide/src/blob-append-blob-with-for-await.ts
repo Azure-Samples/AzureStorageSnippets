@@ -1,4 +1,9 @@
-import { BlobServiceClient } from '@azure/storage-blob';
+import {
+  AppendBlobClient,
+  AppendBlobCreateIfNotExistsOptions,
+  BlobServiceClient,
+  ContainerCreateOptions
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -20,13 +25,13 @@ async function appendBlob(appendBlobClient, readableStream) {
   }
 }
 
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `append-blob-from-log-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
-  const containerOptions = {
+  const containerOptions: ContainerCreateOptions = {
     access: 'container'
   };
 
@@ -35,7 +40,7 @@ async function main(blobServiceClient) {
     await blobServiceClient.createContainer(containerName, containerOptions);
 
   const blobName = `append-blob-for-await-${timestamp}`;
-  const options = {
+  const options: AppendBlobCreateIfNotExistsOptions = {
     metadata: {
       owner: 'YOUR-NAME',
       project: 'append-blob-sample'
@@ -43,11 +48,15 @@ async function main(blobServiceClient) {
   };
 
   // get appendBlob client
-  const appendBlobClient = containerClient.getAppendBlobClient(blobName);
+  const appendBlobClient: AppendBlobClient =
+    containerClient.getAppendBlobClient(blobName);
 
   // create blob to save logs
-  await appendBlobClient.createIfNotExists(options);
-  console.log(`Created appendBlob`);
+  const createResult = await appendBlobClient.createIfNotExists(options);
+
+  if (createResult.errorCode) throw Error(createResult.errorCode);
+
+  console.log(`Created appendBlob ${createResult.date}`);
 
   // fetch log as stream
   // get fully qualified path of file

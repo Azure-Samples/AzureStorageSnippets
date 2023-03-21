@@ -20,6 +20,7 @@ import {
   BlobSASSignatureValues,
   BlobServiceClient,
   BlockBlobClient,
+  BlockBlobUploadHeaders,
   BlockBlobUploadResponse,
   generateBlobSASQueryParameters,
   SASProtocol,
@@ -97,7 +98,7 @@ async function uploadStringToBlob(
   blobName: string,
   sasToken,
   textAsString: string
-): Promise<BlockBlobUploadResponse> {
+): Promise<BlockBlobUploadHeaders> {
   // Get environment variables
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
   const containerName = 'my-container';
@@ -110,7 +111,7 @@ async function uploadStringToBlob(
   const blockBlobClient = new BlockBlobClient(sasUrl);
 
   // Upload string
-  const blockBlobUploadResponse: BlockBlobUploadResponse =
+  const blockBlobUploadResponse: BlockBlobUploadHeaders =
     await blockBlobClient.upload(textAsString, textAsString.length, undefined);
 
   if (blockBlobUploadResponse.errorCode)
@@ -133,11 +134,14 @@ async function main(blobServiceClient: BlobServiceClient) {
 
   // Server hands off SAS Token & blobName to client to
   // Upload content
-  await uploadStringToBlob(
+  const result: BlockBlobUploadHeaders = await uploadStringToBlob(
     blobName,
     userDelegationSasForBlob,
     'Hello Blob World'
   );
+
+  if (result.errorCode) throw Error(result.errorCode);
+  console.log(`\n${blobName} uploaded successfully ${result.lastModified}\n`);
 }
 
 main(blobServiceClient)

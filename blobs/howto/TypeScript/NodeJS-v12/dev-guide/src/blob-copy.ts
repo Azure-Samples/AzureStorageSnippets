@@ -23,8 +23,13 @@ async function createBlobFromString(
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // upload blob
-  await blockBlobClient.upload(blobContent, blobContent.length);
-  console.log(`created blob ${blobName}`);
+  const uploadResult = await blockBlobClient.upload(
+    blobContent,
+    blobContent.length
+  );
+  if (!uploadResult.errorCode) {
+    console.log(`created blob ${blobName} ${uploadResult.date}`);
+  }
 }
 // <snippet_copyBlob>
 async function copyBlob(
@@ -99,7 +104,7 @@ async function copyThenAbortBlob(
   }
 }
 // </copyThenAbortBlob>
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerNameA = `copy-blob-a-${timestamp}`;

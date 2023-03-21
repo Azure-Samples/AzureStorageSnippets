@@ -19,7 +19,7 @@ const baseUrl = `https://${accountName}.blob.core.windows.net`;
 const timeStamp = Date.now();
 const containerName = `my-container`;
 
-async function main() {
+async function main(): Promise<void> {
   try {
     // create container client from DefaultAzureCredential
     const containerClient = new ContainerClient(

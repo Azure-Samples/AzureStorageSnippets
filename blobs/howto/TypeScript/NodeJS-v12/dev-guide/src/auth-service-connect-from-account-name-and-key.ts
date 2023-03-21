@@ -22,7 +22,7 @@ const blobServiceClient = new BlobServiceClient(
   sharedKeyCredential
 );
 
-async function main() {
+async function main(): Promise<void> {
   const containerName = 'my-container';
   const blobName = 'my-blob';
 
@@ -42,9 +42,13 @@ async function main() {
   const blobClient = await containerClient.getBlockBlobClient(blobName);
 
   // download file
-  await blobClient.downloadToFile(fileName);
+  const downloadResult = await blobClient.downloadToFile(fileName);
 
-  console.log(`${fileName} downloaded`);
+  if (downloadResult.errorCode) throw Error(downloadResult.errorCode);
+
+  console.log(
+    `${fileName} downloaded, created on ${downloadResult.createdOn}}`
+  );
 }
 
 main()

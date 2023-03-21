@@ -17,11 +17,13 @@
 //<Snippet_Dependencies>
 import { DefaultAzureCredential } from '@azure/identity';
 import {
+  BlobSASSignatureValues,
   BlobServiceClient,
   ContainerClient,
   ContainerSASPermissions,
   generateBlobSASQueryParameters,
-  SASProtocol
+  SASProtocol,
+  UserDelegationKey
 } from '@azure/storage-blob';
 
 // used for local environment variables
@@ -53,20 +55,22 @@ async function createContainerSas() {
 
   // Best practice: delegation key is time-limited
   // When using a user delegation key, container must already exist
-  const userDelegationKey = await blobServiceClient.getUserDelegationKey(
-    TEN_MINUTES_BEFORE_NOW,
-    TEN_MINUTES_AFTER_NOW
-  );
+  const userDelegationKey: UserDelegationKey =
+    await blobServiceClient.getUserDelegationKey(
+      TEN_MINUTES_BEFORE_NOW,
+      TEN_MINUTES_AFTER_NOW
+    );
 
   // Need only list permission to list blobs
   const containerPermissionsForAnonymousUser = 'l';
+  const permissions: ContainerSASPermissions = ContainerSASPermissions.parse(
+    containerPermissionsForAnonymousUser
+  );
 
   // Best practice: SAS options are time-limited
-  const sasOptions = {
+  const sasOptions: BlobSASSignatureValues = {
     containerName,
-    permissions: ContainerSASPermissions.parse(
-      containerPermissionsForAnonymousUser
-    ),
+    permissions,
     protocol: SASProtocol.HttpsAndHttp,
     startsOn: TEN_MINUTES_BEFORE_NOW,
     expiresOn: TEN_MINUTES_AFTER_NOW
@@ -84,7 +88,7 @@ async function createContainerSas() {
 
 //<Snippet_ListBlobs>
 // Client or another process uses SAS token to use container
-async function listBlobs(sasToken) {
+async function listBlobs(sasToken: string): Promise<void> {
   // Get environment variables
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
   const containerName = 'my-container';

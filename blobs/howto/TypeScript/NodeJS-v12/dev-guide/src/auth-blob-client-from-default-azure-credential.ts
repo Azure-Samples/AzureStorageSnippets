@@ -1,5 +1,9 @@
 // Azure Storage dependency
-import { BlockBlobClient, BlockBlobUploadResponse } from '@azure/storage-blob';
+import {
+  BlockBlobClient,
+  BlockBlobUploadHeaders,
+  BlockBlobUploadResponse
+} from '@azure/storage-blob';
 import { getBlockBlobClientFromDefaultAzureCredential } from './auth-get-client';
 
 // For development environment - include environment variables from .env
@@ -17,12 +21,14 @@ const fileContentsAsString = 'Hello there.';
 const blockBlobClient: BlockBlobClient =
   getBlockBlobClientFromDefaultAzureCredential(containerName, blobName);
 
-async function main(blockBlobClient: BlockBlobClient) {
+async function main(
+  blockBlobClient: BlockBlobClient
+): Promise<BlockBlobUploadHeaders> {
   // Get file url - available before contents are uploaded
   console.log(`blob.url: ${blockBlobClient.url}`);
 
   // Upload file contents
-  const result: BlockBlobUploadResponse = await blockBlobClient.upload(
+  const result: BlockBlobUploadHeaders = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length
   );

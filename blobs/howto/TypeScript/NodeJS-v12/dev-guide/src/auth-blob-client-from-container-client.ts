@@ -1,6 +1,8 @@
 // Azure Storage dependency
 import {
   BlobClient,
+  BlobDownloadHeaders,
+  BlobGetPropertiesHeaders,
   BlobGetPropertiesResponse,
   BlockBlobClient,
   ContainerClient
@@ -17,13 +19,12 @@ const containerClient: ContainerClient =
 
 const blobName = `my-blob`;
 
-async function main(containerClient: ContainerClient) {
+async function main(containerClient: ContainerClient): Promise<void> {
   // Create BlobClient object
   const blobClient: BlobClient = containerClient.getBlobClient(blobName);
 
   // do something with blobClient...
-  const properties: BlobGetPropertiesResponse =
-    await blobClient.getProperties();
+  const properties: BlobGetPropertiesHeaders = await blobClient.getProperties();
   if (properties.errorCode) throw Error(properties.errorCode);
 
   console.log(`Blob ${blobName} properties:`);
@@ -32,7 +33,9 @@ async function main(containerClient: ContainerClient) {
   const blockBlobClient: BlockBlobClient = blobClient.getBlockBlobClient();
 
   // do something with blockBlobClient...
-  const downloadResponse = await blockBlobClient.download(0);
+  const downloadResponse: BlobDownloadHeaders = await blockBlobClient.download(
+    0
+  );
   if (downloadResponse.errorCode) throw Error(downloadResponse.errorCode);
 }
 

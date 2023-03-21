@@ -33,9 +33,13 @@ async function main() {
   const blobClient = await containerClient.getBlockBlobClient(blobName);
 
   // download file
-  await blobClient.downloadToFile(fileName);
+  const downloadResult = await blobClient.downloadToFile(fileName);
 
-  console.log(`${fileName} downloaded`);
+  if (downloadResult.errorCode) throw Error(downloadResult.errorCode);
+
+  console.log(
+    `${fileName} downloaded ${downloadResult.contentType}, isCurrentVersion: ${downloadResult.isCurrentVersion}`
+  );
 }
 
 main()

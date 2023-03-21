@@ -15,9 +15,14 @@ const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 // <snippet_getContainerProperties>
-async function getContainerProperties(containerClient: ContainerClient) {
+async function getContainerProperties(
+  containerClient: ContainerClient
+): Promise<void> {
   const properties: ContainerGetPropertiesResponse =
     await containerClient.getProperties();
+
+  if (properties.errorCode) throw Error(properties.errorCode);
+
   console.log(containerClient.containerName + ' properties: ');
 
   for (const property in properties) {

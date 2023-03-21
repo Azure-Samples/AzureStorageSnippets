@@ -1,4 +1,9 @@
-import { BlobServiceClient } from '@azure/storage-blob';
+import {
+  AppendBlobCreateIfNotExistsOptions,
+  BlobServiceClient,
+  ContainerClient,
+  ContainerCreateOptions
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -9,12 +14,12 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-async function appendToBlob(containerClient, timestamp) {
+async function appendToBlob(containerClient: ContainerClient, timestamp) {
   // name of blob
   const blobName = `append-blob-transform-${timestamp}`;
 
   // add metadata to blob
-  const options = {
+  const options: AppendBlobCreateIfNotExistsOptions = {
     metadata: {
       owner: 'YOUR-NAME',
       project: 'append-blob-sample'
@@ -25,8 +30,14 @@ async function appendToBlob(containerClient, timestamp) {
   const appendBlobClient = containerClient.getAppendBlobClient(blobName);
 
   // create blob to save logs
-  await appendBlobClient.createIfNotExists(options);
-  console.log(`Created appendBlob ${blobName}`);
+  const createAppendBlobResult = await appendBlobClient.createIfNotExists(
+    options
+  );
+
+  if (createAppendBlobResult.errorCode)
+    throw Error(createAppendBlobResult.errorCode);
+
+  console.log(`Created appendBlob ${blobName} ${createAppendBlobResult.date}`);
 
   // fetch log as stream
   // get fully qualified path of file
@@ -40,8 +51,13 @@ async function appendToBlob(containerClient, timestamp) {
 
   // send content to appendBlob
   // such as a log file on hourly basis
-  await appendBlobClient.appendBlock(contents, contents.length);
-  console.log(`appendBlock finished`);
+  const appendBlockResult = await appendBlobClient.appendBlock(
+    contents,
+    contents.length
+  );
+
+  if (appendBlockResult.errorCode) throw Error(appendBlockResult.errorCode);
+  console.log(`appendBlock finished ${appendBlockResult.lastModified}`);
 
   // add more iterations of appendBlob to continue adding
   // to same blob
@@ -49,17 +65,21 @@ async function appendToBlob(containerClient, timestamp) {
 
   // when done, seal a day's log to read-only
   // doesn't work on hierarchical namespace account
-  await appendBlobClient.seal({});
-  console.log(`Sealed appendBlob ${blobName}`);
+  const sealResult = await appendBlobClient.seal({});
+  if (sealResult.errorCode) throw Error(sealResult.errorCode);
+
+  console.log(
+    `Sealed appendBlob ${blobName} ${sealResult.blobCommittedBlockCount}`
+  );
 }
 
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `append-blob-from-log-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
-  const containerOptions = {
+  const containerOptions: ContainerCreateOptions = {
     access: 'container'
   };
 
