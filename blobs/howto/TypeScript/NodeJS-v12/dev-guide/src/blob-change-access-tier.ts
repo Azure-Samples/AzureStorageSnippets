@@ -40,7 +40,7 @@ async function main(blockBlobClient: BlockBlobClient): Promise<void> {
     tierOptions
   );
 
-  if (result?.errorCode == undefined) {
+  if (!result?.errorCode) {
     console.log(`Change to access was successful`);
   } else {
     console.log(result);
