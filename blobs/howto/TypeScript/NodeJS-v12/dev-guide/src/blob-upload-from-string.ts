@@ -34,18 +34,20 @@ async function createBlobFromString(
     await containerClient.getBlockBlobClient(blobName);
 
   // Upload string
-  await blockBlobClient.upload(
+  const uploadResult = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length,
     uploadOptions
   );
 
-  // do something with blob
-  const tags: Tags = await getBlobTags(blockBlobClient);
+  if (!uploadResult.errorCode) {
+    // do something with blob
+    const tags: Tags = await getBlobTags(blockBlobClient);
+  }
 }
 // </Snippet_UploadBlob>
 
-async function main(blobServiceClient) {
+async function main(blobServiceClient): Promise<void> {
   type TList = Promise<void>;
   const blobs: Promise<void>[] = [];
 
@@ -57,11 +59,10 @@ async function main(blobServiceClient) {
   const containerOptions: ContainerCreateOptions = {
     access: 'container'
   };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
-
+  const { containerClient, containerCreateResponse } =
+    await blobServiceClient.createContainer(containerName, containerOptions);
+  if (containerCreateResponse.errorCode)
+    throw Error('container creation failed');
   console.log('container creation succeeded');
 
   // create 10 blobs with Promise.all

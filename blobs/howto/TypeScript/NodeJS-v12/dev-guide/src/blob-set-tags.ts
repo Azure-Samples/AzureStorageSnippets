@@ -24,7 +24,7 @@ export async function getBlobTags(
 }
 // </Snippet_getTags>
 // <Snippet_setTags>
-async function setBlobTags(
+export async function setBlobTags(
   blockBlobClient: BlockBlobClient,
   tags: Tags
 ): Promise<void> {

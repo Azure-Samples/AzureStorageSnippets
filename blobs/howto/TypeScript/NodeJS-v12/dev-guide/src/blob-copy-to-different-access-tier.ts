@@ -1,4 +1,8 @@
-import { BlobClient, ContainerClient } from '@azure/storage-blob';
+import {
+  BlobBeginCopyFromURLOptions,
+  BlobClient,
+  ContainerClient
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import { getContainerClientFromSharedKeyCredential } from './auth-get-client';
 dotenv.config();
@@ -14,7 +18,7 @@ const containerClient: ContainerClient =
 //<Snippet_CopyWithAccessTier>
 async function copyBlobWithDifferentAccessTier(
   containerClient: ContainerClient
-) {
+): Promise<void> {
   // create blob clients
   const sourceBlobClient: BlobClient = await containerClient.getBlobClient(
     originalBlob
@@ -23,10 +27,12 @@ async function copyBlobWithDifferentAccessTier(
     copyBlob
   );
 
+  const copyOptions: BlobBeginCopyFromURLOptions = { tier: 'Hot' };
+
   // start copy, access tiers include `Hot`, `Cool`, `Archive`
   const copyPoller = await destinationBlobClient.beginCopyFromURL(
     sourceBlobClient.url,
-    { tier: 'Hot' }
+    copyOptions
   );
   console.log('start copy from original to copy');
 

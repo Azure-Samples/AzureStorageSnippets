@@ -46,7 +46,7 @@ async function deleteContainerSoft(
 async function deleteContainersWithPrefix(
   blobServiceClient: BlobServiceClient,
   prefix: string
-) {
+): Promise<void> {
   const containerOptions: ServiceListContainersOptions = {
     // only delete containers not deleted
     includeDeleted: false,
@@ -83,7 +83,7 @@ async function deleteContainersWithPrefix(
 async function undeleteContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
-) {
+): Promise<void> {
   // version to undelete
   let containerVersion: string | undefined;
 
@@ -142,7 +142,7 @@ async function undeleteContainer(
 async function createContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
-) {
+): Promise<void> {
   // public access at container level
   const containerCreateOptions: ContainerCreateOptions = {
     access: 'container'
@@ -163,12 +163,14 @@ async function createContainer(
   // list container properties
   const containerProperties: ContainerGetPropertiesResponse =
     await containerClient.getProperties(containerGetPropertiesOptions);
-  console.log(
-    `${containerName} lastModified: ${containerProperties.lastModified}`
-  );
+  if (!containerProperties.errorCode) {
+    console.log(
+      `${containerName} lastModified: ${containerProperties.lastModified}`
+    );
+  }
 }
 
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const length = 9;
   const pContainers: Promise<void>[] = new Array(length);
 

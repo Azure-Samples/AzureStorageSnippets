@@ -24,7 +24,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(
 const baseUrl = `https://${accountName}.blob.core.windows.net`;
 const containerName = `my-container`;
 
-async function main() {
+async function main(): Promise<void> {
   try {
     // create container from ContainerClient
     const containerClient = new ContainerClient(

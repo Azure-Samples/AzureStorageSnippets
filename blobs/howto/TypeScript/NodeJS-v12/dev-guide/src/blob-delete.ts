@@ -20,7 +20,10 @@ const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 // <snippet_deleteBlob>
-async function deleteBlob(containerClient: ContainerClient, blobName) {
+async function deleteBlob(
+  containerClient: ContainerClient,
+  blobName
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient =
     await containerClient.getBlockBlobClient(blobName);
@@ -43,7 +46,7 @@ async function deleteBlob(containerClient: ContainerClient, blobName) {
 async function deleteBlobIfItExists(
   containerClient: ContainerClient,
   blobName
-) {
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
@@ -61,7 +64,10 @@ async function deleteBlobIfItExists(
 }
 // </snippet_deleteBlobIfExists>
 // <snippet_undeleteBlob>
-async function undeleteBlob(containerClient: ContainerClient, blobName) {
+async function undeleteBlob(
+  containerClient: ContainerClient,
+  blobName
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient =
     await containerClient.getBlockBlobClient(blobName);
@@ -84,7 +90,7 @@ async function createBlobFromString(
   blobName,
   fileContentsAsString,
   uploadOptions: BlockBlobUploadOptions
-) {
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = await client.getBlockBlobClient(
     blobName
@@ -93,7 +99,7 @@ async function createBlobFromString(
   console.log(`uploading blob ${blobName}`);
 
   // Upload string
-  await blockBlobClient.upload(
+  const uploadResults = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length,
     uploadOptions
@@ -101,11 +107,14 @@ async function createBlobFromString(
 
   // do something with blob
   // ...
+  if (!uploadResults.errorCode) {
+    console.log(`Success: ${uploadResults.date}`);
+  }
 }
 
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const length = 2;
-  const blobs: Promise<void>[] = new Array(length);
+  const blobs = new Array(length);
 
   // create container
   const timestamp = Date.now();

@@ -1,4 +1,9 @@
-import { BlobGetPropertiesOptions, BlockBlobClient } from '@azure/storage-blob';
+import {
+  BlobGetPropertiesOptions,
+  BlobSetTierOptions,
+  BlobSetTierResponse,
+  BlockBlobClient
+} from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import { getBlobClientFromAccountAndKey } from './auth-get-client';
 dotenv.config();
@@ -11,22 +16,29 @@ const blockBlobClient: BlockBlobClient = getBlobClientFromAccountAndKey(
 );
 
 //<Snippet_BlobChangeAccessTier>
-async function main(blockBlobClient: BlockBlobClient) {
+async function main(blockBlobClient: BlockBlobClient): Promise<void> {
   const options: BlobGetPropertiesOptions = {};
 
   // Get current access tier
-  const { accessTier } = await blockBlobClient.getProperties(options);
-  console.log(`Current access tier: ${accessTier}`);
+  const { errorCode, accessTier } = await blockBlobClient.getProperties(
+    options
+  );
+  if (!errorCode) {
+    console.log(`Current access tier: ${accessTier}`);
+  }
 
   // 'Hot', 'Cool', or 'Archive'
   const newAccessTier = 'Cool';
 
   // Rehydrate priority: 'High' or 'Standard'
-  const rehydratePriority = 'High';
+  const tierOptions: BlobSetTierOptions = {
+    rehydratePriority: 'High'
+  };
 
-  const result = await blockBlobClient.setAccessTier(newAccessTier, {
-    rehydratePriority
-  });
+  const result: BlobSetTierResponse = await blockBlobClient.setAccessTier(
+    newAccessTier,
+    tierOptions
+  );
 
   if (result?.errorCode == undefined) {
     console.log(`Change to access was successful`);

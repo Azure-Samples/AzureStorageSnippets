@@ -31,7 +31,7 @@ const blobServiceClient = new BlobServiceClient(
   sharedKeyCredential
 );
 
-async function main() {
+async function main(): Promise<void> {
   try {
     // Create container client
     const containerClient = await blobServiceClient.getContainerClient(

@@ -17,7 +17,9 @@ const blobServiceClient: BlobServiceClient =
 const timestamp = Date.now();
 
 // <snippet_listBlobsFlatWithPageMarker>
-async function listBlobsFlatWithPageMarker(containerClient: ContainerClient) {
+async function listBlobsFlatWithPageMarker(
+  containerClient: ContainerClient
+): Promise<void> {
   // page size
   const maxPageSize = 2;
 
@@ -77,7 +79,7 @@ async function listBlobsFlatWithPageMarker(containerClient: ContainerClient) {
 async function listBlobHierarchical(
   containerClient: ContainerClient,
   virtualHierarchyDelimiter = '/'
-) {
+): Promise<void> {
   // page size - artificially low as example
   const maxPageSize = 2;
 
@@ -127,7 +129,7 @@ async function createBlobFromString(
   blobName,
   fileContentsAsString,
   uploadOptions: BlockBlobUploadOptions
-) {
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
@@ -138,8 +140,13 @@ async function createBlobFromString(
     uploadOptions
   );
 
-  // do something with blob
-  const getTagsResponse = await blockBlobClient.getTags();
+  if (!uploadBlobResponse.errorCode) {
+    // do something with blob
+    const getTagsResponse = await blockBlobClient.getTags();
+    if (!getTagsResponse.errorCode) {
+      // do something with tags
+    }
+  }
 }
 async function createContainer(blobServiceClient, containerName) {
   const blobs: Promise<void>[] = [];
@@ -153,6 +160,8 @@ async function createContainer(blobServiceClient, containerName) {
   const { containerClient, containerCreateResponse } =
     await blobServiceClient.createContainer(containerName, options);
 
+  if (containerCreateResponse.errorCode)
+    throw Error('container creation failed');
   console.log(`container ${containerName} created`);
 
   // create 10 blobs with Promise.all
@@ -188,7 +197,7 @@ async function createContainer(blobServiceClient, containerName) {
   await Promise.all(blobs);
 }
 
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const containerName = `list-containers-${timestamp}`;
   await createContainer(blobServiceClient, containerName);
 
