@@ -2,7 +2,9 @@ import {
   BlobClient,
   BlobGetPropertiesResponse,
   BlobServiceClient,
+  BlockBlobClient,
   BlockBlobUploadOptions,
+  ContainerCreateOptions,
   Metadata
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
@@ -14,52 +16,69 @@ const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 // <snippet_setBlobMetadata>
-/*
-metadata= {
-    reviewedBy: 'Bob',
-    releasedBy: 'Jill',
-}
+async function setBlobMetadata(
+  blobClient: BlobClient,
+  metadata: Metadata
+): Promise<void> {
+  /*
+    metadata= {
+        reviewedBy: 'Bob',
+        releasedBy: 'Jill',
+    }
 */
-async function setBlobMetadata(blobClient: BlobClient, metadata: Metadata) {
-  await blobClient.setMetadata(metadata);
+  const metadataResults = await blobClient.setMetadata(metadata);
 
-  console.log(`metadata set successfully`);
+  if (!metadataResults.errorCode) {
+    console.log(`metadata set successfully ${metadataResults.date}`);
+  }
 }
 // </snippet_setBlobMetadata>
+
 // <snippet_setHTTPHeaders>
-/*
-properties= {
+async function setHTTPHeaders(blobClient: BlobClient, headers): Promise<void> {
+  /*
+  headers= {
       blobContentType: 'text/plain',
       blobContentLanguage: 'en-us',
       blobContentEncoding: 'utf-8',
       // all other http properties are cleared
     }
-*/
-async function setHTTPHeaders(blobClient: BlobClient, headers) {
-  await blobClient.setHTTPHeaders(headers);
+  */
 
-  console.log(`headers set successfully`);
+  const headerResults = await blobClient.setHTTPHeaders(headers);
+
+  if (!headerResults.errorCode) {
+    console.log(`headers set successfully ${headerResults.date}`);
+  }
 }
 // </snippet_setHTTPHeaders>
-// <snippet_getProperties>
-async function getProperties(blobClient: BlobClient) {
-  const properties: BlobGetPropertiesResponse =
-    await blobClient.getProperties();
-  console.log(blobClient.name + ' properties: ');
 
-  for (const property in properties) {
-    switch (property) {
-      // nested properties are stringified and returned as strings
-      case 'metadata':
-      case 'objectReplicationRules':
-        console.log(`    ${property}: ${JSON.stringify(properties[property])}`);
-        break;
-      default:
-        console.log(`    ${property}: ${properties[property]}`);
-        break;
+// <snippet_getProperties>
+async function getProperties(blobClient: BlobClient): Promise<void> {
+  const propertiesResponse: BlobGetPropertiesResponse =
+    await blobClient.getProperties();
+
+  if (!propertiesResponse.errorCode) {
+    console.log(blobClient.name + ' properties: ');
+
+    for (const property in propertiesResponse) {
+      switch (property) {
+        // nested properties are stringified and returned as strings
+        case 'metadata':
+        case 'objectReplicationRules':
+          console.log(
+            `    ${property}: ${JSON.stringify(propertiesResponse[property])}`
+          );
+          break;
+        default:
+          console.log(`    ${property}: ${propertiesResponse[property]}`);
+          break;
+      }
     }
   }
 }
+// </snippet_getProperties>
+
 /*
 my-blob.txt properties:
     lastModified: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
@@ -106,7 +125,6 @@ my-blob.txt properties:
     objectReplicationDestinationPolicyId: undefined
     objectReplicationSourceProperties:
 */
-// </snippet_getProperties>
 
 // containerName: string
 // blobName: string, includes file extension if provided
@@ -116,36 +134,39 @@ async function createBlobFromString(
   blobName,
   fileContentsAsString,
   uploadOptions: BlockBlobUploadOptions | undefined
-) {
+): Promise<BlockBlobClient> {
   // Create blob client from container client
   const blockBlobClient = await client.getBlockBlobClient(blobName);
 
   console.log(`uploading blob ${blobName}`);
 
   // Upload string
-  await blockBlobClient.upload(
+  const uploadResult = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length,
     uploadOptions
   );
 
+  if (uploadResult.errorCode) throw Error(uploadResult.errorCode);
+
   // do something with blob
   // ...
   return blockBlobClient;
 }
-async function main(blobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `blob-set-properties-and-metadata-${timestamp}`;
   console.log(`creating container ${containerName}`);
 
-  const containerOptions = {
+  const containerOptions: ContainerCreateOptions = {
     access: 'container'
   };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
+  const { containerClient, containerCreateResponse } =
+    await blobServiceClient.createContainer(containerName, containerOptions);
+
+  if (containerCreateResponse.errorCode)
+    throw Error(containerCreateResponse.errorCode);
 
   console.log('container creation succeeded');
 
@@ -165,7 +186,7 @@ async function main(blobServiceClient) {
     }
   };
 
-  const options = undefined;
+  const options: BlockBlobUploadOptions | undefined = undefined;
 
   const blobClient = await createBlobFromString(
     containerClient,

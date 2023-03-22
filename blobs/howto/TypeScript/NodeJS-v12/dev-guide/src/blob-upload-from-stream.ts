@@ -82,14 +82,15 @@ async function createBlobFromReadStream(
 }
 // </Snippet_UploadBlob>
 // <Snippet_useUploadStream>
-async function main(blobServiceClient) {
+async function main(blobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `create-blob-from-stream-${timestamp}`;
   console.log(`creating container ${containerName}`);
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName
-  );
+  const { containerClient, containerCreateResponse } =
+    await blobServiceClient.createContainer(containerName);
+  if (containerCreateResponse.errorCode)
+    throw Error('container creation failed');
 
   console.log('container creation succeeded');
 

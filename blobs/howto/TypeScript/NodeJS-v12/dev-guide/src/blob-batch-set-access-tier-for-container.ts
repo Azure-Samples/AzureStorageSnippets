@@ -1,6 +1,11 @@
 import {
+  BlobBatch,
+  BlobBatchClient,
+  BlobGetPropertiesOptions,
+  BlobGetPropertiesResponse,
   BlockBlobClient,
   ContainerClient,
+  ContainerCreateResponse,
   StorageSharedKeyCredential
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
@@ -39,12 +44,16 @@ const containerClient = new ContainerClient(
 
 // Create container, add blobs with default `Hot` tier
 async function prepContainer(
-  containerClient,
+  containerClient: ContainerClient,
   blockBlobCount,
   blockBlobClients
-) {
+): Promise<void> {
   // Create container
-  await containerClient.create();
+  const containerCreateResponse: ContainerCreateResponse =
+    await containerClient.create();
+
+  if (containerCreateResponse.errorCode)
+    throw Error(containerCreateResponse.errorCode);
 
   // Create block blob clients to be used in batch
   for (let i = 0; i < blockBlobCount; i++) {
@@ -56,26 +65,38 @@ async function prepContainer(
 
     // Upload new blob
     const fileContents = `hello from sample ${i}`;
-    await blockBlobClients[i].upload(fileContents, fileContents.length);
+    const uploadResult = await blockBlobClients[i].upload(
+      fileContents,
+      fileContents.length
+    );
 
-    // Check blob tier default is `Hot`
-    const resp = await blockBlobClients[i].getProperties();
-    console.log(`[${i}] access tier ${resp.accessTier}`);
+    if (!uploadResult.errorCode) {
+      // Check blob tier default is `Hot`
+      const resp: BlobGetPropertiesResponse = await (
+        blockBlobClients[i] as BlockBlobClient
+      ).getProperties();
+      if (!resp.errorCode) {
+        console.log(`[${i}] access tier ${resp.accessTier}`);
+      }
+    }
   }
 }
 
 //<Snippet_BatchChangeAccessTier>
-async function main(containerClient: ContainerClient) {
+async function batchChangeAccessTier(
+  containerClient: ContainerClient
+): Promise<void> {
   // Prep array
   const blockBlobCount = 3;
-  const blockBlobClients = new Array(blockBlobCount);
+  const blockBlobClients: BlockBlobClient[] = new Array(blockBlobCount);
 
   // Create container and blobs in `Hot` tier
   await prepContainer(containerClient, blockBlobCount, blockBlobClients);
 
   // Blob batch client and batch
-  const containerScopedBatchClient = containerClient.getBlobBatchClient();
-  const blobBatch = containerScopedBatchClient.createBatch();
+  const containerScopedBatchClient: BlobBatchClient =
+    containerClient.getBlobBatchClient();
+  const blobBatch: BlobBatch = containerScopedBatchClient.createBatch();
 
   // Assemble batch to set tier to `Cool` tier
   for (let i = 0; i < blockBlobCount; i++) {
@@ -89,6 +110,9 @@ async function main(containerClient: ContainerClient) {
 
   // Submit batch request and verify response
   const resp = await containerScopedBatchClient.submitBatch(blobBatch, {});
+
+  if (resp.errorCode) throw Error(resp.errorCode);
+
   console.log(
     `Requested ${blockBlobCount}, batched ${resp.subResponses.length}, success ${resp.subResponsesSucceededCount}, failure ${resp.subResponsesFailedCount}`
   );
@@ -97,13 +121,16 @@ async function main(containerClient: ContainerClient) {
   for (let i = 0; i < blockBlobCount; i++) {
     // Check blob tier set properly
     const resp2 = await blockBlobClients[i].getProperties();
+
+    if (resp2.errorCode) throw Error(resp2.errorCode);
+
     console.log(
       `[${i}] access tier ${resp2.accessTier}, status ${resp.subResponses[i].status}, message ${resp.subResponses[i].statusMessage}`
     );
   }
 }
 //</Snippet_BatchChangeAccessTier>
-main(containerClient)
+batchChangeAccessTier(containerClient)
   .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {

@@ -5,6 +5,7 @@ import {
   BlockBlobUploadOptions,
   ContainerClient,
   ContainerCreateOptions,
+  ContainerCreateResponse,
   Tags
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
@@ -43,13 +44,13 @@ async function downloadBlobAsStream(
 
   const downloadResponse = await blobClient.download();
 
-  if (downloadResponse?.readableStreamBody) {
+  if (!downloadResponse.errorCode && downloadResponse?.readableStreamBody) {
     downloadResponse.readableStreamBody.pipe(writableStream);
     console.log(`download of ${blobName} succeeded`);
   }
 }
 // </snippet_downloadBlobAsStream>
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `download-blob-to-string-${timestamp}`;
@@ -58,10 +59,11 @@ async function main(blobServiceClient: BlobServiceClient) {
   const containerOptions: ContainerCreateOptions = {
     access: 'container'
   };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
+  const { containerClient, containerCreateResponse } =
+    await blobServiceClient.createContainer(containerName, containerOptions);
+
+  if (containerCreateResponse.errorCode)
+    throw Error(containerCreateResponse.errorCode);
 
   console.log('container creation success');
 

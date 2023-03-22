@@ -2,10 +2,13 @@
 import {
   AccountSASPermissions,
   AccountSASResourceTypes,
+  AccountSASSignatureValues,
   AccountSASServices,
   BlobServiceClient,
   generateAccountSASQueryParameters,
   SASProtocol,
+  SASQueryParameters,
+  ServiceGetPropertiesResponse,
   StorageSharedKeyCredential
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
@@ -33,18 +36,22 @@ async function useSasToken(sasToken) {
   );
 
   // Get Blob Service properties
-  const blobServicePropertiesResponse = await blobServiceClient.getProperties();
+  const blobServicePropertiesResponse: ServiceGetPropertiesResponse =
+    await blobServiceClient.getProperties();
 
-  // Display Blob Service properties
+  if (blobServicePropertiesResponse.errorCode)
+    throw Error(blobServicePropertiesResponse.errorCode);
+
+  // Display BlobServiceProperties
   console.log(
-    `Success: Properties ${JSON.stringify(blobServicePropertiesResponse)}\n`
+    `Static website enabled: ${blobServicePropertiesResponse?.staticWebsite?.enabled}\n`
   );
 }
 //</Snippet_UseSas>
 
 //<Snippet_GetSas>
 export async function createAccountSas(): Promise<string> {
-  const sasOptions = {
+  const sasOptions: AccountSASSignatureValues = {
     services: AccountSASServices.parse('btqf').toString(), // blobs, tables, queues, files
     resourceTypes: AccountSASResourceTypes.parse('sco').toString(), // service, container, object
     permissions: AccountSASPermissions.parse('rwdlacupi'), // permissions
@@ -53,10 +60,11 @@ export async function createAccountSas(): Promise<string> {
     expiresOn: new Date(new Date().valueOf() + 10 * 60 * 1000) // 10 minutes
   };
 
-  const sasToken = generateAccountSASQueryParameters(
+  const queryParams: SASQueryParameters = generateAccountSASQueryParameters(
     sasOptions,
     sharedKeyCredential
-  ).toString();
+  );
+  const sasToken: string = queryParams.toString();
 
   console.log(`sasToken = '${sasToken}'\n`);
 
@@ -66,7 +74,7 @@ export async function createAccountSas(): Promise<string> {
 //</Snippet_GetSas>
 
 //<Snippet_AsyncBoilerplate>
-async function main() {
+async function main(): Promise<void> {
   const sasToken = await createAccountSas();
 
   await useSasToken(sasToken);

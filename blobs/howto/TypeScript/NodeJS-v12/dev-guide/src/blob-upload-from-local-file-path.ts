@@ -32,8 +32,14 @@ async function createBlobFromLocalPath(
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // upload file to blob storage
-  await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
-  console.log(`${blobName} succeeded`);
+  const uploadResult = await blockBlobClient.uploadFile(
+    localFileWithPath,
+    uploadOptions
+  );
+
+  if (!uploadResult.errorCode) {
+    console.log(`${blobName} succeeded ${uploadResult.date}`);
+  }
 }
 // </Snippet_UploadBlob>
 
@@ -49,10 +55,10 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
     access: 'container'
   };
 
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
+  const { containerClient, containerCreateResponse } =
+    await blobServiceClient.createContainer(containerName, containerOptions);
+  if (containerCreateResponse.errorCode)
+    throw Error('container creation failed');
   console.log('container creation succeeded');
 
   // get fully qualified path of file

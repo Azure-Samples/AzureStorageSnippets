@@ -39,10 +39,15 @@ async function createBlobFromBuffer(
     await containerClient.getBlockBlobClient(blobName);
 
   // Upload buffer
-  await blockBlobClient.uploadData(buffer, uploadOptions);
+  const uploadResponse = await blockBlobClient.uploadData(
+    buffer,
+    uploadOptions
+  );
 
-  // do something with blob
-  const tags: Tags = await getBlobTags(blockBlobClient);
+  if (!uploadResponse.errorCode) {
+    // do something with blob
+    const tags: Tags = await getBlobTags(blockBlobClient);
+  }
 }
 // </Snippet_UploadBlob>
 
@@ -104,7 +109,7 @@ async function main(blobServiceClient: BlobServiceClient) {
   await Promise.all(blobs);
 }
 main(blobServiceClient)
-  .then(() => console.log('done'))
+  .then(() => console.log('success'))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

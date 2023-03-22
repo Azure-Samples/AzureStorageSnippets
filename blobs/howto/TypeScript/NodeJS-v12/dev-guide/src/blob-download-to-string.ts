@@ -20,30 +20,36 @@ async function createBlobFromString(
   blobName,
   fileContentsAsString,
   options: BlockBlobUploadOptions
-) {
+): Promise<void> {
   const blockBlobClient = await client.getBlockBlobClient(blobName);
 
-  await blockBlobClient.upload(
+  const uploadResult = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length,
     options
   );
-  console.log(`created blob ${blobName}`);
+  if (!uploadResult.errorCode) {
+    console.log(`created blob ${blobName} ${uploadResult.date}`);
+  }
 }
 
 // <snippet_downloadBlobToString>
 async function downloadBlobToString(
   containerClient: ContainerClient,
   blobName
-) {
+): Promise<void> {
   const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
 
   const downloadResponse: BlobDownloadResponseParsed =
     await blobClient.download();
 
-  const downloaded = await streamToBuffer(downloadResponse.readableStreamBody);
-  if (downloaded) {
-    console.log('Downloaded blob content:', downloaded.toString());
+  if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
+    const downloaded = await streamToBuffer(
+      downloadResponse.readableStreamBody
+    );
+    if (downloaded) {
+      console.log('Downloaded blob content:', downloaded.toString());
+    }
   }
 }
 async function streamToBuffer(readableStream) {
@@ -62,7 +68,7 @@ async function streamToBuffer(readableStream) {
 }
 // </snippet_downloadBlobToString>
 
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `download-blob-to-string-${timestamp}`;

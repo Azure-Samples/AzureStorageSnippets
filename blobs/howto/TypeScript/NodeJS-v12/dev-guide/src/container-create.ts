@@ -17,7 +17,7 @@ const blobServiceClient: BlobServiceClient =
 async function createContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
-) {
+): Promise<ContainerClient> {
   // public access at container level
   const options: ContainerCreateOptions = {
     access: 'container'
@@ -49,7 +49,7 @@ async function createContainer(
 }
 //</snippet_create_container>
 
-async function main(blobServiceClient) {
+async function main(blobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `create-container-${timestamp}`;
@@ -62,7 +62,6 @@ async function main(blobServiceClient) {
   );
 
   // Do something with containerClient
-  // ...
 
   // only 1 $root per blob storage resource
   const containerRootName = '$root';

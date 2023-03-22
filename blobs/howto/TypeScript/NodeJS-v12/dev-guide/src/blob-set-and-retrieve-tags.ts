@@ -1,5 +1,6 @@
 import {
   BlobServiceClient,
+  BlockBlobClient,
   BlockBlobUploadOptions,
   ContainerClient,
   ContainerCreateOptions,
@@ -26,31 +27,42 @@ const blobServiceClient: BlobServiceClient =
 //   reportOwner: 'John Doe',
 //   reportPresented: 'April 2022'
 // }
-async function setTags(containerClient: ContainerClient, blobName, tags: Tags) {
+async function setTags(
+  containerClient: ContainerClient,
+  blobName,
+  tags: Tags
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // Set tags
-  await blockBlobClient.setTags(tags);
+  const tagResult = await blockBlobClient.setTags(tags);
 
-  console.log(`uploading blob ${blobName}`);
+  if (!tagResult.errorCode) {
+    console.log(`uploading blob ${blobName} ${tagResult.date}`);
+  }
 }
-async function getTags(containerClient: ContainerClient, blobName) {
+async function getTags(
+  containerClient: ContainerClient,
+  blobName
+): Promise<void> {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // Get tags
   const result = await blockBlobClient.getTags();
 
-  for (const tag in result.tags) {
-    console.log(`TAG: ${tag}: ${result.tags[tag]}`);
+  if (!result.errorCode) {
+    for (const tag in result.tags) {
+      console.log(`TAG: ${tag}: ${result.tags[tag]}`);
+    }
   }
 }
-
+// <Snippet_findBlobsByQuery>
 async function findBlobsByQuery(
   blobServiceClient: BlobServiceClient,
   tagOdataQuery: string
-) {
+): Promise<void> {
   // page size
   const maxPageSize = 10;
 
@@ -89,7 +101,7 @@ async function findBlobsByQuery(
     }
   }
 }
-
+// </Snippet_findBlobsByQuery>
 // containerName: string
 // blobName: string, includes file extension if provided
 // fileContentsAsString: blob content
@@ -98,14 +110,16 @@ async function createBlobFromString(
   blobName,
   fileContentsAsString,
   uploadOptions: BlockBlobUploadOptions | undefined
-) {
+): Promise<void> {
   // Create blob client from container client
-  const blockBlobClient = await client.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient = await client.getBlockBlobClient(
+    blobName
+  );
 
   console.log(`uploading blob ${blobName}`);
 
   // Upload string
-  await blockBlobClient.upload(
+  const uploadResult = await blockBlobClient.upload(
     fileContentsAsString,
     fileContentsAsString.length,
     uploadOptions
@@ -113,9 +127,12 @@ async function createBlobFromString(
 
   // do something with blob
   // ...
+  if (!uploadResult.errorCode) {
+    console.log(`Uploaded at ${uploadResult.date}`);
+  }
 }
 
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // create container
   const timestamp = Date.now();
   const containerName = `set-tags-${timestamp}`;

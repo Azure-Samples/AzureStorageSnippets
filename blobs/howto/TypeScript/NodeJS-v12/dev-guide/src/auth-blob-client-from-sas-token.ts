@@ -1,5 +1,6 @@
 // Azure Storage dependency
 import {
+  BlobDownloadHeaders,
   BlobDownloadResponseParsed,
   BlockBlobClient
 } from '@azure/storage-blob';
@@ -46,6 +47,11 @@ async function main() {
   // Download file contents
   const result: BlobDownloadResponseParsed = await client.download();
   if (!result.readableStreamBody) throw Error('No readableStreamBody found');
+
+  // Get properties from BlobDownloadHeaders
+  const lastModifiedData = result.lastModified;
+  const contentType = result.contentType;
+  const isCurrentVersion = result.isCurrentVersion;
 
   const content: NodeJS.ReadableStream = (await streamToBuffer(
     result.readableStreamBody

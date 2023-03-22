@@ -59,7 +59,7 @@ export async function getContainerListOfBlobsProperties(
   }
   return blobWithProperties;
 }
-async function main(blobServiceClient: BlobServiceClient) {
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   // Container should have blobs in it
   const containerName = 'my-container';
 
@@ -75,11 +75,9 @@ async function main(blobServiceClient: BlobServiceClient) {
     blobPrefix
   );
   console.log(listBlobsWithProperties);
-
-  return;
 }
 main(blobServiceClient)
-  .then((properties) => console.log(JSON.stringify(properties)))
+  .then(() => console.log(`success`))
   .catch((err: unknown) => {
     if (err instanceof Error) {
       console.log(err.message);

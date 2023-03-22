@@ -17,7 +17,7 @@ const sasToken = process.env.AZURE_STORAGE_SAS_TOKEN as string;
 // Create SAS URL
 const sasUrl = `https://${accountName}.blob.core.windows.net/${containerName}?${sasToken}`;
 
-async function main() {
+async function main(): Promise<void> {
   try {
     // create container client from SAS token
     const containerClient = new ContainerClient(sasUrl);
