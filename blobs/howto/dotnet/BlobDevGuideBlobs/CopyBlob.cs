@@ -1,7 +1,6 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 
 namespace BlobDevGuide
 {
@@ -25,38 +24,11 @@ namespace BlobDevGuide
         // Copy a blob
         //-------------------------------------------------
         // <Snippet_CopyBlob>
-        public static async Task CopyBlobAsync(BlobServiceClient blobServiceClient)
+        public static async Task CopyBlobAsync(Uri sourceBlobURI, BlobClient destinationBlob)
         {
-            // Instantiate BlobClient for the source blob and destination blob
-            BlobClient sourceBlob = blobServiceClient
-                .GetBlobContainerClient("source-container")
-                .GetBlobClient("sample-blob.txt");
-            BlobClient destinationBlob = blobServiceClient
-                .GetBlobContainerClient("destination-container")
-                .GetBlobClient("sample-blob.txt");
-
-            // Lease the source blob for the copy operation 
-            // to prevent another client from modifying it
-            BlobLeaseClient lease = sourceBlob.GetBlobLeaseClient();
-
-            try
-            {
-                // Acquire an infinite lease on the source blob
-                await lease.AcquireAsync(BlobLeaseClient.InfiniteLeaseDuration);
-
-                // Start the copy operation and wait for it to complete
-                CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
-                await copyOperation.WaitForCompletionAsync();
-            }
-            catch (RequestFailedException ex)
-            {
-                // Handle the exception
-            }
-            finally
-            {
-                // Release the lease on the source blob
-                await lease.ReleaseAsync();
-            }
+            // Start the copy operation and wait for it to complete
+            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlobURI);
+            await copyOperation.WaitForCompletionAsync();
         }
         // </Snippet_CopyBlob>
 
@@ -123,15 +95,9 @@ namespace BlobDevGuide
         // Rehydrate a blob using a copy operation
         //-------------------------------------------------
         // <Snippet_RehydrateUsingCopy>
-        public static async Task RehydrateBlobUsingCopyAsync(BlobServiceClient blobServiceClient)
+        public static async Task RehydrateBlobUsingCopyAsync(BlobClient sourceArchiveBlob, BlobClient destinationRehydratedBlob)
         {
-            // Instantiate BlobClient for the source blob and destination blob
-            BlobClient sourceBlob = blobServiceClient
-                .GetBlobContainerClient("source-container")
-                .GetBlobClient("sample-blob-archive.txt");
-            BlobClient destinationBlob = blobServiceClient
-                .GetBlobContainerClient("source-container")
-                .GetBlobClient("sample-blob.txt");
+            // Note that the destination blob must have a different name than the archived source blob
 
             // Configure copy options to specify hot tier and standard priority
             BlobCopyFromUriOptions copyOptions = new()
@@ -141,7 +107,7 @@ namespace BlobDevGuide
             };
 
             // Copy source blob from archive tier to destination blob in hot tier
-            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri, copyOptions);
+            CopyFromUriOperation copyOperation = await destinationRehydratedBlob.StartCopyFromUriAsync(sourceArchiveBlob.Uri, copyOptions);
             await copyOperation.WaitForCompletionAsync();
         }
         // </Snippet_RehydrateUsingCopy>
