@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 namespace BlobDevGuide
 {
@@ -31,6 +32,55 @@ namespace BlobDevGuide
             await copyOperation.WaitForCompletionAsync();
         }
         // </Snippet_CopyBlob>
+
+        // <Snippet_CopyBlobWithinStorageAccount>
+        //-------------------------------------------------
+        // Copy a blob from the same storage account
+        //-------------------------------------------------
+        public static async Task CopyBlobAsync(
+            BlobClient sourceBlob,
+            BlobClient destinationBlob)
+        {
+            BlobLeaseClient sourceBlobLease = new(sourceBlob);
+            try
+            {
+                await sourceBlobLease.AcquireAsync(BlobLeaseClient.InfiniteLeaseDuration);
+
+                // Start the copy operation and wait for it to complete
+                CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
+                await copyOperation.WaitForCompletionAsync();
+            }
+            catch (RequestFailedException ex)
+            {
+                // Handle the exception
+            }
+            finally
+            {
+                await sourceBlobLease.ReleaseAsync();
+            }
+        }
+        // </Snippet_CopyBlobWithinStorageAccount>
+
+        // <Snippet_CopyBlobFromDifferentStorageAccount>
+        //-------------------------------------------------
+        // Copy a blob from a different storage account
+        //-------------------------------------------------
+        public static async Task CopyBlobAsync(
+            BlobClient destinationBlob,
+            string srcAccountName,
+            string srcContainerName,
+            string srcBlobName,
+            string sasToken)
+        {
+            // Append the SAS token to the URI - include ? before the SAS token
+            var srcBlobURI = new Uri(
+                $"https://{srcAccountName}.blob.core.windows.net/{srcContainerName}/{srcBlobName}?{sasToken}");
+
+            // Start the copy operation and wait for it to complete
+            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(srcBlobURI);
+            await copyOperation.WaitForCompletionAsync();
+        }
+        // </Snippet_CopyBlobFromDifferentStorageAccount>
 
         //-------------------------------------------------
         // Abort a blob copy operation
