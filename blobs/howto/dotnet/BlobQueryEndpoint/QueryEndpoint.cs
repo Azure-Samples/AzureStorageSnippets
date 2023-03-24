@@ -7,10 +7,13 @@ namespace ManagementTasks
     public static class AccountProperties
     {
         // <Snippet_QueryEndpoint>
-        public static async Task<Uri> GetBlobServiceEndpoint(string storageAccountName, TokenCredential credential)
+        public static async Task<Uri> GetBlobServiceEndpoint(
+            string storageAccountName,
+            TokenCredential credential)
         {
             // TODO: replace with your subscription ID and resource group name
-            // You can locate your subscription ID on the Subscriptions blade of the Azure Portal (https://portal.azure.com)
+            // You can locate your subscription ID on the Subscriptions blade
+            // of the Azure portal (https://portal.azure.com)
             const string subscriptionId = "<subscription-id>";
             const string rgName = "<resource-group-name>";
 
