@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 
 namespace BlobDevGuide
 {
@@ -21,33 +22,25 @@ namespace BlobDevGuide
                 Console.WriteLine($"Copy status: {value}");
         }
         // </Snippet_CheckStatusCopyBlob>
-        //-------------------------------------------------
-        // Copy a blob
-        //-------------------------------------------------
-        // <Snippet_CopyBlob>
-        public static async Task CopyBlobAsync(Uri sourceBlobURI, BlobClient destinationBlob)
-        {
-            // Start the copy operation and wait for it to complete
-            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlobURI);
-            await copyOperation.WaitForCompletionAsync();
-        }
-        // </Snippet_CopyBlob>
 
-        // <Snippet_CopyBlobWithinStorageAccount>
+        // <Snippet_CopyBlobWithinAccount>
         //-------------------------------------------------
         // Copy a blob from the same storage account
         //-------------------------------------------------
-        public static async Task CopyBlobAsync(
+        public static async Task CopyBlobWithinAccountAsync(
             BlobClient sourceBlob,
             BlobClient destinationBlob)
         {
+            // Lease the source blob to prevent changes during the copy operation
             BlobLeaseClient sourceBlobLease = new(sourceBlob);
+
             try
             {
                 await sourceBlobLease.AcquireAsync(BlobLeaseClient.InfiniteLeaseDuration);
 
                 // Start the copy operation and wait for it to complete
-                CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
+                CopyFromUriOperation copyOperation = 
+                    await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
                 await copyOperation.WaitForCompletionAsync();
             }
             catch (RequestFailedException ex)
@@ -56,31 +49,34 @@ namespace BlobDevGuide
             }
             finally
             {
+                // Release the lease once the copy operation completes
                 await sourceBlobLease.ReleaseAsync();
             }
         }
-        // </Snippet_CopyBlobWithinStorageAccount>
+        // </Snippet_CopyBlobWithinAccount>
 
-        // <Snippet_CopyBlobFromDifferentStorageAccount>
+        // <Snippet_CopyBlobAcrossAccounts>
         //-------------------------------------------------
         // Copy a blob from a different storage account
         //-------------------------------------------------
-        public static async Task CopyBlobAsync(
-            BlobClient destinationBlob,
-            string srcAccountName,
-            string srcContainerName,
-            string srcBlobName,
-            string sasToken)
+        public static async Task CopyBlobAcrossAccountsAsync(
+            BlobClient sourceBlob,
+            BlobClient destinationBlob)
         {
-            // Append the SAS token to the URI - include ? before the SAS token
-            var srcBlobURI = new Uri(
-                $"https://{srcAccountName}.blob.core.windows.net/{srcContainerName}/{srcBlobName}?{sasToken}");
+            // Note: to use GenerateSasUri() for the source blob, the
+            // source blob client must be authorized via account key
+
+            // Set the SAS token to expire in 60 minutes, as an example
+            DateTimeOffset expiresOn = DateTimeOffset.UtcNow.AddMinutes(60);
+
+            // Create a Uri object with a SAS token appended - specify Read (r) permissions
+            Uri sourceBlobSASURI = sourceBlob.GenerateSasUri(BlobSasPermissions.Read, expiresOn);
 
             // Start the copy operation and wait for it to complete
-            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(srcBlobURI);
+            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlobSASURI);
             await copyOperation.WaitForCompletionAsync();
         }
-        // </Snippet_CopyBlobFromDifferentStorageAccount>
+        // </Snippet_CopyBlobAcrossAccounts>
 
         //-------------------------------------------------
         // Abort a blob copy operation

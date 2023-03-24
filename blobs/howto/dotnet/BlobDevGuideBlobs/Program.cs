@@ -1,9 +1,11 @@
 ﻿using Azure.Identity;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 
 using BlobDevGuide;
 
-// <Snippet_CopyWithinStorageAccount>
+#region Copy blob within a storage account
+/*
 var blobServiceClient = new BlobServiceClient(
         new Uri("https://<storage-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
@@ -16,28 +18,30 @@ BlobClient destinationBlob = blobServiceClient
     .GetBlobContainerClient("destination-container")
     .GetBlobClient("sample-blob.txt");
 
-await CopyBlob.CopyBlobAsync(sourceBlob.Uri, destinationBlob);
-// </Snippet_CopyWithinStorageAccount>
+await CopyBlob.CopyBlobWithinAccountAsync(sourceBlob, destinationBlob);
+*/
+#endregion
 
-// <Snippet_CopyAcrossStorageAccounts>
-string accountNameSrc = "<source-storage-account-name>";
-string containerNameSrc = "source-container";
-string blobNameSrc = "sample-blob.txt";
+#region Copy blob across storage accounts
+/*
+string srcAccountName = "<source-account-name";
+string srcAccountKey = "<account-key>";
+BlobServiceClient blobServiceClientSrc = new(
+        new Uri($"https://{srcAccountName}.blob.core.windows.net"),
+        new StorageSharedKeyCredential(srcAccountName, srcAccountKey));
 
-// When copying from another storage account, the source blob must be authorized with a SAS token
-// The SAS token for the source blob needs to have the Read ('r') permission
-string sasToken = "<sas-token>";
-
-// Append the SAS token to the URI - include ? before the SAS token
-var srcBlobURI = new Uri($"https://{accountNameSrc}.blob.core.windows.net/{containerNameSrc}/{blobNameSrc}?{sasToken}");
-
-BlobServiceClient blobServiceClientDestination = new(
-        new Uri("https://<dest-storage-account-name>.blob.core.windows.net"),
+BlobServiceClient blobServiceClientDest = new(
+        new Uri("https://<destination-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
-BlobClient destBlob = blobServiceClientDestination
+BlobClient srcBlob = blobServiceClientSrc
+    .GetBlobContainerClient("source-container")
+    .GetBlobClient("sample-blob.txt");
+
+BlobClient destBlob = blobServiceClientDest
     .GetBlobContainerClient("destination-container")
     .GetBlobClient("sample-blob.txt");
 
-await CopyBlob.CopyBlobAsync(srcBlobURI, destBlob);
-// </Snippet_CopyAcrossStorageAccounts>
+await CopyBlob.CopyBlobAcrossAccountsAsync(srcBlob, destBlob);
+*/
+#endregion
