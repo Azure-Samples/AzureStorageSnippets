@@ -23,13 +23,13 @@ namespace BlobDevGuide
         }
         // </Snippet_CheckStatusCopyBlob>
 
-        // <Snippet_CopyBlobWithinAccount>
+        // <Snippet_CopyWithinAccount_CopyBlob>
         //-------------------------------------------------
         // Copy a blob from the same storage account
         //-------------------------------------------------
-        public static async Task CopyBlobWithinAccountAsync(
+        public static async Task CopyWithinStorageAccountAsync(
             BlobClient sourceBlob,
-            BlobClient destinationBlob)
+            BlockBlobClient destinationBlob)
         {
             // Lease the source blob to prevent changes during the copy operation
             BlobLeaseClient sourceBlobLease = new(sourceBlob);
@@ -53,15 +53,15 @@ namespace BlobDevGuide
                 await sourceBlobLease.ReleaseAsync();
             }
         }
-        // </Snippet_CopyBlobWithinAccount>
+        // </Snippet_CopyWithinAccount_CopyBlob>
 
-        // <Snippet_CopyBlobAcrossAccounts>
+        // <Snippet_CopyAcrossAccounts_CopyBlob>
         //-------------------------------------------------
         // Copy a blob from a different storage account
         //-------------------------------------------------
-        public static async Task CopyBlobAcrossAccountsAsync(
+        public static async Task CopyAcrossStorageAccountsAsync(
             BlobClient sourceBlob,
-            BlobClient destinationBlob)
+            BlockBlobClient destinationBlob)
         {
             // Note: to use GenerateSasUri() for the source blob, the
             // source blob client must be authorized via account key
@@ -76,7 +76,23 @@ namespace BlobDevGuide
             CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlobSASURI);
             await copyOperation.WaitForCompletionAsync();
         }
-        // </Snippet_CopyBlobAcrossAccounts>
+        // </Snippet_CopyAcrossAccounts_CopyBlob>
+
+        // <Snippet_CopyFromExternalSource_CopyBlob>
+        //-------------------------------------------------
+        // Copy a blob from an external source
+        //-------------------------------------------------
+        public static async Task CopyFromExternalSourceAsync(
+            string sourceLocation,
+            BlockBlobClient destinationBlob)
+        {
+            Uri sourceUri = new(sourceLocation);
+
+            // Start the copy operation and wait for it to complete
+            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceUri);
+            await copyOperation.WaitForCompletionAsync();
+        }
+        // </Snippet_CopyFromExternalSource_CopyBlob>
 
         //-------------------------------------------------
         // Abort a blob copy operation
@@ -99,63 +115,6 @@ namespace BlobDevGuide
                 }
             }
         }
-        // </Snippet_AbortBlobCopy>
-
-        //-------------------------------------------------
-        // Copy a snapshot over a base blob
-        //-------------------------------------------------
-        // <Snippet_CopySnapshot>
-        public static async Task<BlobClient> CopySnapshotOverBaseBlobAsync(BlobClient blobClient, string snapshotTimestamp)
-        {
-            // Instantiate BlobClient with identical URI and add snapshot timestamp
-            BlobClient blobSnapshotClient = blobClient.WithSnapshot(snapshotTimestamp);
-
-            // Restore the specified snapshot by copying it over the base blob
-            CopyFromUriOperation copyOperation = await blobClient.StartCopyFromUriAsync(blobSnapshotClient.Uri);
-            await copyOperation.WaitForCompletionAsync();
-
-            // Return the client object after the copy operation
-            return blobClient;
-        }
-        // </Snippet_CopySnapshot>
-
-        //-------------------------------------------------
-        // Copy a previous version over a base blob
-        //-------------------------------------------------
-        // <Snippet_CopyVersion>
-        public static async Task<BlobClient> CopyVersionOverBaseBlobAsync(BlobClient blobClient, string versionTimestamp)
-        {
-            // Instantiate BlobClient with identical URI and add version timestamp
-            BlobClient blobVersionClient = blobClient.WithVersion(versionTimestamp);
-
-            // Restore the specified snapshot by copying it over the base blob
-            CopyFromUriOperation copyOperation = await blobClient.StartCopyFromUriAsync(blobVersionClient.Uri);
-            await copyOperation.WaitForCompletionAsync();
-
-            // Return the client object after the copy operation
-            return blobClient;
-        }
-        // </Snippet_CopyVersion>
-
-        //-------------------------------------------------
-        // Rehydrate a blob using a copy operation
-        //-------------------------------------------------
-        // <Snippet_RehydrateUsingCopy>
-        public static async Task RehydrateBlobUsingCopyAsync(BlobClient sourceArchiveBlob, BlobClient destinationRehydratedBlob)
-        {
-            // Note that the destination blob must have a different name than the archived source blob
-
-            // Configure copy options to specify hot tier and standard priority
-            BlobCopyFromUriOptions copyOptions = new()
-            {
-                AccessTier = AccessTier.Hot,
-                RehydratePriority = RehydratePriority.Standard
-            };
-
-            // Copy source blob from archive tier to destination blob in hot tier
-            CopyFromUriOperation copyOperation = await destinationRehydratedBlob.StartCopyFromUriAsync(sourceArchiveBlob.Uri, copyOptions);
-            await copyOperation.WaitForCompletionAsync();
-        }
-        // </Snippet_RehydrateUsingCopy>
+        // </Snippet_AbortBlobCopy>        
     }
 }
