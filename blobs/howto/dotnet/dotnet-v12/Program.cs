@@ -189,6 +189,18 @@ namespace dotnet_v12
             return true;
         }
 
+        //-----------------------------------------------
+        // Submenu for Concurrency scenarios.
+        //----------------------------------------------- 
+        static bool Concurrency()
+        {
+            Concurrency concurrency = new Concurrency();
+
+            while (concurrency.MenuAsync().Result) { }
+
+            return true;
+        }
+
         //------------------------------------------------
         // Main function
         //------------------------------------------------
@@ -218,6 +230,7 @@ namespace dotnet_v12
             Console.WriteLine("12) Parallel file transfers");
             Console.WriteLine("13) Manage access tiers");
             Console.WriteLine("14) Configure retry policy");
+            Console.WriteLine("15) Test concurrency scenarios");
             Console.WriteLine("X) Exit");
             Console.Write("\r\nSelect an option: ");
  
@@ -264,6 +277,9 @@ namespace dotnet_v12
 
                 case "14":
                     return Retry();
+
+                case "15":
+                    return Concurrency();
 
                 case "x":
                 case "X":
