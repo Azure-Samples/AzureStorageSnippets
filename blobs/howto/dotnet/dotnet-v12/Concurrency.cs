@@ -25,43 +25,33 @@ namespace dotnet_v12
         {
             Console.WriteLine("Demonstrate optimistic concurrency");
 
-            BlobContainerClient containerClient = blobClient.GetParentBlobContainerClient();
-
             try
             {
-                // Create the container if it does not exist.
-                await containerClient.CreateIfNotExistsAsync();
+                // Download a blob
+                Response<BlobDownloadResult> response = await blobClient.DownloadContentAsync();
+                BlobDownloadResult downloadResult = response.Value;
+                string blobContents = downloadResult.Content.ToString();
 
-                // Upload text to a new block blob.
-                string blobContents1 = "First update. Overwrite blob if it exists.";
-                byte[] byteArray = Encoding.ASCII.GetBytes(blobContents1);
+                ETag originalETag = downloadResult.Details.ETag;
+                Console.WriteLine("Blob ETag = {0}", originalETag);
 
-                ETag originalETag;
+                // Update the existing block blob contents
+                // No ETag condition is provided, so original blob is overwritten and ETag is updated
+                string blobContentsUpdate1 = $"{blobContents} Update 1";
+                byte[] byteArray = Encoding.ASCII.GetBytes(blobContentsUpdate1);
 
-                using (MemoryStream stream = new MemoryStream(byteArray))
+                using (MemoryStream stream = new(byteArray))
                 {
                     BlobContentInfo blobContentInfo = await blobClient.UploadAsync(stream, overwrite: true);
-                    originalETag = blobContentInfo.ETag;
-                    Console.WriteLine("Blob added. Original ETag = {0}", originalETag);
+                    Console.WriteLine("Blob update. Updated ETag = {0}", blobContentInfo.ETag);
                 }
 
-                // This code simulates an update by another client.
-                // No ETag was provided, so original blob is overwritten and ETag updated.
-                string blobContents2 = "Second update overwrites first update.";
-                byteArray = Encoding.ASCII.GetBytes(blobContents2);
+                // Now try to update the blob using the original ETag value
+                string blobContentsUpdate2 = $"{blobContents} Update 2. If-Match condition set to original ETag.";
+                byteArray = Encoding.ASCII.GetBytes(blobContentsUpdate2);
 
-                using (MemoryStream stream = new MemoryStream(byteArray))
-                {
-                    BlobContentInfo blobContentInfo = await blobClient.UploadAsync(stream, overwrite: true);
-                    Console.WriteLine("Blob updated. Updated ETag = {0}", blobContentInfo.ETag);
-                }
-
-                // Now try to update the blob using the original ETag value.
-                string blobContents3 = "Third update. If-Match condition set to original ETag.";
-                byteArray = Encoding.ASCII.GetBytes(blobContents3);
-
-                // Set the If-Match condition to the original ETag.
-                BlobUploadOptions blobUploadOptions = new BlobUploadOptions()
+                // Set the If-Match condition to the original ETag
+                BlobUploadOptions blobUploadOptions = new()
                 {
                     Conditions = new BlobRequestConditions()
                     {
@@ -69,9 +59,9 @@ namespace dotnet_v12
                     }
                 };
 
-                using (MemoryStream stream = new MemoryStream(byteArray))
+                using (MemoryStream stream = new(byteArray))
                 {
-                    // This call should fail with error code 412 (Precondition Failed).
+                    // This call should fail with error code 412 (Precondition Failed)
                     BlobContentInfo blobContentInfo = await blobClient.UploadAsync(stream, blobUploadOptions);
                 }
             }
@@ -80,12 +70,11 @@ namespace dotnet_v12
                 if (e.Status == (int)HttpStatusCode.PreconditionFailed)
                 {
                     Console.WriteLine(
-                        @"Precondition failure as expected. Blob's ETag does not match ETag provided.");
+                        @"Precondition failure as expected. Blob's ETag does not match ETag provided. Fetch the blob again to get updated contents and properties.");
                 }
                 else
                 {
-                    Console.WriteLine(e.Message);
-                    throw;
+                    // Handle other exceptions
                 }
             }
         }
