@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Azure;
@@ -16,52 +17,34 @@ namespace dotnet_v12
 
         #region DemonstrateOptimisticConcurrencyBlob
 
-        //-------------------------------------------------
+        //------------------------------------------------------------------
         // Demonstrate optimistic concurrency for write operations to a blob
-        //-------------------------------------------------
+        //------------------------------------------------------------------
 
         // <Snippet_DemonstrateOptimisticConcurrencyBlob>
         private static async Task DemonstrateOptimisticConcurrencyBlob(BlobClient blobClient)
         {
             Console.WriteLine("Demonstrate optimistic concurrency");
 
-            BlobContainerClient containerClient = blobClient.GetParentBlobContainerClient();
-
             try
             {
-                // Create the container if it does not exist.
-                await containerClient.CreateIfNotExistsAsync();
+                // Download a blob
+                Response<BlobDownloadResult> response = await blobClient.DownloadContentAsync();
+                BlobDownloadResult downloadResult = response.Value;
+                string blobContents = downloadResult.Content.ToString();
 
-                // Upload text to a new block blob.
-                string blobContents1 = "First update. Overwrite blob if it exists.";
-                byte[] byteArray = Encoding.ASCII.GetBytes(blobContents1);
+                ETag originalETag = downloadResult.Details.ETag;
+                Console.WriteLine("Blob ETag = {0}", originalETag);
 
-                ETag originalETag;
+                // This function simulates an external change to the blob after we've fetched it
+                // The external change updates the contents of the blob and the ETag value
+                await SimulateExternalBlobChangesAsync(blobClient);
 
-                using (MemoryStream stream = new MemoryStream(byteArray))
-                {
-                    BlobContentInfo blobContentInfo = await blobClient.UploadAsync(stream, overwrite: true);
-                    originalETag = blobContentInfo.ETag;
-                    Console.WriteLine("Blob added. Original ETag = {0}", originalETag);
-                }
+                // Now try to update the blob using the original ETag value
+                string blobContentsUpdate2 = $"{blobContents} Update 2. If-Match condition set to original ETag.";
 
-                // This code simulates an update by another client.
-                // No ETag was provided, so original blob is overwritten and ETag updated.
-                string blobContents2 = "Second update overwrites first update.";
-                byteArray = Encoding.ASCII.GetBytes(blobContents2);
-
-                using (MemoryStream stream = new MemoryStream(byteArray))
-                {
-                    BlobContentInfo blobContentInfo = await blobClient.UploadAsync(stream, overwrite: true);
-                    Console.WriteLine("Blob updated. Updated ETag = {0}", blobContentInfo.ETag);
-                }
-
-                // Now try to update the blob using the original ETag value.
-                string blobContents3 = "Third update. If-Match condition set to original ETag.";
-                byteArray = Encoding.ASCII.GetBytes(blobContents3);
-
-                // Set the If-Match condition to the original ETag.
-                BlobUploadOptions blobUploadOptions = new BlobUploadOptions()
+                // Set the If-Match condition to the original ETag
+                BlobUploadOptions blobUploadOptions = new()
                 {
                     Conditions = new BlobRequestConditions()
                     {
@@ -69,25 +52,33 @@ namespace dotnet_v12
                     }
                 };
 
-                using (MemoryStream stream = new MemoryStream(byteArray))
-                {
-                    // This call should fail with error code 412 (Precondition Failed).
-                    BlobContentInfo blobContentInfo = await blobClient.UploadAsync(stream, blobUploadOptions);
-                }
+                // This call should fail with error code 412 (Precondition Failed)
+                BlobContentInfo blobContentInfo = await blobClient.UploadAsync(BinaryData.FromString(blobContentsUpdate2), blobUploadOptions);
             }
-            catch (RequestFailedException e)
+            catch (RequestFailedException e) when (e.Status == (int)HttpStatusCode.PreconditionFailed)
             {
                 if (e.Status == (int)HttpStatusCode.PreconditionFailed)
                 {
                     Console.WriteLine(
-                        @"Precondition failure as expected. Blob's ETag does not match ETag provided.");
-                }
-                else
-                {
-                    Console.WriteLine(e.Message);
-                    throw;
+                        @"Blob's ETag does not match ETag provided. Fetch the blob to get updated contents and properties.");
                 }
             }
+        }
+
+        private static async Task SimulateExternalBlobChangesAsync(BlobClient blobClient)
+        {
+            // Simulates an external change to the blob for this example
+
+            // Download a blob
+            Response<BlobDownloadResult> response = await blobClient.DownloadContentAsync();
+            BlobDownloadResult downloadResult = response.Value;
+            string blobContents = downloadResult.Content.ToString();
+
+            // Update the existing block blob contents
+            // No ETag condition is provided, so original blob is overwritten and ETag is updated
+            string blobContentsUpdate1 = $"{blobContents} Update 1";
+            BlobContentInfo blobContentInfo = await blobClient.UploadAsync(BinaryData.FromString(blobContentsUpdate1), overwrite: true);
+            Console.WriteLine("Blob update. Updated ETag = {0}", blobContentInfo.ETag);
         }
         // </Snippet_DemonstrateOptimisticConcurrencyBlob>
 
