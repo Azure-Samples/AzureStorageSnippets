@@ -53,15 +53,13 @@ namespace dotnet_v12
                 };
 
                 // This call should fail with error code 412 (Precondition Failed)
-                BlobContentInfo blobContentInfo = await blobClient.UploadAsync(BinaryData.FromString(blobContentsUpdate2), blobUploadOptions);
+                BlobContentInfo blobContentInfo =
+                    await blobClient.UploadAsync(BinaryData.FromString(blobContentsUpdate2), blobUploadOptions);
             }
             catch (RequestFailedException e) when (e.Status == (int)HttpStatusCode.PreconditionFailed)
             {
-                if (e.Status == (int)HttpStatusCode.PreconditionFailed)
-                {
-                    Console.WriteLine(
-                        @"Blob's ETag does not match ETag provided. Fetch the blob to get updated contents and properties.");
-                }
+                Console.WriteLine(
+                    @"Blob's ETag does not match ETag provided. Fetch the blob to get updated contents and properties.");
             }
         }
 
@@ -77,7 +75,8 @@ namespace dotnet_v12
             // Update the existing block blob contents
             // No ETag condition is provided, so original blob is overwritten and ETag is updated
             string blobContentsUpdate1 = $"{blobContents} Update 1";
-            BlobContentInfo blobContentInfo = await blobClient.UploadAsync(BinaryData.FromString(blobContentsUpdate1), overwrite: true);
+            BlobContentInfo blobContentInfo =
+                await blobClient.UploadAsync(BinaryData.FromString(blobContentsUpdate1), overwrite: true);
             Console.WriteLine("Blob update. Updated ETag = {0}", blobContentInfo.ETag);
         }
         // </Snippet_DemonstrateOptimisticConcurrencyBlob>
