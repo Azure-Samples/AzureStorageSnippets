@@ -6,12 +6,37 @@ using Azure.Storage.Blobs.Specialized;
 using BlobDevGuide;
 using BlobDevGuideBlobs;
 
-#region Copy blob within a storage account
-/*
 var blobServiceClient = new BlobServiceClient(
         new Uri("https://<storage-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
+#region Lease blob operations
+/*
+BlobClient blobClient = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob.txt");
+
+BlobLeaseClient leaseClient = await LeaseBlob.AcquireBlobLeaseAsync(blobClient);
+await LeaseBlob.RenewBlobLeaseAsync(blobClient, leaseClient.LeaseId);
+await LeaseBlob.ReleaseBlobLeaseAsync(blobClient, leaseClient.LeaseId);
+//await LeaseBlob.BreakBlobLeaseAsync(blobClient);
+*/
+#endregion
+
+#region Lease container operations
+/*
+BlobContainerClient containerClient = blobServiceClient
+    .GetBlobContainerClient("sample-container");
+
+BlobLeaseClient leaseClient = await LeaseContainer.AcquireContainerLeaseAsync(containerClient);
+await LeaseContainer.RenewContainerLeaseAsync(containerClient, leaseClient.LeaseId);
+await LeaseContainer.ReleaseContainerLeaseAsync(containerClient, leaseClient.LeaseId);
+//await LeaseContainer.BreakContainerLeaseAsync(containerClient);
+*/
+#endregion
+
+#region Copy blob within a storage account
+/*
 // Instantiate BlobClient for the source blob and destination blob
 BlobClient sourceBlob = blobServiceClient
     .GetBlobContainerClient("source-container")
@@ -58,10 +83,6 @@ BlockBlobClient destBlob = blobServiceClientDest
 
 #region Copy blob from external source
 /*
-var blobServiceClient = new BlobServiceClient(
-        new Uri("https://<storage-account-name>.blob.core.windows.net"),
-        new DefaultAzureCredential());
-
 // Instantiate BlobClient for the source blob and destination blob
 BlobClient sourceBlob = blobServiceClient
     .GetBlobContainerClient("source-container")
