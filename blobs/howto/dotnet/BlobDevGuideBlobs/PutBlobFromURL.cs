@@ -17,7 +17,8 @@ namespace BlobDevGuideBlobs
             BlockBlobClient destinationBlob)
         {
             // Get the source blob URI and create the destination blob
-            await destinationBlob.SyncUploadFromUriAsync(sourceBlob.Uri/*, bool overwrite = false*/);
+            // overwrite param defaults to false
+            await destinationBlob.SyncUploadFromUriAsync(sourceBlob.Uri/*, overwrite: false*/);
         }
         // </Snippet_CopyWithinAccount_PutBlobFromURL>
 
@@ -39,7 +40,8 @@ namespace BlobDevGuideBlobs
             Uri sourceBlobSASURI = sourceBlob.GenerateSasUri(BlobSasPermissions.Read, expiresOn);
 
             // Get the source blob URI and create the destination blob
-            await destinationBlob.SyncUploadFromUriAsync(sourceBlobSASURI/*, bool overwrite = false*/);
+            // overwrite param defaults to false
+            await destinationBlob.SyncUploadFromUriAsync(sourceBlobSASURI/*, overwrite: false*/);
         }
         // </Snippet_CopyAcrossAccounts_PutBlobFromURL>
 
@@ -54,7 +56,8 @@ namespace BlobDevGuideBlobs
             Uri sourceUri = new(sourceLocation);
 
             // Get the source blob URI and create the destination blob
-            await destinationBlob.SyncUploadFromUriAsync(sourceUri/*, bool overwrite = false*/);
+            // overwrite param defaults to false
+            await destinationBlob.SyncUploadFromUriAsync(sourceUri/*, overwrite: false*/);
         }
         // </Snippet_CopyFromExternalSource_PutBlobFromURL>
 
