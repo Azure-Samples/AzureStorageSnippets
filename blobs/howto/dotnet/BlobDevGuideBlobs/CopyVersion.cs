@@ -10,7 +10,9 @@ namespace BlobDevGuideBlobs
         // Copy a previous version over a base blob
         //-------------------------------------------------
         // <Snippet_CopyVersion>
-        public static async Task<BlockBlobClient> CopyVersionOverBaseBlobAsync(BlockBlobClient client, string versionTimestamp)
+        public static async Task<BlockBlobClient> CopyVersionOverBaseBlobAsync(
+            BlockBlobClient client,
+            string versionTimestamp)
         {
             // Instantiate BlobClient with identical URI and add version timestamp
             BlockBlobClient versionClient = client.WithVersion(versionTimestamp);
