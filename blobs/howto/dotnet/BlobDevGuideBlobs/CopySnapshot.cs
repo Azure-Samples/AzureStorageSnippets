@@ -10,7 +10,9 @@ namespace BlobDevGuideBlobs
         // Copy a snapshot over a base blob
         //-------------------------------------------------
         // <Snippet_CopySnapshot>
-        public static async Task<BlockBlobClient> CopySnapshotOverBaseBlobAsync(BlockBlobClient client, string snapshotTimestamp)
+        public static async Task<BlockBlobClient> CopySnapshotOverBaseBlobAsync(
+            BlockBlobClient client,
+            string snapshotTimestamp)
         {
             // Instantiate BlockBlobClient with identical URI and add snapshot timestamp
             BlockBlobClient snapshotClient = client.WithSnapshot(snapshotTimestamp);
