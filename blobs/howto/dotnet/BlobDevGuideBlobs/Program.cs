@@ -98,3 +98,29 @@ BlockBlobClient destinationBlob = blobServiceClient
 //await PutBlobFromURL.CopyFromExternalSourceAsync("<source-url>", destinationBlob);
 */
 #endregion
+
+#region Copy blob snapshot
+/*
+// Instantiate BlockBlobClient for the destination blob
+BlockBlobClient client = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlockBlobClient("sample-blob.txt");
+
+string snapshot = "<snapshot-timestamp>";
+
+client = await CopySnapshot.CopySnapshotOverBaseBlobAsync(client, snapshot);
+*/
+#endregion
+
+#region Copy blob version
+/*
+// Instantiate BlockBlobClient for the destination blob
+BlockBlobClient client = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlockBlobClient("sample-blob.txt");
+
+string version = "<version-timestamp>";
+
+client = await CopyVersion.CopyVersionOverBaseBlobAsync(client, version);
+*/
+#endregion

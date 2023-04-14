@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 namespace BlobDevGuideBlobs
 {
@@ -9,17 +10,16 @@ namespace BlobDevGuideBlobs
         // Copy a previous version over a base blob
         //-------------------------------------------------
         // <Snippet_CopyVersion>
-        public static async Task<BlobClient> CopyVersionOverBaseBlobAsync(BlobClient blobClient, string versionTimestamp)
+        public static async Task<BlockBlobClient> CopyVersionOverBaseBlobAsync(BlockBlobClient client, string versionTimestamp)
         {
             // Instantiate BlobClient with identical URI and add version timestamp
-            BlobClient blobVersionClient = blobClient.WithVersion(versionTimestamp);
+            BlockBlobClient versionClient = client.WithVersion(versionTimestamp);
 
-            // Restore the specified snapshot by copying it over the base blob
-            CopyFromUriOperation copyOperation = await blobClient.StartCopyFromUriAsync(blobVersionClient.Uri);
-            await copyOperation.WaitForCompletionAsync();
+            // Restore the specified version by copying it over the base blob
+            await client.SyncUploadFromUriAsync(versionClient.Uri);
 
             // Return the client object after the copy operation
-            return blobClient;
+            return client;
         }
         // </Snippet_CopyVersion>
     }

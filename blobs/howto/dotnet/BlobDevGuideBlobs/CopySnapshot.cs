@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 namespace BlobDevGuideBlobs
 {
@@ -9,17 +10,16 @@ namespace BlobDevGuideBlobs
         // Copy a snapshot over a base blob
         //-------------------------------------------------
         // <Snippet_CopySnapshot>
-        public static async Task<BlobClient> CopySnapshotOverBaseBlobAsync(BlobClient blobClient, string snapshotTimestamp)
+        public static async Task<BlockBlobClient> CopySnapshotOverBaseBlobAsync(BlockBlobClient client, string snapshotTimestamp)
         {
-            // Instantiate BlobClient with identical URI and add snapshot timestamp
-            BlobClient blobSnapshotClient = blobClient.WithSnapshot(snapshotTimestamp);
+            // Instantiate BlockBlobClient with identical URI and add snapshot timestamp
+            BlockBlobClient snapshotClient = client.WithSnapshot(snapshotTimestamp);
 
             // Restore the specified snapshot by copying it over the base blob
-            CopyFromUriOperation copyOperation = await blobClient.StartCopyFromUriAsync(blobSnapshotClient.Uri);
-            await copyOperation.WaitForCompletionAsync();
+            await client.SyncUploadFromUriAsync(snapshotClient.Uri, overwrite: true);
 
             // Return the client object after the copy operation
-            return blobClient;
+            return client;
         }
         // </Snippet_CopySnapshot>
     }
