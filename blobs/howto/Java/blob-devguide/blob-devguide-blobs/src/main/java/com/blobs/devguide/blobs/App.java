@@ -11,72 +11,90 @@ public class App {
         // Create a service client using DefaultAzureCredential
         BlobServiceClient blobServiceClient = GetBlobServiceClientTokenCredential();
 
-        // Create a service client using a SAS
+        //region Create a service client using a SAS
         // String sasToken = "<SAS token>";
         // BlobServiceClient blobServiceClient = GetBlobServiceClientSAS(sasToken);
+        //endregion
 
-        // Create a service client using the account key
+        //region Create a service client using the account key
         // String accountName = "<Account name>";
         // String accountKey = "<Account key>";
         //BlobServiceClient blobServiceClient = GetBlobServiceClientAccountKey(accountName, accountKey);
+        //endregion
 
-        // Create a service client using a connection string
+        //region Create a service client using a connection string
         // String connectionString = "<Connection string>";
         //BlobServiceClient blobServiceClient = GetBlobServiceClientConnectionString(connectionString);
+        //endregion
 
         // This sample assumes a container named 'sample-container' and a blob called 'sampleBlob.txt'
         BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient("sample-container");
         BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
 
-        // Test various upload methods
-        BlobUpload uploadHelper = new BlobUpload();
-        uploadHelper.uploadDataToBlob(blobContainerClient);
+        //region Test upload methods
+        //BlobUpload uploadHelper = new BlobUpload();
+        //uploadHelper.uploadDataToBlob(blobContainerClient);
         // uploadHelper.uploadBlobFromStream(blobContainerClient);
         // uploadHelper.uploadBlobFromFile(blobContainerClient);
+        //endregion
 
-        // Test methods for properties, metadata, and tags
-        BlobPropertiesMetadataTags propertiesHelper = new BlobPropertiesMetadataTags();
-        propertiesHelper.setBlobProperties(blobClient);
-        propertiesHelper.getBlobProperties(blobClient);
-        propertiesHelper.addBlobMetadata(blobClient);
-        propertiesHelper.readBlobMetadata(blobClient);
-        propertiesHelper.setBlobTags(blobClient);
-        propertiesHelper.getBlobTags(blobClient);
-        propertiesHelper.findBlobsByTag(blobContainerClient);
+        //region Test methods for properties, metadata, and tags
+        //BlobPropertiesMetadataTags propertiesHelper = new BlobPropertiesMetadataTags();
+        //propertiesHelper.setBlobProperties(blobClient);
+        //propertiesHelper.getBlobProperties(blobClient);
+        //propertiesHelper.addBlobMetadata(blobClient);
+        //propertiesHelper.readBlobMetadata(blobClient);
+        //propertiesHelper.setBlobTags(blobClient);
+        //propertiesHelper.getBlobTags(blobClient);
+        //propertiesHelper.findBlobsByTag(blobContainerClient);
+        //endregion
 
-        // Test methods for blob leases
-        BlobLease leaseHelper = new BlobLease();
-        BlobLeaseClient leaseClient = leaseHelper.acquireBlobLease(blobClient);
-        leaseHelper.renewBlobLease(leaseClient);
-        leaseHelper.releaseBlobLease(leaseClient);
+        //region Test methods for blob leases
+        //BlobLease leaseHelper = new BlobLease();
+        //BlobLeaseClient leaseClient = leaseHelper.acquireBlobLease(blobClient);
+        //leaseHelper.renewBlobLease(leaseClient);
+        //leaseHelper.releaseBlobLease(leaseClient);
         // leaseHelper.breakBlobLease(leaseClient);
+        //endregion
 
-        // Test methods for copy blob operations
-        BlobCopy copyHelper = new BlobCopy();
-        copyHelper.copyBlob_copyFromUrl(blobServiceClient);
+        //region Test methods for copy blob operations
+        //BlobCopy copyHelper = new BlobCopy();
+        //BlobContainerClient sourceContainer = blobServiceClient.getBlobContainerClient("source-container");
+        //BlobClient sourceBlob = blobContainerClient.getBlobClient("sample-blob.txt");
+        //BlobContainerClient destinationContainer = blobServiceClient.getBlobContainerClient("destination-container");
+        //BlockBlobClient destinationBlob = destinationContainer.getBlobClient("sample-blob-copy.txt").getBlockBlobClient();
+        //copyHelper.copyFromSourceInAzure(sourceBlob, destinationBlob);
+        //String sourceURL = "<source-object-url>";
+        //copyHelper.copyFromExternalSource(sourceURL, destinationBlob);
+        //copyHelper.copyBlobWithinStorageAccount(sourceBlob, destinationBlob);
+        //copyHelper.copyBlobAcrossStorageAccounts(sourceBlob, destinationBlob);
         // copyHelper.copyBlob_beginCopy(blobServiceClient);
         // copyHelper.copyBlobWithOptions(blobServiceClient);
         // copyHelper.abortCopy(blobServiceClient);
+        //endregion
 
-        // Test methods for listing blobs
-        String prefix = "";
-        BlobList listHelper = new BlobList();
-        listHelper.listBlobsFlat(blobContainerClient);
-        listHelper.listBlobsFlatWithOptions(blobContainerClient);
-        System.out.println("List blobs hierarchical:");
-        listHelper.listBlobsHierarchicalListing(blobContainerClient, prefix);
+        //region Test methods for listing blobs
+        //String prefix = "";
+        //BlobList listHelper = new BlobList();
+        //listHelper.listBlobsFlat(blobContainerClient);
+        //listHelper.listBlobsFlatWithOptions(blobContainerClient);
+        //System.out.println("List blobs hierarchical:");
+        //listHelper.listBlobsHierarchicalListing(blobContainerClient, prefix);
+        //endregion
 
-        // Test methods for downloading blobs
-        BlobDownload downloadHelper = new BlobDownload();
+        //region Test methods for downloading blobs
+        //BlobDownload downloadHelper = new BlobDownload();
         // downloadHelper.downloadBlobToFile(blobClient);
         // downloadHelper.downloadBlobToStream(blobClient);
-        downloadHelper.downloadBlobToText(blobClient);
+        //downloadHelper.downloadBlobToText(blobClient);
         // downloadHelper.readBlobFromStream(blobClient);
+        //endregion
 
-        // Test methods for deleting blobs
-        BlobDelete deleteHelper = new BlobDelete();
-        deleteHelper.deleteBlob(blobClient);
+        //region Test methods for deleting blobs
+        //BlobDelete deleteHelper = new BlobDelete();
+        //deleteHelper.deleteBlob(blobClient);
         // deleteHelper.deleteBlobWithSnapshots(blobClient);
+        //endregion
     }
 
     // <Snippet_GetServiceClientAzureAD>
