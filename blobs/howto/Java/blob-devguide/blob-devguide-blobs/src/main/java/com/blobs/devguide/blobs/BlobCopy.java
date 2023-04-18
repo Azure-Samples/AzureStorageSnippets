@@ -4,6 +4,8 @@ import com.azure.core.util.polling.*;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 import com.azure.storage.blob.options.*;
+import com.azure.storage.blob.sas.BlobSasPermission;
+import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.blob.specialized.*;
 
 import java.time.*;
@@ -163,17 +165,121 @@ public class BlobCopy {
     }
     // </Snippet_CopyBlobOptions>
 
-    // <Snippet_AbortCopy>
-    public void abortCopy(BlobServiceClient blobServiceClient) {
-        // Get the destination blob and its properties
-        BlobClient destBlob = blobServiceClient.getBlobContainerClient("different-sample-container")
-                .getBlobClient("sampleBlob.txt");
-        BlobProperties destBlobProps = destBlob.getProperties();
+    // <Snippet_CopyFromAzure_PutBlobFromURL>
+    public void copyFromSourceInAzure(
+            BlobClient sourceBlob,
+            BlockBlobClient destinationBlob) {
+        // Get the source blob URL and create the destination blob
+        // set overwrite param to true if you want to overwrite an existing blob
+        destinationBlob.uploadFromUrl(sourceBlob.getBlobUrl(), false);
+    }
+    // </Snippet_CopyFromAzure_PutBlobFromURL>
 
+    // <Snippet_CopyFromExternalSource_PutBlobFromURL>
+    public void copyFromExternalSource(
+            String sourceURL,
+            BlockBlobClient destinationBlob) {
+        // Create the destination blob from the source URL
+        // set overwrite param to true if you want to overwrite an existing blob
+        destinationBlob.uploadFromUrl(sourceURL, false);
+    }
+    // </Snippet_CopyFromExternalSource_PutBlobFromURL>
+
+    // <Snippet_CopyWithinStorageAccount_CopyBlob>
+    public void copyBlobWithinStorageAccount(
+            BlobClient sourceBlob,
+            BlockBlobClient destinationBlob) {
+
+        // Lease the source blob to prevent changes during the copy operation
+        BlobLeaseClient lease = new BlobLeaseClientBuilder()
+                .blobClient(sourceBlob)
+                .buildClient();
+
+        try {
+            lease.acquireLease(-1);
+
+            // Start the copy operation and wait for it to complete
+            final SyncPoller<BlobCopyInfo, Void> poller = destinationBlob.beginCopy(
+                    sourceBlob.getBlobUrl(),
+                    Duration.ofSeconds(2));
+            PollResponse<BlobCopyInfo> response = poller.waitUntil(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED);
+        } finally {
+            // Release the lease once the copy operation completes
+            lease.releaseLease();
+        }
+    }
+    // </Snippet_CopyWithinStorageAccount_CopyBlob>
+
+    // <Snippet_CopyAcrossStorageAccounts_CopyBlob>
+    public void copyBlobAcrossStorageAccounts(
+            BlobClient sourceBlob,
+            BlockBlobClient destinationBlob) {
+        // Create a SAS token for the source blob or use an existing one
+        String sasToken = generateUserDelegationSAS(
+                sourceBlob.getContainerClient().getServiceClient(),
+                sourceBlob);
+
+        // Get the source blob URL and append the SAS token
+        String sourceBlobSasURL = sourceBlob.getBlobUrl() + "?" + sasToken;
+
+        // Start the copy operation and wait for it to complete
+        final SyncPoller<BlobCopyInfo, Void> poller = destinationBlob.beginCopy(
+                sourceBlobSasURL,
+                Duration.ofSeconds(2));
+        PollResponse<BlobCopyInfo> response = poller.waitUntil(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED);
+    }
+
+    public String generateUserDelegationSAS(
+            BlobServiceClient blobServiceClient,
+            BlobClient sourceBlob) {
+        // Get a user delegation key
+        OffsetDateTime delegationKeyStartTime = OffsetDateTime.now();
+        OffsetDateTime delegationKeyExpiryTime = OffsetDateTime.now().plusDays(1);
+        UserDelegationKey key = blobServiceClient.getUserDelegationKey(
+            delegationKeyStartTime,
+            delegationKeyExpiryTime);
+
+        // Create a SAS token that's valid for one day, as an example
+        OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
+
+        // Set the Read (r) permission on the SAS token
+        BlobSasPermission permission = new BlobSasPermission().setReadPermission(true);
+
+        BlobServiceSasSignatureValues myValues = new BlobServiceSasSignatureValues(expiryTime, permission)
+                .setStartTime(OffsetDateTime.now());
+
+        // Create a SAS token that's valid for one day
+        String sasToken = sourceBlob.generateUserDelegationSas(myValues, key);
+
+        return sasToken;
+    }
+    // </Snippet_CopyAcrossStorageAccounts_CopyBlob>
+
+    // <Snippet_CopyFromExternalSource_CopyBlob>
+    public void copyFromExternalSourceAsyncScheduling(
+            String sourceURL,
+            BlockBlobClient destinationBlob) {
+        // Start the copy operation and wait for it to complete
+        final SyncPoller<BlobCopyInfo, Void> poller = destinationBlob.beginCopy(
+                sourceURL,
+                Duration.ofSeconds(2));
+        PollResponse<BlobCopyInfo> response = poller.waitUntil(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED);
+    }
+    // </Snippet_CopyFromExternalSource_CopyBlob>
+
+    // <Snippet_CheckCopyStatus>
+    public void checkCopyStatus(BlobCopyInfo copyInfo) {
+        // Check the copy status for the 
+        System.out.printf("Copy status", copyInfo.getCopyStatus());
+    }
+    // </Snippet_CheckCopyStatus>
+
+    // <Snippet_AbortCopy>
+    public void abortCopy(BlobCopyInfo copyInfo, BlobClient destinationBlob) {
         // Check the copy status and abort if pending
-        if (destBlobProps.getCopyStatus() == CopyStatusType.PENDING) {
-            destBlob.abortCopyFromUrl(destBlobProps.getCopyId());
-            System.out.printf("Copy operation %s has been aborted%n", destBlobProps.getCopyId());
+        if (copyInfo.getCopyStatus() == CopyStatusType.PENDING) {
+            destinationBlob.abortCopyFromUrl(copyInfo.getCopyId());
+            System.out.printf("Copy operation %s has been aborted%n", copyInfo.getCopyId());
         }
     }
     // </Snippet_AbortCopy>
