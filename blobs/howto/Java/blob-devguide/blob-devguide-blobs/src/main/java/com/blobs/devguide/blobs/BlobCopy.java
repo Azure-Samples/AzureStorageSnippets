@@ -235,11 +235,11 @@ public class BlobCopy {
         // Set the Read (r) permission on the SAS token
         BlobSasPermission permission = new BlobSasPermission().setReadPermission(true);
 
-        BlobServiceSasSignatureValues myValues = new BlobServiceSasSignatureValues(expiryTime, permission)
+        BlobServiceSasSignatureValues sasValues = new BlobServiceSasSignatureValues(expiryTime, permission)
                 .setStartTime(OffsetDateTime.now());
 
         // Create a SAS token that's valid for one day
-        String sasToken = sourceBlob.generateUserDelegationSas(myValues, key);
+        String sasToken = sourceBlob.generateUserDelegationSas(sasValues, key);
 
         return sasToken;
     }
