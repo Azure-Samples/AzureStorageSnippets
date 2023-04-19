@@ -166,9 +166,7 @@ public class BlobCopy {
     // </Snippet_CopyBlobOptions>
 
     // <Snippet_CopyFromAzure_PutBlobFromURL>
-    public void copyFromSourceInAzure(
-            BlobClient sourceBlob,
-            BlockBlobClient destinationBlob) {
+    public void copyFromSourceInAzure(BlobClient sourceBlob, BlockBlobClient destinationBlob) {
         // Get the source blob URL and create the destination blob
         // set overwrite param to true if you want to overwrite an existing blob
         destinationBlob.uploadFromUrl(sourceBlob.getBlobUrl(), false);
@@ -176,9 +174,7 @@ public class BlobCopy {
     // </Snippet_CopyFromAzure_PutBlobFromURL>
 
     // <Snippet_CopyFromExternalSource_PutBlobFromURL>
-    public void copyFromExternalSource(
-            String sourceURL,
-            BlockBlobClient destinationBlob) {
+    public void copyFromExternalSource(String sourceURL, BlockBlobClient destinationBlob) {
         // Create the destination blob from the source URL
         // set overwrite param to true if you want to overwrite an existing blob
         destinationBlob.uploadFromUrl(sourceURL, false);
@@ -186,10 +182,7 @@ public class BlobCopy {
     // </Snippet_CopyFromExternalSource_PutBlobFromURL>
 
     // <Snippet_CopyWithinStorageAccount_CopyBlob>
-    public void copyBlobWithinStorageAccount(
-            BlobClient sourceBlob,
-            BlockBlobClient destinationBlob) {
-
+    public void copyBlobWithinStorageAccount(BlobClient sourceBlob, BlockBlobClient destinationBlob) {
         // Lease the source blob to prevent changes during the copy operation
         BlobLeaseClient lease = new BlobLeaseClientBuilder()
                 .blobClient(sourceBlob)
@@ -212,9 +205,7 @@ public class BlobCopy {
     // </Snippet_CopyWithinStorageAccount_CopyBlob>
 
     // <Snippet_CopyAcrossStorageAccounts_CopyBlob>
-    public void copyBlobAcrossStorageAccounts(
-            BlobClient sourceBlob,
-            BlockBlobClient destinationBlob) {
+    public void copyBlobAcrossStorageAccounts(BlobClient sourceBlob, BlockBlobClient destinationBlob) {
         // Create a SAS token for the source blob or use an existing one
         String sasToken = generateUserDelegationSAS(
                 sourceBlob.getContainerClient().getServiceClient(),
@@ -230,9 +221,7 @@ public class BlobCopy {
         PollResponse<BlobCopyInfo> response = poller.waitUntil(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED);
     }
 
-    public String generateUserDelegationSAS(
-            BlobServiceClient blobServiceClient,
-            BlobClient sourceBlob) {
+    public String generateUserDelegationSAS(BlobServiceClient blobServiceClient, BlobClient sourceBlob) {
         // Get a user delegation key
         OffsetDateTime delegationKeyStartTime = OffsetDateTime.now();
         OffsetDateTime delegationKeyExpiryTime = OffsetDateTime.now().plusDays(1);
@@ -257,9 +246,7 @@ public class BlobCopy {
     // </Snippet_CopyAcrossStorageAccounts_CopyBlob>
 
     // <Snippet_CopyFromExternalSource_CopyBlob>
-    public void copyFromExternalSourceAsyncScheduling(
-            String sourceURL,
-            BlockBlobClient destinationBlob) {
+    public void copyFromExternalSourceAsyncScheduling(String sourceURL, BlockBlobClient destinationBlob) {
         // Start the copy operation and wait for it to complete
         final SyncPoller<BlobCopyInfo, Void> poller = destinationBlob.beginCopy(
                 sourceURL,
