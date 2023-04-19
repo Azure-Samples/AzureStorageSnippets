@@ -196,6 +196,7 @@ public class BlobCopy {
                 .buildClient();
 
         try {
+            // Specifying -1 creates an infinite lease
             lease.acquireLease(-1);
 
             // Start the copy operation and wait for it to complete
@@ -269,7 +270,7 @@ public class BlobCopy {
 
     // <Snippet_CheckCopyStatus>
     public void checkCopyStatus(BlobCopyInfo copyInfo) {
-        // Check the copy status for the 
+        // Check the status of the copy operation 
         System.out.printf("Copy status", copyInfo.getCopyStatus());
     }
     // </Snippet_CheckCopyStatus>
