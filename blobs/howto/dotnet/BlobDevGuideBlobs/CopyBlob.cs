@@ -63,18 +63,63 @@ namespace BlobDevGuide
             BlobClient sourceBlob,
             BlockBlobClient destinationBlob)
         {
-            // Note: to use GenerateSasUri() for the source blob, the
-            // source blob client must be authorized via account key
-
-            // Set the SAS token to expire in 60 minutes, as an example
-            DateTimeOffset expiresOn = DateTimeOffset.UtcNow.AddMinutes(60);
+            // Lease the source blob to prevent changes during the copy operation
+            BlobLeaseClient sourceBlobLease = new(sourceBlob);
 
             // Create a Uri object with a SAS token appended - specify Read (r) permissions
-            Uri sourceBlobSASURI = sourceBlob.GenerateSasUri(BlobSasPermissions.Read, expiresOn);
+            Uri sourceBlobSASURI = await GenerateUserDelegationSAS(sourceBlob);
 
-            // Start the copy operation and wait for it to complete
-            CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlobSASURI);
-            await copyOperation.WaitForCompletionAsync();
+            try
+            {
+                await sourceBlobLease.AcquireAsync(BlobLeaseClient.InfiniteLeaseDuration);
+
+                // Start the copy operation and wait for it to complete
+                CopyFromUriOperation copyOperation = await destinationBlob.StartCopyFromUriAsync(sourceBlobSASURI);
+                await copyOperation.WaitForCompletionAsync();
+            }
+            catch (RequestFailedException ex)
+            {
+                // Handle the exception
+            }
+            finally
+            {
+                // Release the lease once the copy operation completes
+                await sourceBlobLease.ReleaseAsync();
+            }
+        }
+
+        async static Task<Uri> GenerateUserDelegationSAS(BlobClient sourceBlob)
+        {
+            BlobServiceClient blobServiceClient =
+                sourceBlob.GetParentBlobContainerClient().GetParentBlobServiceClient();
+
+            // Get a user delegation key for the Blob service that's valid for 1 day
+            UserDelegationKey userDelegationKey =
+                await blobServiceClient.GetUserDelegationKeyAsync(DateTimeOffset.UtcNow,
+                                                                  DateTimeOffset.UtcNow.AddDays(1));
+
+            // Create a SAS token that's also valid for 1 day
+            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = sourceBlob.BlobContainerName,
+                BlobName = sourceBlob.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow,
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(1)
+            };
+
+            // Specify read permissions for the SAS
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            // Add the SAS token to the blob URI
+            BlobUriBuilder blobUriBuilder = new BlobUriBuilder(sourceBlob.Uri)
+            {
+                // Specify the user delegation key
+                Sas = sasBuilder.ToSasQueryParameters(userDelegationKey,
+                                                      blobServiceClient.AccountName)
+            };
+
+            return blobUriBuilder.ToUri();
         }
         // </Snippet_CopyAcrossAccounts_CopyBlob>
 

@@ -54,12 +54,10 @@ BlockBlobClient destinationBlob = blobServiceClient
 #endregion
 
 #region Copy blob across storage accounts
-/*
-string srcAccountName = "<source-account-name";
-string srcAccountKey = "<account-key>";
+
 BlobServiceClient blobServiceClientSrc = new(
-        new Uri($"https://{srcAccountName}.blob.core.windows.net"),
-        new StorageSharedKeyCredential(srcAccountName, srcAccountKey));
+        new Uri("https://<src-account-name>.blob.core.windows.net"),
+        new DefaultAzureCredential());
 
 BlobServiceClient blobServiceClientDest = new(
         new Uri("https://<destination-account-name>.blob.core.windows.net"),
@@ -74,11 +72,11 @@ BlockBlobClient destBlob = blobServiceClientDest
     .GetBlockBlobClient("sample-blob.txt");
 
 // Using Copy Blob API
-//await CopyBlob.CopyAcrossStorageAccountsAsync(srcBlob, destBlob);
+await CopyBlob.CopyAcrossStorageAccountsAsync(srcBlob, destBlob);
 
 // Using Put Blob From URL API
 //await PutBlobFromURL.CopyAcrossStorageAccountsAsync(srcBlob, destBlob);
-*/
+
 #endregion
 
 #region Copy blob from external source
