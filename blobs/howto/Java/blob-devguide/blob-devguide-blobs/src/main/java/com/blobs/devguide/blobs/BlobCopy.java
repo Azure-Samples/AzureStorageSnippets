@@ -206,6 +206,11 @@ public class BlobCopy {
 
     // <Snippet_CopyAcrossStorageAccounts_CopyBlob>
     public void copyBlobAcrossStorageAccounts(BlobClient sourceBlob, BlockBlobClient destinationBlob) {
+        // Lease the source blob during copy to prevent other clients from modifying it
+        BlobLeaseClient lease = new BlobLeaseClientBuilder()
+                .blobClient(sourceBlob)
+                .buildClient();
+
         // Create a SAS token for the source blob or use an existing one
         String sasToken = generateUserDelegationSAS(
                 sourceBlob.getContainerClient().getServiceClient(),
@@ -214,11 +219,19 @@ public class BlobCopy {
         // Get the source blob URL and append the SAS token
         String sourceBlobSasURL = sourceBlob.getBlobUrl() + "?" + sasToken;
 
-        // Start the copy operation and wait for it to complete
-        final SyncPoller<BlobCopyInfo, Void> poller = destinationBlob.beginCopy(
-                sourceBlobSasURL,
-                Duration.ofSeconds(2));
-        PollResponse<BlobCopyInfo> response = poller.waitUntil(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED);
+        try {
+            // Specifying -1 creates an infinite lease
+            lease.acquireLease(-1);
+
+            // Start the copy operation and wait for it to complete
+            final SyncPoller<BlobCopyInfo, Void> poller = destinationBlob.beginCopy(
+                    sourceBlobSasURL,
+                    Duration.ofSeconds(2));
+            PollResponse<BlobCopyInfo> response = poller.waitUntil(LongRunningOperationStatus.SUCCESSFULLY_COMPLETED);
+        } finally {
+            // Release the lease once the copy operation completes
+            lease.releaseLease();
+        }
     }
 
     public String generateUserDelegationSAS(BlobServiceClient blobServiceClient, BlobClient sourceBlob) {
