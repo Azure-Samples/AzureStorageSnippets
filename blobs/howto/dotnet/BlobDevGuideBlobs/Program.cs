@@ -55,11 +55,9 @@ BlockBlobClient destinationBlob = blobServiceClient
 
 #region Copy blob across storage accounts
 /*
-string srcAccountName = "<source-account-name";
-string srcAccountKey = "<account-key>";
 BlobServiceClient blobServiceClientSrc = new(
-        new Uri($"https://{srcAccountName}.blob.core.windows.net"),
-        new StorageSharedKeyCredential(srcAccountName, srcAccountKey));
+        new Uri("https://<src-account-name>.blob.core.windows.net"),
+        new DefaultAzureCredential());
 
 BlobServiceClient blobServiceClientDest = new(
         new Uri("https://<destination-account-name>.blob.core.windows.net"),
