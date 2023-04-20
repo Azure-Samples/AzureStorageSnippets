@@ -55,7 +55,7 @@ namespace BlobDevGuideBlobs
         {
             Uri sourceUri = new(sourceLocation);
 
-            // Get the source blob URI and create the destination blob
+            // Create the destination blob from the source URL
             // overwrite param defaults to false
             await destinationBlob.SyncUploadFromUriAsync(sourceUri/*, overwrite: false*/);
         }
