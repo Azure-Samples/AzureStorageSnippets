@@ -10,7 +10,7 @@ class BlobCopySamples(object):
     def copy_from_source_in_azure(self, source_blob: BlobClient, destination_blob: BlobClient):
         # Get the source blob URL and create the destination blob
         # set overwrite param to True if you want to overwrite existing blob data
-        destination_blob.upload_blob_from_url(source_url=source_blob.primary_endpoint.url, overwrite=False)
+        destination_blob.upload_blob_from_url(source_url=source_blob.url, overwrite=False)
     # </Snippet_copy_from_azure_put_blob_from_url>
 
     # <Snippet_copy_from_external_source_put_blob_from_url>
@@ -37,5 +37,5 @@ if __name__ == '__main__':
 
     # Copy a blob from an external source to a blob
     source_url = "<source-url>"
-    destination = blob_service_client.get_blob_client(container="destination-container", blob="sample-blob.txt")
+    destination = blob_service_client.get_blob_client(container="destination-container", blob="sample-blob-ext.txt")
     sample.copy_from_external_source(source_url=source_url, destination_blob=destination)

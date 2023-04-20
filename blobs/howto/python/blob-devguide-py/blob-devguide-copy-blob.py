@@ -11,7 +11,7 @@ from azure.storage.blob import (
 
 class BlobCopySamples(object):
 
-    # <Snippet_copy_blob_from_azure>
+    # <Snippet_copy_blob_from_azure_async>
     def copy_from_source_in_azure_async(self, source_blob: BlobClient, destination_blob: BlobClient, blob_service_client: BlobServiceClient):
         # Lease the source blob during copy to prevent other clients from modifying it
         lease = BlobLeaseClient(client=source_blob)
@@ -27,28 +27,10 @@ class BlobCopySamples(object):
         copy_operation = destination_blob.start_copy_from_url(source_url=source_blob_sas_url, requires_sync=False)
         
         # If start_copy_from_url returns copy_status of 'pending', the operation has been started asynchronously
-        # Let's wait for the copy operation to complete
-        if copy_operation['copy_status'] == 'pending':
-            self.wait_for_copy_to_complete(destination_blob)
+        # You can optionally add logic here to wait for the copy operation to complete
 
         # Release the lease on the source blob
         lease.break_lease()
-
-    def wait_for_copy_to_complete(self, destination_blob: BlobClient):
-        # Get the copy status from the destination blob properties
-        copy_status = destination_blob.get_blob_properties().copy.status
-
-        # Check the copy status and wait if pending
-        count = 0
-        # Check the destination blob copy status every 5 seconds, as an example
-        while copy_status == 'pending':
-            count = count + 1
-            # Poll the copy status a certain number of times before taking other actions
-            if count > 10:
-                # Alert the user or abort the copy operation
-                break
-            time.sleep(5)
-            copy_status = destination_blob.get_blob_properties().copy.status
 
     def generate_user_delegation_sas(self, blob_service_client: BlobServiceClient, source_blob: BlobClient):
         # Get a user delegation key
@@ -72,9 +54,9 @@ class BlobCopySamples(object):
         )
 
         return sas_token
-    # </Snippet_copy_blob_from_azure>
+    # </Snippet_copy_blob_from_azure_async>
 
-    # <Snippet_copy_blob_external_source>
+    # <Snippet_copy_blob_external_source_async>
     def copy_from_external_source_async(self, source_url: str, destination_blob: BlobClient):
         # Start the copy operation - specify False for the requires_sync parameter
         copy_operation = dict()
@@ -82,7 +64,15 @@ class BlobCopySamples(object):
         
         # If start_copy_from_url returns copy_status of 'pending', the operation has been started asynchronously
         # You can optionally add logic here to wait for the copy operation to complete
-    # </Snippet_copy_blob_external_source>
+    # </Snippet_copy_blob_external_source_async>
+
+    # <Snippet_check_copy_status>
+    def check_copy_status(self, destination_blob: BlobClient):
+        # Get the copy status from the destination blob properties
+        copy_status = destination_blob.get_blob_properties().copy.status
+
+        return copy_status
+    # </Snippet_check_copy_status>
 
     # <Snippet_abort_copy>
     def abort_copy(self, destination_blob: BlobClient):
