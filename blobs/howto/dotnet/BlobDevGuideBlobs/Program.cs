@@ -10,6 +10,18 @@ var blobServiceClient = new BlobServiceClient(
         new Uri("https://<storage-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
+#region Upload blob
+/*
+UploadBlob.UploadBlobSamples(blobServiceClient);
+*/
+#endregion
+
+#region Download blob
+/*
+DownloadBlob.DownloadBlobSamples(blobServiceClient);
+*/
+#endregion
+
 #region Lease blob operations
 /*
 BlobClient blobClient = blobServiceClient
