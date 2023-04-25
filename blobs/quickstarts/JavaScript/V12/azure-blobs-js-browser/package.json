@@ -21,6 +21,6 @@
     "@azure/storage-blob": "^12.8.0"
   },
   "devDependencies": {
-    "parcel": "^2.3.2"
+    "parcel": "^2.8.3"
   }
 }
