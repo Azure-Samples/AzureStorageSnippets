@@ -44,21 +44,16 @@ class BlobSamples(object):
 
         with open(file=local_file_path, mode="rb") as file_stream:
             block_id_list = []
-            bytes_left = os.path.getsize(local_file_path)
 
-            while bytes_left > 0:
-                if bytes_left >= block_size:
-                    buffer = file_stream.read(block_size)
-                else:
-                    buffer = file_stream.read(bytes_left)
-                    bytes_left = os.path.getsize(local_file_path) - file_stream.tell()
+            while True:
+                buffer = file_stream.read(block_size)
+                if not buffer:
+                    break
 
                 block_id = uuid.uuid4().hex
                 block_id_list.append(BlobBlock(block_id=block_id))
 
                 blob_client.stage_block(block_id=block_id, data=buffer, length=len(buffer))
-
-                bytes_left = os.path.getsize(local_file_path) - file_stream.tell()
 
             blob_client.commit_block_list(block_id_list)
     # </Snippet_upload_blob_blocks>
@@ -74,7 +69,7 @@ if __name__ == '__main__':
 
     sample = BlobSamples()
 
-    file_path = os.path.join('file_path', 'file_name')
+    file_path = os.path.join(r'file_path', 'file_name')
     block_size = 1024*1024*4
     sample.upload_blocks(container_client, file_path, block_size)
 
