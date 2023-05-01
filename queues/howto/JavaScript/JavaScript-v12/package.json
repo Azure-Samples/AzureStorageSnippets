@@ -9,7 +9,7 @@
     "author": "Your Name",
     "license": "MIT",
     "dependencies": {
-        "@azure/storage-queue": "^12.0.0",
+        "@azure/storage-queue": "^12.13.0",
         "@types/dotenv": "^4.0.3",
         "dotenv": "^6.0.0"
     }
