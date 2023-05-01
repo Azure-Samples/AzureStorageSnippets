@@ -8,8 +8,11 @@ import com.azure.storage.blob.options.BlobUploadFromFileOptions;
 import com.azure.storage.blob.specialized.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 
@@ -68,4 +71,40 @@ public class BlobUpload {
         }
     }
     // </Snippet_UploadBlobTags>
+
+    // <Snippet_UploadBlocks>
+    public void uploadBlocks(BlobContainerClient blobContainerClient, String localFilePath, int blockSize) throws IOException {
+        String fileName = new File(localFilePath).getName();
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(fileName).getBlockBlobClient();
+    
+        FileInputStream fileStream = new FileInputStream(localFilePath);
+        ArrayList<String> blockIDArrayList = new ArrayList<>();
+        byte[] buffer;
+    
+        long bytesLeft = fileStream.available();
+    
+        while (bytesLeft > 0) {
+            if (bytesLeft >= blockSize) {
+                buffer = new byte[blockSize];
+                fileStream.read(buffer, 0, blockSize);
+            } else {
+                buffer = new byte[(int) bytesLeft];
+                fileStream.read(buffer, 0, (int) bytesLeft);
+                bytesLeft = fileStream.available();
+            }
+    
+            try (ByteArrayInputStream stream = new ByteArrayInputStream(buffer)) {
+                String blockID = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
+    
+                blockIDArrayList.add(blockID);
+                blobClient.stageBlock(blockID, stream, buffer.length);
+            }
+            bytesLeft = fileStream.available();
+        }
+    
+        String[] blockIDArray = blockIDArrayList.toArray(new String[0]);
+    
+        blobClient.commitBlockList(Arrays.asList(blockIDArray));
+    }
+    // </Snippet_UploadBlocks>
 }
