@@ -24,50 +24,50 @@ async function main(): Promise<void> {
     .getContainerClient("sample-container");
 
   // Acquire lease
-  const leaseClient = await acquireBlobLeaseAsync(blobContainerClient);
+  const leaseClient = await acquireContainerLeaseAsync(blobContainerClient);
   // Output the blob lease status for testing
   console.log((await blobContainerClient.getProperties()).leaseState);
 
   // Renew lease
-  await renewBlobLeaseAsync(blobContainerClient, leaseClient.leaseId);
+  await renewContainerLeaseAsync(blobContainerClient, leaseClient.leaseId);
 
   // Release lease
-  await releaseBlobLeaseAsync(blobContainerClient, leaseClient.leaseId);
+  await releaseContainerLeaseAsync(blobContainerClient, leaseClient.leaseId);
   // Output the blob lease status for testing
   console.log((await blobContainerClient.getProperties()).leaseState);
 
   // Break lease
-  //await breakBlobLeaseAsync(blobClient);
+  //await breakContainerLeaseAsync(blobClient);
 }
 
-// <Snippet_AcquireBlobLease>
-async function acquireBlobLeaseAsync(blobContainerClient: ContainerClient) {
+// <Snippet_AcquireContainerLease>
+async function acquireContainerLeaseAsync(blobContainerClient: ContainerClient) {
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient();
   await leaseClient.acquireLease(30);
   return leaseClient;
 }
-// </Snippet_AcquireBlobLease>
+// </Snippet_AcquireContainerLease>
 
-// <Snippet_RenewBlobLease>
-async function renewBlobLeaseAsync(blobContainerClient: ContainerClient, leaseID: string) {
+// <Snippet_RenewContainerLease>
+async function renewContainerLeaseAsync(blobContainerClient: ContainerClient, leaseID: string) {
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient(leaseID);
   await leaseClient.renewLease();
 }
-// </Snippet_RenewBlobLease>
+// </Snippet_RenewContainerLease>
 
-// <Snippet_ReleaseBlobLease>
-async function releaseBlobLeaseAsync(blobContainerClient: ContainerClient, leaseID: string) {
+// <Snippet_ReleaseContainerLease>
+async function releaseContainerLeaseAsync(blobContainerClient: ContainerClient, leaseID: string) {
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient(leaseID);
   await leaseClient.releaseLease();
 }
-// </Snippet_ReleaseBlobLease>
+// </Snippet_ReleaseContainerLease>
 
-// <Snippet_BreakBlobLease>
-async function breakBlobLeaseAsync(blobContainerClient: ContainerClient, breakPeriod: number) {
+// <Snippet_BreakContainerLease>
+async function breakContainerLeaseAsync(blobContainerClient: ContainerClient, breakPeriod: number) {
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient();
   await leaseClient.breakLease(breakPeriod);
 }
-// </Snippet_BreakBlobLease>
+// </Snippet_BreakContainerLease>
 
 main()
   .then(() => console.log('success'))
