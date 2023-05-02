@@ -61,7 +61,7 @@ async function releaseBlobLeaseAsync(blobClient: BlobClient, leaseID: string) {
   const leaseClient: BlobLeaseClient = blobClient.getBlobLeaseClient(leaseID);
   await leaseClient.releaseLease();
 }
-// <Snippet_ReleaseBlobLease>
+// </Snippet_ReleaseBlobLease>
 
 // <Snippet_BreakBlobLease>
 async function breakBlobLeaseAsync(blobClient: BlobClient, breakPeriod: number) {
