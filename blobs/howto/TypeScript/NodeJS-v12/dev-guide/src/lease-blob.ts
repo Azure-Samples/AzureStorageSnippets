@@ -41,30 +41,34 @@ async function main(): Promise<void> {
   //await breakBlobLeaseAsync(blobClient);
 }
 
-// Acquire Blob Lease
+// <Snippet_AcquireBlobLease>
 async function acquireBlobLeaseAsync(blobClient: BlobClient) {
   const leaseClient: BlobLeaseClient = blobClient.getBlobLeaseClient();
   await leaseClient.acquireLease(30);
   return leaseClient;
 }
+// </Snippet_AcquireBlobLease>
 
-// Renew Blob Lease
+// <Snippet_RenewBlobLease>
 async function renewBlobLeaseAsync(blobClient: BlobClient, leaseID: string) {
   const leaseClient: BlobLeaseClient = blobClient.getBlobLeaseClient(leaseID);
   await leaseClient.renewLease();
 }
+// </Snippet_RenewBlobLease>
 
-// Release Blob Lease
+// <Snippet_ReleaseBlobLease>
 async function releaseBlobLeaseAsync(blobClient: BlobClient, leaseID: string) {
   const leaseClient: BlobLeaseClient = blobClient.getBlobLeaseClient(leaseID);
   await leaseClient.releaseLease();
 }
+// <Snippet_ReleaseBlobLease>
 
-// Break Blob Lease
+// <Snippet_BreakBlobLease>
 async function breakBlobLeaseAsync(blobClient: BlobClient, breakPeriod: number) {
   const leaseClient: BlobLeaseClient = blobClient.getBlobLeaseClient();
   await leaseClient.breakLease(breakPeriod);
 }
+// </Snippet_BreakBlobLease>
 
 main()
   .then(() => console.log('success'))
