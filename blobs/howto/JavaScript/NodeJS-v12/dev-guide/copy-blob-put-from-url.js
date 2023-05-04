@@ -41,7 +41,6 @@ async function main() {
 // <Snippet_copy_from_azure_put_blob_from_url>
 async function copyFromSourceInAzure(sourceBlob, destinationBlob) {
   // Get the source blob URL and create the destination blob
-  // set overwrite param to True if you want to overwrite existing blob data
   await destinationBlob.syncUploadFromURL(sourceBlob.url);
 }
 // </Snippet_copy_from_azure_put_blob_from_url>
@@ -49,7 +48,6 @@ async function copyFromSourceInAzure(sourceBlob, destinationBlob) {
 // <Snippet_copy_from_external_source_put_blob_from_url>
 async function copyFromExternalSource(sourceUrl, destinationBlob) {
   // Create the destination blob from the source URL
-  // set overwrite param to True if you want to overwrite existing blob data
   await destinationBlob.syncUploadFromURL(sourceUrl);
 }
 // </Snippet_copy_from_external_source_put_blob_from_url>
