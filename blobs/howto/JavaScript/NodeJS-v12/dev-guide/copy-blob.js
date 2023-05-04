@@ -31,11 +31,11 @@ async function main() {
 
   const sourceBlob = blobServiceClient
     .getContainerClient("source-container")
-    .getBlobClient("sample-blob.txt");
+    .getBlockBlobClient("sample-blob.txt");
 
   const destinationBlob = blobServiceClientDest
     .getContainerClient("destination-container")
-    .getBlobClient("sample-blob-copy.txt");
+    .getBlockBlobClient("sample-blob-copy.txt");
 
   copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobServiceClient);
 
@@ -52,7 +52,7 @@ async function copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobS
   // Lease the source blob to prevent changes during the copy operation
   const sourceBlobLease = new BlobLeaseClient(sourceBlob);
 
-  // Create a SAS token that's also valid for 1 day
+  // Create a SAS token that's valid for 1 hour
   const sasToken = await generateUserDelegationSAS(sourceBlob, blobServiceClient);
   const sourceBlobSASURL = sourceBlob.url + "?" + sasToken;
 
@@ -79,7 +79,7 @@ async function generateUserDelegationSAS(sourceBlob, blobServiceClient) {
     delegationKeyExpiry
   );
 
-  // Create a SAS token that's also valid for 1 hour, as an example
+  // Create a SAS token that's valid for 1 hour, as an example
   const sasTokenStart = new Date();
   const sasTokenExpiry = new Date(Date.now() + 3600000);
   const blobName = sourceBlob.name;
@@ -111,7 +111,7 @@ async function copyFromExternalSource(sourceURL, destinationBlob) {
 // </Snippet_copy_blob_external_source_async>
 
 // <Snippet_check_copy_status_async>
-async function checkCopyStatus(copyPoller) {
+async function checkCopyStatus(destinationBlob) {
   const properties = await destinationBlob.getProperties();
   console.log(properties.copyStatus);
 }
