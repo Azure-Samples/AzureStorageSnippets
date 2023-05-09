@@ -371,7 +371,7 @@ namespace dotnet_v12
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
-            Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.accountName, Constants.accountKey);
+            Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, Constants.accountKey);
 
             // Uncomment if you want to test AD Authorization.
             //   Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, 
@@ -380,7 +380,7 @@ namespace dotnet_v12
             // Get file system client
 
             DataLakeFileSystemClient fileSystemClient =
-                GetFileSystem(dataLakeServiceClient, "sample-filesystem");
+                GetFileSystem(dataLakeServiceClient, Constants.containerName);
             
             switch (Console.ReadLine())
             {
