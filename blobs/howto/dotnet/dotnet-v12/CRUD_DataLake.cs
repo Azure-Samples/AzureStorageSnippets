@@ -153,7 +153,7 @@ namespace dotnet_v12
         public void DeleteDirectory(DataLakeFileSystemClient fileSystemClient)
         {
             DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("sample-directory");
+                fileSystemClient.GetDirectoryClient("my-directory");
 
             directoryClient.Delete();
         }
@@ -450,7 +450,7 @@ namespace dotnet_v12
 
                 case "9":
 
-                    await RestoreDirectory(fileSystemClient, "sample-directory");
+                    await RestoreDirectory(fileSystemClient, "my-directory");
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
