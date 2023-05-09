@@ -153,11 +153,39 @@ namespace dotnet_v12
         public void DeleteDirectory(DataLakeFileSystemClient fileSystemClient)
         {
             DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("my-directory");
+                fileSystemClient.GetDirectoryClient("sample-directory");
 
             directoryClient.Delete();
         }
         // </Snippet_DeleteDirectory>
+
+        #endregion
+
+        #region Restore a soft-deleted directory
+
+        // ---------------------------------------------------------
+        // Restore a soft-deleted directory
+        //----------------------------------------------------------
+
+        // <Snippet_RestoreDirectory>
+        public async Task RestoreDirectory(DataLakeFileSystemClient fileSystemClient, string directoryName)
+        {
+            DataLakeDirectoryClient directoryClient =
+                fileSystemClient.GetDirectoryClient(directoryName);
+
+            // List deleted paths
+            List<PathDeletedItem> deletedItems = new List<PathDeletedItem>();
+            await foreach (PathDeletedItem deletedItem in fileSystemClient.GetDeletedPathsAsync(directoryName))
+            {
+                deletedItems.Add(deletedItem);
+            }
+
+            // Restore deleted directory
+            Response<DataLakePathClient> restoreResponse = await fileSystemClient.UndeletePathAsync(
+                deletedItems[0].Path,
+                deletedItems[0].DeletionId);
+        }
+        // </Snippet_RestoreDirectory>
 
         #endregion
 
@@ -339,10 +367,11 @@ namespace dotnet_v12
             Console.WriteLine("6) Upload files to a directory");
             Console.WriteLine("7) Upload files to a directory in bulk");
             Console.WriteLine("8) Download a file from a directory");
+            Console.WriteLine("9) Restore a soft-deleted directory");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
-            Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, Constants.accountKey);
+            Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.accountName, Constants.accountKey);
 
             // Uncomment if you want to test AD Authorization.
             //   Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, 
@@ -351,7 +380,7 @@ namespace dotnet_v12
             // Get file system client
 
             DataLakeFileSystemClient fileSystemClient =
-                GetFileSystem(dataLakeServiceClient, Constants.containerName);
+                GetFileSystem(dataLakeServiceClient, "sample-filesystem");
             
             switch (Console.ReadLine())
             {
@@ -414,6 +443,14 @@ namespace dotnet_v12
                 case "8":
 
                     await DownloadFile2(fileSystemClient);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "9":
+
+                    await RestoreDirectory(fileSystemClient, "sample-directory");
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
