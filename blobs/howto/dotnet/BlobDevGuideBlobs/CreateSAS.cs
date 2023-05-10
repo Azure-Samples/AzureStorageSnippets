@@ -14,23 +14,25 @@ namespace BlobDevGuideBlobs
     {
         public static async Task CreateUserDelegationSASSamples(BlobServiceClient blobServiceClient)
         {
+            // Get a user delegation key
+            UserDelegationKey key = GetUserDelegationKey(blobServiceClient).Result;
+
             // <Snippet_UseUserDelegationSASContainer>
             // Create a Uri object with a user delegation SAS appended
             BlobContainerClient containerClient = blobServiceClient
                 .GetBlobContainerClient("sample-container");
-            Uri containerSASURI = await CreateUserDelegationSASContainer(containerClient);
+            Uri containerSASURI = await CreateUserDelegationSASContainer(containerClient, key);
 
             // Create a container client object representing 'sample-container' with SAS authorization
             BlobContainerClient containerClientSAS = new BlobContainerClient(containerSASURI);
             // </Snippet_UseUserDelegationSASContainer>
-            UploadBlob.UploadFromStringAsync(containerClientSAS, "sample-blob.txt");
 
             // <Snippet_UseUserDelegationSASBlob>
             // Create a Uri object with a user delegation SAS appended
             BlobClient blobClient = blobServiceClient
                 .GetBlobContainerClient("sample-container")
                 .GetBlobClient("sample-blob.txt");
-            Uri blobSASURI = await CreateUserDelegationSASBlob(blobClient);
+            Uri blobSASURI = await CreateUserDelegationSASBlob(blobClient, key);
 
             // Create a blob client object representing 'sample-blob.txt' with SAS authorization
             BlobClient blobClientSAS = new BlobClient(blobSASURI);
@@ -81,19 +83,24 @@ namespace BlobDevGuideBlobs
             // </Snippet_UseAccountSAS>
         }
 
-        // <Snippet_CreateUserDelegationSASContainer>
-        public static async Task<Uri> CreateUserDelegationSASContainer(
-            BlobContainerClient containerClient)
+        // <Snippet_CreateUserDelegationSASBlob>
+        public static async Task<UserDelegationKey> GetUserDelegationKey(
+            BlobServiceClient blobServiceClient)
         {
-            BlobServiceClient blobServiceClient =
-                containerClient.GetParentBlobServiceClient();
-
             // Get a user delegation key for the Blob service that's valid for 1 day
             UserDelegationKey userDelegationKey =
                 await blobServiceClient.GetUserDelegationKeyAsync(
                     DateTimeOffset.UtcNow,
                     DateTimeOffset.UtcNow.AddDays(1));
 
+            return userDelegationKey;
+        }
+
+        // <Snippet_CreateUserDelegationSASContainer>
+        public static async Task<Uri> CreateUserDelegationSASContainer(
+            BlobContainerClient containerClient,
+            UserDelegationKey userDelegationKey)
+        {
             // Create a SAS token for the container resource that's also valid for 1 day
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
             {
@@ -112,7 +119,7 @@ namespace BlobDevGuideBlobs
                 // Specify the user delegation key
                 Sas = sasBuilder.ToSasQueryParameters(
                     userDelegationKey,
-                    blobServiceClient.AccountName)
+                    containerClient.GetParentBlobServiceClient().AccountName)
             };
 
             return uriBuilder.ToUri();
@@ -121,17 +128,9 @@ namespace BlobDevGuideBlobs
 
         // <Snippet_CreateUserDelegationSASBlob>
         public static async Task<Uri> CreateUserDelegationSASBlob(
-            BlobClient blobClient)
+            BlobClient blobClient,
+            UserDelegationKey userDelegationKey)
         {
-            BlobServiceClient blobServiceClient =
-                blobClient.GetParentBlobContainerClient().GetParentBlobServiceClient();
-
-            // Get a user delegation key for the Blob service that's valid for 1 day
-            UserDelegationKey userDelegationKey =
-                await blobServiceClient.GetUserDelegationKeyAsync(
-                    DateTimeOffset.UtcNow,
-                    DateTimeOffset.UtcNow.AddDays(1));
-
             // Create a SAS token for the blob resource that's also valid for 1 day
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
             {
@@ -150,7 +149,9 @@ namespace BlobDevGuideBlobs
                 // Specify the user delegation key
                 Sas = sasBuilder.ToSasQueryParameters(
                     userDelegationKey,
-                    blobServiceClient.AccountName)
+                    blobClient
+                    .GetParentBlobContainerClient()
+                    .GetParentBlobServiceClient().AccountName)
             };
 
             return uriBuilder.ToUri();
