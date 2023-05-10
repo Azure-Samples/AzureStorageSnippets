@@ -7,8 +7,26 @@ using BlobDevGuide;
 using BlobDevGuideBlobs;
 
 var blobServiceClient = new BlobServiceClient(
-        new Uri("https://<storage-account-name>.blob.core.windows.net"),
+        new Uri("https://pjstorageaccounttest.blob.core.windows.net"),
         new DefaultAzureCredential());
+
+#region Create user delegation SAS
+
+CreateSAS.CreateUserDelegationSASSamples(blobServiceClient);
+
+#endregion
+
+#region Create service SAS
+/*
+CreateSAS.CreateServiceSASSamples(blobServiceClient);
+*/
+#endregion
+
+#region Create account SAS
+/*
+CreateSAS.CreateAccountSASSamples(blobServiceClient);
+*/
+#endregion
 
 #region Upload blob
 /*
