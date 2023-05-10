@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.IO.Compression;
+using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Text;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BlobDevGuideBlobs
 {
@@ -176,5 +179,38 @@ namespace BlobDevGuideBlobs
             await blobClient.CommitBlockListAsync(blockIDArray);
         }
         // </Snippet_UploadBlocks>
+
+        // <Snippet_UploadWithMD5>
+        public static async Task UploadWithMD5Async(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+
+            byte[] md5 = MD5.Create().ComputeHash(fileStream);
+            fileStream.Seek(0, SeekOrigin.Begin);
+
+            BlobProperties properties = await blobClient.GetPropertiesAsync();
+
+            BlobHttpHeaders headers = new BlobHttpHeaders
+            {
+                ContentType = properties.ContentType,
+                ContentLanguage = properties.ContentLanguage,
+                CacheControl = properties.CacheControl,
+                ContentDisposition = properties.ContentDisposition,
+                ContentEncoding = properties.ContentEncoding,
+                ContentHash = md5
+            };
+
+            // Set the blob's properties
+            await blobClient.SetHttpHeadersAsync(headers);
+
+            await blobClient.UploadAsync(fileStream, true);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithMD5>
     }
 }
