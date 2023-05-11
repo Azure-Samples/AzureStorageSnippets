@@ -41,9 +41,17 @@ namespace BlobDevGuideBlobs
 
         public static async Task CreateServiceSASSamples(BlobServiceClient blobServiceClient)
         {
+            string accountName = "<storage-account-name>";
+            string accountKey = "<storage-account-key";
+            StorageSharedKeyCredential storageSharedKeyCredential =
+                new(accountName, accountKey);
+            BlobServiceClient blobServiceClientSharedKey = new BlobServiceClient(
+                new Uri($"https://{accountName}.blob.core.windows.net"),
+                storageSharedKeyCredential);
+
             // <Snippet_UseServiceSASContainer>
             // Create a Uri object with a service SAS appended
-            BlobContainerClient containerClient = blobServiceClient
+            BlobContainerClient containerClient = blobServiceClientSharedKey
                 .GetBlobContainerClient("sample-container");
             Uri containerSASURI = await CreateServiceSASContainer(containerClient);
 
@@ -52,12 +60,6 @@ namespace BlobDevGuideBlobs
             // </Snippet_UseServiceSASContainer>
 
             // <Snippet_UseServiceSASBlob>
-            StorageSharedKeyCredential storageSharedKeyCredential =
-                new("<storage-account-name", "<account-key>");
-            BlobServiceClient blobServiceClientSharedKey = new BlobServiceClient(
-                new Uri("https://<storage-account-name>.blob.core.windows.net"),
-                storageSharedKeyCredential);
-
             // Create a Uri object with a service SAS appended
             BlobClient blobClient = blobServiceClientSharedKey
                 .GetBlobContainerClient("sample-container")
@@ -72,11 +74,13 @@ namespace BlobDevGuideBlobs
         public static async Task CreateAccountSASSamples(BlobServiceClient blobServiceClient)
         {
             // <Snippet_UseAccountSAS>
+            string accountName = "<storage-account-name>";
+            string accountKey = "<storage-account-key>";
             StorageSharedKeyCredential storageSharedKeyCredential =
-                new("<storage-account-name", "<account-key>");
+                new(accountName, accountKey);
 
             // Create a BlobServiceClient object with the account SAS appended
-            string blobServiceURI = "https://<storage-account-name>.blob.core.windows.net";
+            string blobServiceURI = $"https://{accountName}.blob.core.windows.net";
             string sasToken = await CreateAccountSAS(storageSharedKeyCredential);
             BlobServiceClient blobServiceClientAccountSAS = new BlobServiceClient(
                 new Uri($"{blobServiceURI}?{sasToken}"));
@@ -236,19 +240,19 @@ namespace BlobDevGuideBlobs
     // <Snippet_CreateAccountSAS>
     public static async Task<string> CreateAccountSAS(StorageSharedKeyCredential sharedKey)
         {
-            // Create a SAS token that's valid for one hour.
+            // Create a SAS token that's valid for one day
             AccountSasBuilder sasBuilder = new AccountSasBuilder()
             {
-                Services = AccountSasServices.Blobs | AccountSasServices.Files,
+                Services = AccountSasServices.Blobs | AccountSasServices.Queues,
                 ResourceTypes = AccountSasResourceTypes.Service,
-                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(1),
                 Protocol = SasProtocol.Https
             };
 
             sasBuilder.SetPermissions(AccountSasPermissions.Read |
                 AccountSasPermissions.Write);
 
-            // Use the key to get the SAS token.
+            // Use the key to get the SAS token
             string sasToken = sasBuilder.ToSasQueryParameters(sharedKey).ToString();
 
             return sasToken;
