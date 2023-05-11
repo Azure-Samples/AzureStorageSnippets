@@ -15,7 +15,7 @@ namespace BlobDevGuideBlobs
         public static async Task CreateUserDelegationSASSamples(BlobServiceClient blobServiceClient)
         {
             // Get a user delegation key
-            UserDelegationKey key = GetUserDelegationKey(blobServiceClient).Result;
+            UserDelegationKey key = RequestUserDelegationKey(blobServiceClient).Result;
 
             // <Snippet_UseUserDelegationSASContainer>
             // Create a Uri object with a user delegation SAS appended
@@ -23,7 +23,7 @@ namespace BlobDevGuideBlobs
                 .GetBlobContainerClient("sample-container");
             Uri containerSASURI = await CreateUserDelegationSASContainer(containerClient, key);
 
-            // Create a container client object representing 'sample-container' with SAS authorization
+            // Create a container client object with SAS authorization
             BlobContainerClient containerClientSAS = new BlobContainerClient(containerSASURI);
             // </Snippet_UseUserDelegationSASContainer>
 
@@ -34,7 +34,7 @@ namespace BlobDevGuideBlobs
                 .GetBlobClient("sample-blob.txt");
             Uri blobSASURI = await CreateUserDelegationSASBlob(blobClient, key);
 
-            // Create a blob client object representing 'sample-blob.txt' with SAS authorization
+            // Create a blob client object with SAS authorization
             BlobClient blobClientSAS = new BlobClient(blobSASURI);
             // </Snippet_UseUserDelegationSASBlob>
         }
@@ -87,8 +87,8 @@ namespace BlobDevGuideBlobs
             // </Snippet_UseAccountSAS>
         }
 
-        // <Snippet_CreateUserDelegationSASBlob>
-        public static async Task<UserDelegationKey> GetUserDelegationKey(
+        // <Snippet_RequestUserDelegationKey>
+        public static async Task<UserDelegationKey> RequestUserDelegationKey(
             BlobServiceClient blobServiceClient)
         {
             // Get a user delegation key for the Blob service that's valid for 1 day
@@ -99,6 +99,7 @@ namespace BlobDevGuideBlobs
 
             return userDelegationKey;
         }
+        // </Snippet_RequestUserDelegationKey>
 
         // <Snippet_CreateUserDelegationSASContainer>
         public static async Task<Uri> CreateUserDelegationSASContainer(
