@@ -210,7 +210,7 @@ namespace BlobDevGuideBlobs
                 // Create a SAS token that's valid for one day
                 BlobSasBuilder sasBuilder = new BlobSasBuilder()
                 {
-                    BlobContainerName = blobClient.GetParentBlobContainerClient().Name,                    
+                    BlobContainerName = blobClient.GetParentBlobContainerClient().Name,
                     BlobName = blobClient.Name,
                     Resource = "b"
                 };
@@ -235,10 +235,10 @@ namespace BlobDevGuideBlobs
                 return null;
             }
         }
-    // </Snippet_CreateServiceSASBlob>
+        // </Snippet_CreateServiceSASBlob>
 
-    // <Snippet_CreateAccountSAS>
-    public static async Task<string> CreateAccountSAS(StorageSharedKeyCredential sharedKey)
+        // <Snippet_CreateAccountSAS>
+        public static async Task<string> CreateAccountSAS(StorageSharedKeyCredential sharedKey)
         {
             // Create a SAS token that's valid for one day
             AccountSasBuilder sasBuilder = new AccountSasBuilder()
