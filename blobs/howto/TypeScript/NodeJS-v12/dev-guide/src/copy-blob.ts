@@ -32,7 +32,7 @@ async function main() {
     .getContainerClient('destination-container')
     .getBlockBlobClient('sample-blob-copy.txt');
 
-  //await copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobServiceClient);
+  await copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobServiceClient);
 
   const sourceURL: string = 'source-url';
   const destBlob: BlockBlobClient = blobServiceClient
@@ -47,7 +47,7 @@ async function copyAcrossStorageAccountsAsync(
   sourceBlob: BlockBlobClient,
   destinationBlob: BlockBlobClient,
   blobServiceClient: BlobServiceClient
-) {
+): Promise<void> {
   const sourceBlobLease = new BlobLeaseClient(sourceBlob);
 
   // Create a SAS token that's valid for 1 hour
@@ -66,7 +66,10 @@ async function copyAcrossStorageAccountsAsync(
   }
 }
 
-async function generateUserDelegationSAS(sourceBlob, blobServiceClient) {
+async function generateUserDelegationSAS(
+  sourceBlob: BlockBlobClient,
+  blobServiceClient: BlobServiceClient
+): Promise<string> {
   // Get a user delegation key for the Blob service that's valid for 1 hour, as an example
   const delegationKeyStart = new Date();
   const delegationKeyExpiry = new Date(Date.now() + 3600000);
@@ -100,7 +103,9 @@ async function generateUserDelegationSAS(sourceBlob, blobServiceClient) {
 // </Snippet_copy_from_azure_async>
 
 // <Snippet_copy_blob_external_source_async>
-async function copyFromExternalSource(sourceURL: string, destinationBlob: BlockBlobClient) {
+async function copyFromExternalSource(sourceURL: string,
+  destinationBlob: BlockBlobClient
+): Promise<void> {
   try {
     const copyPoller = await destinationBlob.beginCopyFromURL(sourceURL);
     await copyPoller.pollUntilDone();
@@ -111,14 +116,14 @@ async function copyFromExternalSource(sourceURL: string, destinationBlob: BlockB
 // </Snippet_copy_blob_external_source_async>
 
 // <Snippet_check_copy_status_async>
-async function checkCopyStatus(destinationBlob: BlockBlobClient) {
+async function checkCopyStatus(destinationBlob: BlockBlobClient): Promise<void> {
   const properties = await destinationBlob.getProperties();
   console.log(properties.copyStatus);
 }
 // </Snippet_check_copy_status_async>
 
 // <Snippet_abort_copy_async>
-async function abortCopy(destinationBlob: BlockBlobClient) {
+async function abortCopy(destinationBlob: BlockBlobClient): Promise<void> {
   const properties = await destinationBlob.getProperties();
 
   // Check the copy status and abort if pending
