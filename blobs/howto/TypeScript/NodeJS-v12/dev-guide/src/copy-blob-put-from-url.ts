@@ -40,14 +40,20 @@ async function main() {
 }
 
 // <Snippet_copy_from_azure_put_blob_from_url>
-async function copyFromSourceInAzure(sourceBlob: BlockBlobClient, destinationBlob: BlockBlobClient) {
+async function copyFromSourceInAzure(
+  sourceBlob: BlockBlobClient,
+  destinationBlob: BlockBlobClient
+): Promise<void> {
   // Get the source blob URL and create the destination blob
   await destinationBlob.syncUploadFromURL(sourceBlob.url);
 }
 // </Snippet_copy_from_azure_put_blob_from_url>
 
 // <Snippet_copy_from_external_source_put_blob_from_url>
-async function copyFromExternalSource(sourceUrl: string, destinationBlob: BlockBlobClient) {
+async function copyFromExternalSource(
+  sourceUrl: string,
+  destinationBlob: BlockBlobClient
+): Promise<void> {
   // Create the destination blob from the source URL
   await destinationBlob.syncUploadFromURL(sourceUrl);
 }
