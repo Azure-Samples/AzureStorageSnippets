@@ -182,7 +182,7 @@ namespace BlobDevGuideBlobs
         // </Snippet_UploadBlocks>
 
         // <Snippet_UploadWithChecksum>
-        public static async Task UploadWithMD5Async(
+        public static async Task UploadWithChecksumAsync(
             BlobContainerClient containerClient,
             string localFilePath)
         {
