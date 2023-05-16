@@ -15,13 +15,13 @@ namespace BlobDevGuideBlobs
         public static async Task CreateUserDelegationSASSamples(BlobServiceClient blobServiceClient)
         {
             // Get a user delegation key
-            UserDelegationKey key = RequestUserDelegationKey(blobServiceClient).Result;
+            UserDelegationKey userDelegationKey = RequestUserDelegationKey(blobServiceClient).Result;
 
             // <Snippet_UseUserDelegationSASContainer>
             // Create a Uri object with a user delegation SAS appended
             BlobContainerClient containerClient = blobServiceClient
                 .GetBlobContainerClient("sample-container");
-            Uri containerSASURI = await CreateUserDelegationSASContainer(containerClient, key);
+            Uri containerSASURI = await CreateUserDelegationSASContainer(containerClient, userDelegationKey);
 
             // Create a container client object with SAS authorization
             BlobContainerClient containerClientSAS = new BlobContainerClient(containerSASURI);
@@ -32,7 +32,7 @@ namespace BlobDevGuideBlobs
             BlobClient blobClient = blobServiceClient
                 .GetBlobContainerClient("sample-container")
                 .GetBlobClient("sample-blob.txt");
-            Uri blobSASURI = await CreateUserDelegationSASBlob(blobClient, key);
+            Uri blobSASURI = await CreateUserDelegationSASBlob(blobClient, userDelegationKey);
 
             // Create a blob client object with SAS authorization
             BlobClient blobClientSAS = new BlobClient(blobSASURI);
