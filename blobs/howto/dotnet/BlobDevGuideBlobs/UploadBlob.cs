@@ -176,5 +176,25 @@ namespace BlobDevGuideBlobs
             await blobClient.CommitBlockListAsync(blockIDArray);
         }
         // </Snippet_UploadBlocks>
+
+        // <Snippet_UploadWithAccessTier>
+        public static async Task UploadWithAccessTierAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            FileStream fileStream = File.OpenRead(localFilePath);
+
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            var options = new BlobUploadOptions()
+            {
+                AccessTier = AccessTier.Cool
+            };
+
+            await blobClient.UploadAsync(fileStream, options);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithAccessTier>
     }
 }
