@@ -1,20 +1,15 @@
 ﻿using System.Collections;
 using System.IO.Compression;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
 using System.Text;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BlobDevGuideBlobs
 {
     class UploadBlob
     {
-        public static object TransferValidation { get; private set; }
-
         public static async Task UploadBlobSamples(BlobServiceClient blobServiceClient)
         {
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
