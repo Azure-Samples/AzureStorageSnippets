@@ -30,13 +30,13 @@ CreateSAS.CreateAccountSASSamples(blobServiceClient);
 
 #region Upload blob
 /*
-UploadBlob.UploadBlobSamples(blobServiceClient);
+await UploadBlob.UploadBlobSamples(blobServiceClient);
 */
 #endregion
 
 #region Download blob
 /*
-DownloadBlob.DownloadBlobSamples(blobServiceClient);
+await DownloadBlob.DownloadBlobSamples(blobServiceClient);
 */
 #endregion
 

@@ -15,14 +15,14 @@ namespace BlobDevGuideBlobs
     {
         public static async Task UploadBlobSamples(BlobServiceClient blobServiceClient)
         {
-            //BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
-            //string localFilePath = "<local-file-path>";
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
+            string localFilePath = @"<local-file-path>";
 
             //await UploadFromFileAsync(containerClient, localFilePath);
             //await UploadFromStreamAsync(containerClient, localFilePath);
             //await UploadFromBinaryDataAsync(containerClient, localFilePath);
-
             //await UploadFromStringAsync(containerClient, "sample-blob.txt");
+            //await UploadWithAccessTierAsync(containerClient, localFilePath);
         }
 
         // <Snippet_UploadFile>
@@ -180,6 +180,25 @@ namespace BlobDevGuideBlobs
             await blobClient.CommitBlockListAsync(blockIDArray);
         }
         // </Snippet_UploadBlocks>
+
+        // <Snippet_UploadWithAccessTier>
+        public static async Task UploadWithAccessTierAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlockBlobClient blockBlobClient = containerClient.GetBlockBlobClient(fileName);
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                AccessTier = AccessTier.Cool
+            };
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+            await blockBlobClient.UploadAsync(fileStream, uploadOptions);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithAccessTier>
 
         // <Snippet_UploadWithChecksum>
         public static async Task UploadWithChecksumAsync(
