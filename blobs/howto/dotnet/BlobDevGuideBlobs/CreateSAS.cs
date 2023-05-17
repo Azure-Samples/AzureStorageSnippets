@@ -259,5 +259,28 @@ namespace BlobDevGuideBlobs
             return sasToken;
         }
         // </Snippet_CreateAccountSAS>
+
+        // <Snippet_CreateStoredAccessPolicy>
+        public static async Task CreateStoredAccessPolicyAsync(BlobContainerClient containerClient)
+        {
+            // Create a stored access policy with read and write permissions, valid for one week
+            List<BlobSignedIdentifier> signedIdentifiers = new List<BlobSignedIdentifier>
+            {
+                new BlobSignedIdentifier
+                {
+                    Id = "sample-read-write-policy",
+                    AccessPolicy = new BlobAccessPolicy
+                    {
+                        StartsOn = DateTimeOffset.UtcNow,
+                        ExpiresOn = DateTimeOffset.UtcNow.AddDays(7),
+                        Permissions = "rw"
+                    }
+                }
+            };
+
+            // Set the container's access policy
+            await containerClient.SetAccessPolicyAsync(permissions: signedIdentifiers);
+        }
+        // </Snippet_CreateStoredAccessPolicy>
     }
 }

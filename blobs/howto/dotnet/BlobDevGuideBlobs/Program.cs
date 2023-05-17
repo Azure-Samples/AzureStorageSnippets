@@ -12,19 +12,19 @@ var blobServiceClient = new BlobServiceClient(
 
 #region Create user delegation SAS
 /*
-CreateSAS.CreateUserDelegationSASSamples(blobServiceClient);
+await CreateSAS.CreateUserDelegationSASSamples(blobServiceClient);
 */
 #endregion
 
 #region Create service SAS
 /*
-CreateSAS.CreateServiceSASSamples(blobServiceClient);
+await CreateSAS.CreateServiceSASSamples(blobServiceClient);
 */
 #endregion
 
 #region Create account SAS
 /*
-CreateSAS.CreateAccountSASSamples(blobServiceClient);
+await CreateSAS.CreateAccountSASSamples(blobServiceClient);
 */
 #endregion
 
