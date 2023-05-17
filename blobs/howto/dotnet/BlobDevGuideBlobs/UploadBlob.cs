@@ -13,6 +13,8 @@ namespace BlobDevGuideBlobs
 {
     class UploadBlob
     {
+        public static object TransferValidation { get; private set; }
+
         public static async Task UploadBlobSamples(BlobServiceClient blobServiceClient)
         {
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
@@ -23,6 +25,7 @@ namespace BlobDevGuideBlobs
             //await UploadFromBinaryDataAsync(containerClient, localFilePath);
             //await UploadFromStringAsync(containerClient, "sample-blob.txt");
             //await UploadWithAccessTierAsync(containerClient, localFilePath);
+            await UploadWithChecksumAsync(containerClient, localFilePath);
         }
 
         // <Snippet_UploadFile>
@@ -208,12 +211,17 @@ namespace BlobDevGuideBlobs
             string fileName = Path.GetFileName(localFilePath);
             BlobClient blobClient = containerClient.GetBlobClient(fileName);
 
+            var validationOptions = new UploadTransferValidationOptions
+            {
+                ChecksumAlgorithm = StorageChecksumAlgorithm.Auto
+            };
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                TransferValidation = validationOptions
+            };
+
             FileStream fileStream = File.OpenRead(localFilePath);
-
-            // Specify the algorithm for generating a checksum to verify uploaded contents
-            var uploadOptions = new BlobUploadOptions();
-            uploadOptions.TransferValidation.ChecksumAlgorithm = StorageChecksumAlgorithm.Auto;
-
             await blobClient.UploadAsync(fileStream, uploadOptions);
             fileStream.Close();
         }
