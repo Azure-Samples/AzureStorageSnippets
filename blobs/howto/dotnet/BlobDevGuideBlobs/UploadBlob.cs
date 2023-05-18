@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.IO.Compression;
 using System.Text;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -19,6 +20,7 @@ namespace BlobDevGuideBlobs
             //await UploadFromBinaryDataAsync(containerClient, localFilePath);
             //await UploadFromStringAsync(containerClient, "sample-blob.txt");
             //await UploadWithAccessTierAsync(containerClient, localFilePath);
+            await UploadWithChecksumAsync(containerClient, localFilePath);
         }
 
         // <Snippet_UploadFile>
@@ -195,5 +197,29 @@ namespace BlobDevGuideBlobs
             fileStream.Close();
         }
         // </Snippet_UploadWithAccessTier>
+
+        // <Snippet_UploadWithChecksum>
+        public static async Task UploadWithChecksumAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            var validationOptions = new UploadTransferValidationOptions
+            {
+                ChecksumAlgorithm = StorageChecksumAlgorithm.Auto
+            };
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                TransferValidation = validationOptions
+            };
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+            await blobClient.UploadAsync(fileStream, uploadOptions);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithChecksum>
     }
 }
