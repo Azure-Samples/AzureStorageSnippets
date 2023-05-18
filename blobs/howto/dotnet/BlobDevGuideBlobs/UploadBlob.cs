@@ -20,7 +20,8 @@ namespace BlobDevGuideBlobs
             //await UploadFromBinaryDataAsync(containerClient, localFilePath);
             //await UploadFromStringAsync(containerClient, "sample-blob.txt");
             //await UploadWithAccessTierAsync(containerClient, localFilePath);
-            await UploadWithChecksumAsync(containerClient, localFilePath);
+            //await UploadWithChecksumAsync(containerClient, localFilePath);
+            await UploadWithTransferOptionsAsync(containerClient, localFilePath);
         }
 
         // <Snippet_UploadFile>
@@ -221,5 +222,36 @@ namespace BlobDevGuideBlobs
             fileStream.Close();
         }
         // </Snippet_UploadWithChecksum>
+
+        // <Snippet_UploadWithTransferOptions>
+        public static async Task UploadWithTransferOptionsAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            var transferOptions = new StorageTransferOptions
+            {
+                // Set the maximum number of parallel transfer workers
+                MaximumConcurrency = 2,
+
+                // Set the initial transfer length to 8 MiB
+                InitialTransferSize = 8 * 1024 * 1024,
+
+                // Set the maximum length of a transfer to 4 MiB
+                MaximumTransferSize = 4 * 1024 * 1024
+            };
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                TransferOptions = transferOptions
+            };
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+            await blobClient.UploadAsync(fileStream, uploadOptions);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithTransferOptions>
     }
 }
