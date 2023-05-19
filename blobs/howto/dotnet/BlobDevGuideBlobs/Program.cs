@@ -28,6 +28,12 @@ await CreateSAS.CreateAccountSASSamples(blobServiceClient);
 */
 #endregion
 
+#region Stored access policy
+/*
+await CreateSAS.StoredAccessPolicySamples(blobServiceClient);
+*/
+#endregion
+
 #region Upload blob
 /*
 await UploadBlob.UploadBlobSamples(blobServiceClient);

@@ -87,6 +87,16 @@ namespace BlobDevGuideBlobs
             // </Snippet_UseAccountSAS>
         }
 
+        public static async Task StoredAccessPolicySamples(BlobServiceClient blobServiceClient)
+        {
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
+
+            await CreateStoredAccessPolicyAsync(containerClient);
+            await ModifyStoredAccessPolicyAsync(containerClient);
+            await RevokeStoredAccessPolicyAsync(containerClient);
+            await DeleteStoredAccessPolicyAsync(containerClient);
+        }
+
         // <Snippet_RequestUserDelegationKey>
         public static async Task<UserDelegationKey> RequestUserDelegationKey(
             BlobServiceClient blobServiceClient)
@@ -263,7 +273,7 @@ namespace BlobDevGuideBlobs
         // <Snippet_CreateStoredAccessPolicy>
         public static async Task CreateStoredAccessPolicyAsync(BlobContainerClient containerClient)
         {
-            // Create a stored access policy with read and write permissions, valid for one week
+            // Create a stored access policy with read and write permissions, valid for one day
             List<BlobSignedIdentifier> signedIdentifiers = new List<BlobSignedIdentifier>
             {
                 new BlobSignedIdentifier
@@ -272,8 +282,18 @@ namespace BlobDevGuideBlobs
                     AccessPolicy = new BlobAccessPolicy
                     {
                         StartsOn = DateTimeOffset.UtcNow,
-                        ExpiresOn = DateTimeOffset.UtcNow.AddDays(7),
+                        ExpiresOn = DateTimeOffset.UtcNow.AddDays(1),
                         Permissions = "rw"
+                    }
+                },
+                new BlobSignedIdentifier
+                {
+                    Id = "sample-read-policy",
+                    AccessPolicy = new BlobAccessPolicy
+                    {
+                        StartsOn = DateTimeOffset.UtcNow,
+                        ExpiresOn = DateTimeOffset.UtcNow.AddDays(1),
+                        Permissions = "r"
                     }
                 }
             };
@@ -282,5 +302,43 @@ namespace BlobDevGuideBlobs
             await containerClient.SetAccessPolicyAsync(permissions: signedIdentifiers);
         }
         // </Snippet_CreateStoredAccessPolicy>
+
+        // <Snippet_ModifyStoredAccessPolicy>
+        public static async Task ModifyStoredAccessPolicyAsync(BlobContainerClient containerClient)
+        {
+            BlobContainerAccessPolicy accessPolicy = await containerClient.GetAccessPolicyAsync();
+            List<BlobSignedIdentifier> signedIdentifiers = accessPolicy.SignedIdentifiers.ToList();
+
+            // Modify the expiration date a single policy
+            var samplePolicy = signedIdentifiers.FirstOrDefault(item => item.Id == "sample-read-policy");
+            samplePolicy.AccessPolicy.PolicyExpiresOn = DateTimeOffset.UtcNow.AddDays(7);
+
+            // Update the container's access policy
+            await containerClient.SetAccessPolicyAsync(permissions: signedIdentifiers);
+        }
+        // </Snippet_ModifyStoredAccessPolicy>
+
+        // <Snippet_RevokeStoredAccessPolicy>
+        public static async Task RevokeStoredAccessPolicyAsync(BlobContainerClient containerClient)
+        {
+            BlobContainerAccessPolicy accessPolicy = await containerClient.GetAccessPolicyAsync();
+            List<BlobSignedIdentifier> signedIdentifiers = accessPolicy.SignedIdentifiers.ToList();
+
+            // Revoke a single policy by changing its name
+            var samplePolicy = signedIdentifiers.FirstOrDefault(item => item.Id == "sample-read-policy");
+            samplePolicy.Id = "sample-read-policy-revoke";
+
+            // Update the container's access policy
+            await containerClient.SetAccessPolicyAsync(permissions: signedIdentifiers);
+        }
+        // </Snippet_RevokeStoredAccessPolicy>
+
+        // <Snippet_DeleteStoredAccessPolicy>
+        public static async Task DeleteStoredAccessPolicyAsync(BlobContainerClient containerClient)
+        {
+            // Remove all stored access policies for the container resource
+            await containerClient.SetAccessPolicyAsync();
+        }
+        // </Snippet_DeleteStoredAccessPolicy>
     }
 }
