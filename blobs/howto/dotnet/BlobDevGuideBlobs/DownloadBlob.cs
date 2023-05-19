@@ -110,10 +110,7 @@ namespace BlobDevGuideBlobs
                 TransferOptions = transferOptions
             };
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
             await blobClient.DownloadToAsync(fileStream, downloadOptions);
-            stopwatch.Stop();
-            Console.WriteLine(stopwatch.Elapsed.ToString());
 
             fileStream.Close();
         }
