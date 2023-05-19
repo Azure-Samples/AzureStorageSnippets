@@ -1,4 +1,6 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Diagnostics;
+using Azure.Storage;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 
 namespace BlobDevGuideBlobs
@@ -7,12 +9,14 @@ namespace BlobDevGuideBlobs
     {
         public static async Task DownloadBlobSamples(BlobServiceClient blobServiceClient)
         {
-            //BlobClient blobClient = blobServiceClient
-            //    .GetBlobContainerClient("sample-container")
-            //    .GetBlobClient("sample-blob.txt");
-            //string filePath = "";
-            
+            BlobClient blobClient = blobServiceClient
+                .GetBlobContainerClient("sample-container")
+                .GetBlobClient("sample-blob.txt");
+            string localFilePath = @"<local-file-path>";
+
             //await DownloadBlobToFileAsync(blobClient, filePath);
+            //await DownloadBlobWithChecksumAsync(blobClient, localFilePath);
+            //await DownloadBlobWithTransferOptionsAsync(blobClient, localFilePath);
         }
 
         // <Snippet_DownloadBlobToFile>
@@ -57,5 +61,62 @@ namespace BlobDevGuideBlobs
             }
         }
         // </Snippet_DownloadBlobFromStream>
+
+        // <Snippet_DownloadBlobWithChecksum>
+        public static async Task DownloadBlobWithChecksumAsync(
+            BlobClient blobClient,
+            string localFilePath)
+        {
+            FileStream fileStream = File.OpenWrite(localFilePath);
+
+            var validationOptions = new DownloadTransferValidationOptions
+            {
+                AutoValidateChecksum = true,
+                ChecksumAlgorithm = StorageChecksumAlgorithm.Auto
+            };
+
+            BlobDownloadToOptions downloadOptions = new BlobDownloadToOptions()
+            {
+                TransferValidation = validationOptions
+            };
+
+            await blobClient.DownloadToAsync(fileStream, downloadOptions);
+
+            fileStream.Close();
+        }
+        // </Snippet_DownloadBlobWithChecksum>
+
+        // <Snippet_DownloadBlobWithTransferOptions>
+        public static async Task DownloadBlobWithTransferOptionsAsync(
+            BlobClient blobClient,
+            string localFilePath)
+        {
+            FileStream fileStream = File.OpenWrite(localFilePath);
+
+            var transferOptions = new StorageTransferOptions
+            {
+                // Set the maximum number of parallel transfer workers
+                MaximumConcurrency = 2,
+
+                // Set the initial transfer length to 8 MiB
+                InitialTransferSize = 8 * 1024 * 1024,
+
+                // Set the maximum length of a transfer to 4 MiB
+                MaximumTransferSize = 4 * 1024 * 1024
+            };
+
+            BlobDownloadToOptions downloadOptions = new BlobDownloadToOptions()
+            {
+                TransferOptions = transferOptions
+            };
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            await blobClient.DownloadToAsync(fileStream, downloadOptions);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.ToString());
+
+            fileStream.Close();
+        }
+        // </Snippet_DownloadBlobWithTransferOptions>
     }
 }
