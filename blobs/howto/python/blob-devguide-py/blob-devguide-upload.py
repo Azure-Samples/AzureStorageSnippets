@@ -71,7 +71,7 @@ class BlobSamples(object):
         )
         
         with open(file=os.path.join(r'file_path', blob_name), mode="rb") as data:
-            blob_client = blob_client.upload_blob(data=data, overwrite=True, max_concurrency=1)
+            blob_client = blob_client.upload_blob(data=data, overwrite=True, max_concurrency=2)
     # </Snippet_upload_blob_transfer_options>
 
     # <Snippet_upload_blob_access_tier>
