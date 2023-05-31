@@ -83,6 +83,15 @@ class BlobSamples(object):
             blob_client = blob_client.upload_blob(data=data, overwrite=True, standard_blob_tier=StandardBlobTier.COOL)
     # </Snippet_upload_blob_access_tier>
 
+    # <Snippet_upload_blob_transfer_validation>
+    def upload_blob_transfer_validation(self, blob_service_client: BlobServiceClient, container_name: str, blob_name: str):
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+        
+        #Upload blob to the cool tier
+        with open(file=os.path.join(r'file_path', blob_name), mode="rb") as data:
+            blob_client = blob_client.upload_blob(data=data, overwrite=True, validate_content=True)
+    # </Snippet_upload_blob_transfer_validation>
+
 if __name__ == '__main__':
     # TODO: Replace <storage-account-name> with your actual storage account name
     account_url = "https://<storage-account-name>.blob.core.windows.net"
@@ -103,4 +112,5 @@ if __name__ == '__main__':
     #sample.upload_blob_file(blob_service_client, "sample-container")
     #sample.upload_blob_tags(blob_service_client, "sample-container")
     #sample.upload_blob_transfer_options(account_url, "sample-container", "sample-blob.txt")
-    sample.upload_blob_access_tier(blob_service_client, "sample-container", "sample-blob.txt")
+    #sample.upload_blob_access_tier(blob_service_client, "sample-container", "sample-blob.txt")
+    sample.upload_blob_transfer_validation(blob_service_client, "sample-container", "sample-blob.txt")
