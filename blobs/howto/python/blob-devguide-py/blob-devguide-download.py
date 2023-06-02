@@ -56,8 +56,8 @@ class BlobSamples(object):
             container_name=container_name, 
             blob_name=blob_name,
             credential=DefaultAzureCredential(),
-            max_single_get_size=1024*1024*32,
-            max_chunk_get_size=1024*1024*4,
+            max_single_get_size=1024*1024*32, # 32 MiB
+            max_chunk_get_size=1024*1024*4 # 4 MiB
         )
 
         with open(file=os.path.join(r'file_path', 'file_name'), mode="wb") as sample_blob:

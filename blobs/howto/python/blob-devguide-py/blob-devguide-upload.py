@@ -66,8 +66,8 @@ class BlobSamples(object):
             container_name=container_name, 
             blob_name=blob_name,
             credential=DefaultAzureCredential(),
-            max_block_size=1024*1024*4,
-            max_single_put_size=1024*1024*8,
+            max_block_size=1024*1024*4, # 4 MiB
+            max_single_put_size=1024*1024*8 # 8 MiB
         )
         
         with open(file=os.path.join(r'file_path', blob_name), mode="rb") as data:
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     sample = BlobSamples()
 
     file_path = os.path.join(r'file_path', 'file_name')
-    block_size = 1024*1024*4
+    block_size = 1024*1024*4 # 4 MiB
     #sample.upload_blocks(container_client, file_path, block_size)
 
     #sample.upload_blob_data(blob_service_client, "sample-container")
@@ -113,4 +113,4 @@ if __name__ == '__main__':
     #sample.upload_blob_tags(blob_service_client, "sample-container")
     #sample.upload_blob_transfer_options(account_url, "sample-container", "sample-blob.txt")
     #sample.upload_blob_access_tier(blob_service_client, "sample-container", "sample-blob.txt")
-    sample.upload_blob_transfer_validation(blob_service_client, "sample-container", "sample-blob.txt")
+    #sample.upload_blob_transfer_validation(blob_service_client, "sample-container", "sample-blob.txt")
