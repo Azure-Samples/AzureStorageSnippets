@@ -6,135 +6,160 @@ from azure.storage.blob import (
     ContainerClient,
     BlobClient,
     BlobSasPermissions,
-    generate_account_sas,
     ResourceTypes,
     AccountSasPermissions,
+    UserDelegationKey,
+    generate_account_sas,
+    generate_container_sas,
     generate_blob_sas
 )
 
 class SASSamples(object):
 
-    # <Snippet_get_service_client_DAC>
-    def get_blob_service_client_token_credential(self):
-        # TODO: Replace <storage-account-name> with your actual storage account name
-        account_url = "https://<storage-account-name>.blob.core.windows.net"
-        credential = DefaultAzureCredential()
-
-        # Create the BlobServiceClient object
-        blob_service_client = BlobServiceClient(account_url, credential=credential)
-
-        return blob_service_client
-    # </Snippet_get_service_client_DAC>
-
-    # <Snippet_get_service_client_SAS>
-    def get_blob_service_client_sas(self, sas_token: str):
-        # TODO: Replace <storage-account-name> with your actual storage account name
-        account_url = "https://<storage-account-name>.blob.core.windows.net"
-        # The SAS token string can be assigned to credential here or appended to the account URL
-        credential = sas_token
-
-        # Create the BlobServiceClient object
-        blob_service_client = BlobServiceClient(account_url, credential=credential)
-
-        return blob_service_client
-    # </Snippet_get_service_client_SAS>
-
-    # <Snippet_get_service_client_account_key>
-    def get_blob_service_client_account_key(self):
-        # TODO: Replace <storage-account-name> with your actual storage account name
-        account_url = "https://<storage-account-name>.blob.core.windows.net"
-        shared_access_key = os.getenv("AZURE_STORAGE_ACCESS_KEY")
-        credential = shared_access_key
-
-        # Create the BlobServiceClient object
-        blob_service_client = BlobServiceClient(account_url, credential=credential)
-
-        return blob_service_client
-    # </Snippet_get_service_client_account_key>
-
     # <Snippet_create_account_sas>
-    def create_account_sas(self, blob_service_client: BlobServiceClient):
-        # Create a SAS token that's valid for one hour
-        
-        # Define SAS token expiry time
-        expiry_time=datetime.utcnow() + timedelta(hours=1)
+    def create_account_sas(self, account_name: str, account_key: str):
+        # Create an account SAS that's valid for one day
+        start_time = datetime.datetime.now(datetime.timezone.utc)
+        expiry_time = start_time + datetime.timedelta(days=1)
 
         # Define the SAS token permissions
         sas_permissions=AccountSasPermissions(read=True)
 
         # Define the SAS token resource types
-        sas_resource_types=ResourceTypes(container=True)
+        # For this example, we grant access to service-level APIs
+        sas_resource_types=ResourceTypes(service=True)
 
         sas_token = generate_account_sas(
-            blob_service_client.account_name,
-            account_key=blob_service_client.credential.account_key,
+            account_name=account_name,
+            account_key=account_key,
             resource_types=sas_resource_types,
             permission=sas_permissions,
-            expiry=datetime.datetime.utcnow() + datetime.timedelta(hours=1),
-            start=datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+            expiry=expiry_time,
+            start=start_time
         )
 
         return sas_token
     # </Snippet_create_account_sas>
 
-    # <Snippet_create_account_sas>
-    def create_account_sas(self, blob_service_client: BlobServiceClient):
-        # Create a SAS token that's valid for one hour
+    def use_account_sas(self, blob_service_client: BlobServiceClient):
+        # <Snippet_use_account_sas>
+        account_name = blob_service_client.account_name
+        account_key = blob_service_client.credential.account_key
+        sas_token = self.create_account_sas(account_name=account_name, account_key=account_key)
+
+        # The SAS token string can be appended to the account URL with a ? delimiter
+        # or passed as the credential argument to the client constructor
+        account_sas_url = f"{blob_service_client.url}?{sas_token}"
+
+        print(account_sas_url)
         
-        # Define SAS token expiry time
-        expiry_time=datetime.utcnow() + timedelta(hours=1)
+        # Create a BlobServiceClient object
+        blob_service_client = BlobServiceClient(account_url=account_sas_url)
+        # </Snippet_create_account_sas>
 
-        # Define the SAS token permissions
-        sas_permissions=AccountSasPermissions(read=True)
-
-        # Define the SAS token resource types
-        sas_resource_types=ResourceTypes(container=True)
-
-        sas_token = generate_account_sas(
-            blob_service_client.account_name,
-            account_key=blob_service_client.credential.account_key,
-            resource_types=sas_resource_types,
-            permission=sas_permissions,
-            expiry=datetime.datetime.utcnow() + datetime.timedelta(hours=1),
-            start=datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-        )
-
-        return sas_token
-    # </Snippet_create_account_sas>
-
-    # <Snippet_create_service_sas_container>
-
-    # </Snippet_create_service_sas_container>
-
-    # <Snippet_create_user_delegation_sas_container>
-    sas_token = self.generate_user_delegation_sas(blob_service_client=blob_service_client, source_blob=source_blob)
-    source_blob_sas_url = source_blob.url + "?" + sas_token
-    def generate_user_delegation_sas(self, blob_service_client: BlobServiceClient, source_blob: BlobClient):
-        # Get a user delegation key
+    # <Snippet_request_user_delegation_key>
+    def request_user_delegation_key(self, blob_service_client: BlobServiceClient) -> UserDelegationKey:
+        # Get a user delegation key that's valid for 1 day
         delegation_key_start_time = datetime.datetime.now(datetime.timezone.utc)
-        delegation_key_expiry_time = delegation_key_start_time + datetime.timedelta(hours=1)
-        key = blob_service_client.get_user_delegation_key(
+        delegation_key_expiry_time = delegation_key_start_time + datetime.timedelta(days=1)
+
+        user_delegation_key = blob_service_client.get_user_delegation_key(
             key_start_time=delegation_key_start_time,
             key_expiry_time=delegation_key_expiry_time
         )
 
-        # Create a SAS token that's valid for one hour, as an example
+        return user_delegation_key
+    # <Snippet_request_user_delegation_key>
+
+    # <Snippet_create_user_delegation_sas_blob>
+    def create_user_delegation_sas_blob(self, blob_client: BlobClient, user_delegation_key: UserDelegationKey):
+        # Create a SAS token that's valid for one day, as an example
+        start_time = datetime.datetime.now(datetime.timezone.utc)
+        expiry_time = start_time + datetime.timedelta(days=1)
+
         sas_token = generate_blob_sas(
-            account_name=blob_service_client.account_name,
-            container_name=source_blob.container_name,
-            blob_name=source_blob.blob_name,
+            account_name=blob_client.account_name,
+            container_name=blob_client.container_name,
+            blob_name=blob_client.blob_name,
             account_key=None,
-            user_delegation_key=key,
+            user_delegation_key=user_delegation_key,
             permission=BlobSasPermissions(read=True),
-            expiry=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=1),
-            start=datetime.datetime.now(datetime.timezone.utc)
+            expiry=expiry_time,
+            start=start_time
+        )
+
+        return sas_token
+    # </Snippet_create_user_delegation_sas_blob>
+
+    def use_user_delegation_sas_blob(self, blob_service_client: BlobServiceClient):
+        user_delegation_key = self.request_user_delegation_key(blob_service_client=blob_service_client)
+
+        # <Snippet_use_user_delegation_sas_blob>
+        blob_client = blob_service_client.get_blob_client(container="sample-container", blob="sample-blob.txt")
+        sas_token = self.create_user_delegation_sas_blob(blob_client=blob_client, user_delegation_key=user_delegation_key)
+
+        # The SAS token string can be appended to the resource URL with a ? delimiter
+        # or passed as the credential argument to the client constructor
+        sas_url = f"{blob_client.url}?{sas_token}"
+
+        print(sas_url)
+        
+        # Create a BlobClient object with SAS authorization
+        blob_client_sas = BlobClient.from_blob_url(blob_url=sas_url)
+        # </Snippet_use_user_delegation_sas_blob>
+
+    # <Snippet_create_user_delegation_sas_container>
+    def create_user_delegation_sas_container(self, container_client: ContainerClient, user_delegation_key: UserDelegationKey):
+        # Create a SAS token that's valid for one day, as an example
+        start_time = datetime.datetime.now(datetime.timezone.utc)
+        expiry_time = start_time + datetime.timedelta(days=1)
+
+        sas_token = generate_container_sas(
+            account_name=container_client.account_name,
+            container_name=container_client.container_name,
+            account_key=None,
+            user_delegation_key=user_delegation_key,
+            permission=BlobSasPermissions(read=True),
+            expiry=expiry_time,
+            start=start_time
         )
 
         return sas_token
     # </Snippet_create_user_delegation_sas_container>
 
+    def use_user_delegation_sas_container(self, blob_service_client: BlobServiceClient):
+        user_delegation_key = self.request_user_delegation_key(blob_service_client=blob_service_client)
+
+        # <Snippet_use_user_delegation_sas_container>
+        container_client = blob_service_client.get_container_client(container="sample-container")
+        sas_token = self.create_user_delegation_sas_container(container_client=container_client, user_delegation_key=user_delegation_key)
+
+        # The SAS token string can be appended to the resource URL with a ? delimiter
+        # or passed as the credential argument to the client constructor
+        sas_url = f"{container_client.url}?{sas_token}"
+
+        print(sas_url)
+        
+        # Create a BlobClient object with SAS authorization
+        container_client_sas = ContainerClient.from_container_url(container_url=sas_url)
+        # </Snippet_use_user_delegation_sas_container>
+
+    # <Snippet_create_service_sas_container>
+
+    # </Snippet_create_service_sas_container>
+
 if __name__ == '__main__':
     sample = SASSamples()
-    #blob_service_client = sample.get_blob_service_client_token_credential()
-    #blob_service_client = sample.get_blob_service_client_sas(sas_token=<sas_token_str>)
-    blob_service_client = sample.get_blob_service_client_account_key()
+
+    # TODO: Replace <storage-account-name> with your actual storage account name
+    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
+    blob_service_client = BlobServiceClient(account_url, credential=DefaultAzureCredential())
+    
+    #sample.use_user_delegation_sas_blob(blob_service_client=blob_service_client)
+    sample.use_user_delegation_sas_container(blob_service_client=blob_service_client)
+
+    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
+    account_key = "XKqGyS9HSkIOz3BgdJpL0WPLb56Cn5x+2VgL7zgWO7kzaFEXf8bNvfJnUyEpvmk/r+OmGYF6KaiC+AStyzIUNw=="
+    blob_service_client_account_key = BlobServiceClient(account_url, credential=account_key)
+
+    #sample.use_account_sas(blob_service_client=blob_service_client_account_key)
