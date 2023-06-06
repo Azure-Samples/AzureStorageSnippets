@@ -152,14 +152,14 @@ if __name__ == '__main__':
     sample = SASSamples()
 
     # TODO: Replace <storage-account-name> with your actual storage account name
-    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
+    account_url = "https://<storage-account-name>.blob.core.windows.net"
     blob_service_client = BlobServiceClient(account_url, credential=DefaultAzureCredential())
     
     #sample.use_user_delegation_sas_blob(blob_service_client=blob_service_client)
     sample.use_user_delegation_sas_container(blob_service_client=blob_service_client)
 
-    account_url = "https://pjstorageaccounttest.blob.core.windows.net"
-    account_key = "XKqGyS9HSkIOz3BgdJpL0WPLb56Cn5x+2VgL7zgWO7kzaFEXf8bNvfJnUyEpvmk/r+OmGYF6KaiC+AStyzIUNw=="
+    account_url = "https://<storage-account-name>.blob.core.windows.net"
+    account_key = "<account-key>"
     blob_service_client_account_key = BlobServiceClient(account_url, credential=account_key)
 
     #sample.use_account_sas(blob_service_client=blob_service_client_account_key)
