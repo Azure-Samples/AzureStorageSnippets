@@ -148,6 +148,7 @@ class SASSamples(object):
             account_name=container_client.account_name,
             container_name=container_client.container_name,
             account_key=container_client.credential.account_key,
+            user_delegation_key=None,
             permission=BlobSasPermissions(read=True),
             expiry=expiry_time,
             start=start_time
@@ -164,8 +165,6 @@ class SASSamples(object):
         # The SAS token string can be appended to the resource URL with a ? delimiter
         # or passed as the credential argument to the client constructor
         sas_url = f"{container_client.url}?{sas_token}"
-
-        print(sas_url)
         
         # Create a ContainerClient object with SAS authorization
         container_client_sas = ContainerClient.from_container_url(container_url=sas_url)
@@ -182,6 +181,7 @@ class SASSamples(object):
             container_name=blob_client.container_name,
             blob_name=blob_client.blob_name,
             account_key=blob_client.credential.account_key,
+            user_delegation_key=None,
             permission=BlobSasPermissions(read=True),
             expiry=expiry_time,
             start=start_time
@@ -198,8 +198,6 @@ class SASSamples(object):
         # The SAS token string can be appended to the resource URL with a ? delimiter
         # or passed as the credential argument to the client constructor
         sas_url = f"{blob_client.url}?{sas_token}"
-
-        print(sas_url)
         
         # Create a BlobClient object with SAS authorization
         blob_client_sas = BlobClient.from_blob_url(blob_url=sas_url)
