@@ -53,7 +53,7 @@ class SASSamples(object):
         
         # Create a BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url=account_sas_url)
-        # </Snippet_create_account_sas>
+        # </Snippet_use_account_sas>
 
     # <Snippet_request_user_delegation_key>
     def request_user_delegation_key(self, blob_service_client: BlobServiceClient) -> UserDelegationKey:
@@ -67,7 +67,7 @@ class SASSamples(object):
         )
 
         return user_delegation_key
-    # <Snippet_request_user_delegation_key>
+    # </Snippet_request_user_delegation_key>
 
     # <Snippet_create_user_delegation_sas_blob>
     def create_user_delegation_sas_blob(self, blob_client: BlobClient, user_delegation_key: UserDelegationKey):
