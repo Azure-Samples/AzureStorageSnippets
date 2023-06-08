@@ -98,8 +98,6 @@ class SASSamples(object):
         # The SAS token string can be appended to the resource URL with a ? delimiter
         # or passed as the credential argument to the client constructor
         sas_url = f"{blob_client.url}?{sas_token}"
-
-        print(sas_url)
         
         # Create a BlobClient object with SAS authorization
         blob_client_sas = BlobClient.from_blob_url(blob_url=sas_url)
@@ -133,8 +131,6 @@ class SASSamples(object):
         # The SAS token string can be appended to the resource URL with a ? delimiter
         # or passed as the credential argument to the client constructor
         sas_url = f"{container_client.url}?{sas_token}"
-
-        print(sas_url)
         
         # Create a ContainerClient object with SAS authorization
         container_client_sas = ContainerClient.from_container_url(container_url=sas_url)
@@ -167,8 +163,6 @@ class SASSamples(object):
         # The SAS token string can be appended to the resource URL with a ? delimiter
         # or passed as the credential argument to the client constructor
         sas_url = f"{container_client.url}?{sas_token}"
-
-        print(sas_url)
         
         # Create a ContainerClient object with SAS authorization
         container_client_sas = ContainerClient.from_container_url(container_url=sas_url)
@@ -202,8 +196,6 @@ class SASSamples(object):
         # The SAS token string can be appended to the resource URL with a ? delimiter
         # or passed as the credential argument to the client constructor
         sas_url = f"{blob_client.url}?{sas_token}"
-
-        print(sas_url)
         
         # Create a BlobClient object with SAS authorization
         blob_client_sas = BlobClient.from_blob_url(blob_url=sas_url)
