@@ -11,6 +11,12 @@ public class App {
         // Create a service client using DefaultAzureCredential
         BlobServiceClient blobServiceClient = GetBlobServiceClientTokenCredential();
 
+        //region Create a user delegation SAS
+        BlobSAS sasHelper = new BlobSAS();
+        sasHelper.useUserDelegationSASBlob(blobServiceClient);
+        sasHelper.useUserDelegationSASContainer(blobServiceClient);
+        //endregion
+
         //region Create a service client using a SAS
         // String sasToken = "<SAS token>";
         // BlobServiceClient blobServiceClient = GetBlobServiceClientSAS(sasToken);
