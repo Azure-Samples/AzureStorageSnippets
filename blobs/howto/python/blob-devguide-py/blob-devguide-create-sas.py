@@ -52,7 +52,7 @@ class SASSamples(object):
         account_sas_url = f"{blob_service_client.url}?{sas_token}"
         
         # Create a BlobServiceClient object
-        blob_service_client = BlobServiceClient(account_url=account_sas_url)
+        blob_service_client_sas = BlobServiceClient(account_url=account_sas_url)
         # </Snippet_use_account_sas>
 
     # <Snippet_request_user_delegation_key>
