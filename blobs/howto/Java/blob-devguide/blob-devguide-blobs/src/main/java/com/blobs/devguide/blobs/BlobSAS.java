@@ -46,9 +46,7 @@ public class BlobSAS {
 
         // Assign read permissions to the SAS token
         BlobContainerSasPermission sasPermission = new BlobContainerSasPermission()
-                .setReadPermission(true)
-                .setListPermission(true)
-                .setWritePermission(true);
+                .setReadPermission(true);
 
         BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
                 .setStartTime(OffsetDateTime.now().minusMinutes(5));
