@@ -3,15 +3,19 @@ package com.blobs.devguide.blobs;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 import com.azure.storage.blob.sas.*;
+import com.azure.storage.common.sas.AccountSasPermission;
+import com.azure.storage.common.sas.AccountSasResourceType;
+import com.azure.storage.common.sas.AccountSasService;
+import com.azure.storage.common.sas.AccountSasSignatureValues;
 
 import java.time.OffsetDateTime;
 
 public class BlobSAS {
     // <Snippet_RequestUserDelegationKey>
     public UserDelegationKey requestUserDelegationKey(BlobServiceClient blobServiceClient) {
-        // Request a user delegation key that's valid for 1 day
+        // Request a user delegation key that's valid for 1 day, as an example
         UserDelegationKey userDelegationKey = blobServiceClient.getUserDelegationKey(
-            OffsetDateTime.now(),
+            OffsetDateTime.now().minusMinutes(5),
             OffsetDateTime.now().plusDays(1));
 
         return userDelegationKey;
@@ -28,7 +32,7 @@ public class BlobSAS {
                 .setReadPermission(true);
 
         BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
-                .setStartTime(OffsetDateTime.now());
+                .setStartTime(OffsetDateTime.now().minusMinutes(5));
 
         String sasToken = blobClient.generateUserDelegationSas(sasSignatureValues, userDelegationKey);
         return sasToken;
@@ -42,10 +46,12 @@ public class BlobSAS {
 
         // Assign read permissions to the SAS token
         BlobContainerSasPermission sasPermission = new BlobContainerSasPermission()
-                .setReadPermission(true);
+                .setReadPermission(true)
+                .setListPermission(true)
+                .setWritePermission(true);
 
         BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
-                .setStartTime(OffsetDateTime.now());
+                .setStartTime(OffsetDateTime.now().minusMinutes(5));
 
         String sasToken = containerClient.generateUserDelegationSas(sasSignatureValues, userDelegationKey);
         return sasToken;
@@ -86,8 +92,44 @@ public class BlobSAS {
                 .endpoint(containerClient.getBlobContainerUrl())
                 .sasToken(sasToken)
                 .buildClient();
-        }
         // </Snippet_UseUserDelegationSASContainer>
+
+        // list blobs in container
+        for (BlobItem blobItem : sasContainerClient.listBlobs()) {
+            System.out.println("This is the blob name: " + blobItem.getName());
+        }
     }
     
+    // <Snippet_CreateAccountSAS>
+    public String createAccountSAS(BlobServiceClient blobServiceClient) {
+        // Configure the SAS parameters
+        OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
+        AccountSasPermission accountSasPermission = new AccountSasPermission().setReadPermission(true);
+        AccountSasService services = new AccountSasService().setBlobAccess(true);
+        AccountSasResourceType resourceTypes = new AccountSasResourceType().setService(true);
+
+        // Generate the account SAS
+        AccountSasSignatureValues accountSasValues = new AccountSasSignatureValues(
+            expiryTime,
+            accountSasPermission,
+            services,
+            resourceTypes);
+        String sasToken = blobServiceClient.generateAccountSas(accountSasValues);
+
+        return sasToken;
+    }
+    // </Snippet_CreateAccountSAS>
+
+    public void useAccountSAS(BlobServiceClient blobServiceClient) {
+        // Create a SAS token
+        String sasToken = createAccountSAS(blobServiceClient);
+
+        // <Snippet_UseAccountSAS>
+        // Create a new BlobServiceClient using the SAS token
+        BlobServiceClient sasServiceClient = new BlobServiceClientBuilder()
+                .endpoint(blobServiceClient.getAccountUrl())
+                .sasToken(sasToken)
+                .buildClient();
+        // </Snippet_UseAccountSAS>
+    }
 }

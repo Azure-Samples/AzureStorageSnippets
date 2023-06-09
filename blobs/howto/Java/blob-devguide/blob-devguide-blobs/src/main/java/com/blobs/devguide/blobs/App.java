@@ -9,12 +9,12 @@ import com.azure.storage.common.*;
 public class App {
     public static void main(String[] args) {
         // Create a service client using DefaultAzureCredential
-        BlobServiceClient blobServiceClient = GetBlobServiceClientTokenCredential();
+        //BlobServiceClient blobServiceClient = GetBlobServiceClientTokenCredential();
 
         //region Create a user delegation SAS
         BlobSAS sasHelper = new BlobSAS();
-        sasHelper.useUserDelegationSASBlob(blobServiceClient);
-        sasHelper.useUserDelegationSASContainer(blobServiceClient);
+        //sasHelper.useUserDelegationSASBlob(blobServiceClient);
+        //sasHelper.useUserDelegationSASContainer(blobServiceClient);
         //endregion
 
         //region Create a service client using a SAS
@@ -23,9 +23,13 @@ public class App {
         //endregion
 
         //region Create a service client using the account key
-        // String accountName = "<Account name>";
-        // String accountKey = "<Account key>";
-        //BlobServiceClient blobServiceClient = GetBlobServiceClientAccountKey(accountName, accountKey);
+        String accountName = "<account-name>";
+        String accountKey = "<account-key>";
+        BlobServiceClient blobServiceClient = GetBlobServiceClientAccountKey(accountName, accountKey);
+        //endregion
+
+        //region Create an account SAS
+        sasHelper.useAccountSAS(blobServiceClient);
         //endregion
 
         //region Create a service client using a connection string
@@ -135,9 +139,8 @@ public class App {
         StorageSharedKeyCredential credential = new StorageSharedKeyCredential(accountName, accountKey);
 
         // Azure SDK client builders accept the credential as a parameter
-        // TODO: Replace <storage-account-name> with your actual storage account name
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                .endpoint("https://<storage-account-name>.blob.core.windows.net/")
+                .endpoint(String.format("https://%s.blob.core.windows.net/", accountName))
                 .credential(credential)
                 .buildClient();
 
