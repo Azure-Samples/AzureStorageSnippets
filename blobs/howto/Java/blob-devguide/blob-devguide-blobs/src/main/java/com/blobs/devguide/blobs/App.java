@@ -1,5 +1,8 @@
 package com.blobs.devguide.blobs;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.azure.core.credential.*;
 import com.azure.identity.*;
 import com.azure.storage.blob.*;
@@ -9,10 +12,10 @@ import com.azure.storage.common.*;
 public class App {
     public static void main(String[] args) {
         // Create a service client using DefaultAzureCredential
-        //BlobServiceClient blobServiceClient = GetBlobServiceClientTokenCredential();
+        BlobServiceClient blobServiceClient = GetBlobServiceClientTokenCredential();
 
         //region Create a user delegation SAS
-        BlobSAS sasHelper = new BlobSAS();
+        //BlobSAS sasHelper = new BlobSAS();
         //sasHelper.useUserDelegationSASBlob(blobServiceClient);
         //sasHelper.useUserDelegationSASContainer(blobServiceClient);
         //endregion
@@ -23,13 +26,13 @@ public class App {
         //endregion
 
         //region Create a service client using the account key
-        String accountName = "<account-name>";
-        String accountKey = "<account-key>";
-        BlobServiceClient blobServiceClient = GetBlobServiceClientAccountKey(accountName, accountKey);
+        //String accountName = "<account-name>";
+        //String accountKey = "<account-key>";
+        //BlobServiceClient blobServiceClient = GetBlobServiceClientAccountKey(accountName, accountKey);
         //endregion
 
         //region Create an account SAS
-        sasHelper.useAccountSAS(blobServiceClient);
+        //sasHelper.useAccountSAS(blobServiceClient);
         //endregion
 
         //region Create a service client using a connection string
@@ -42,10 +45,22 @@ public class App {
         BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
 
         //region Test upload methods
-        //BlobUpload uploadHelper = new BlobUpload();
+        File localFilePath = new File("filepath/local-file.png");
+
+        BlobUpload uploadHelper = new BlobUpload();
         //uploadHelper.uploadDataToBlob(blobContainerClient);
-        // uploadHelper.uploadBlobFromStream(blobContainerClient);
-        // uploadHelper.uploadBlobFromFile(blobContainerClient);
+        //uploadHelper.uploadBlobFromStream(blobContainerClient);
+        //uploadHelper.uploadBlobFromFile(blobContainerClient);
+        //uploadHelper.uploadBlockBlobWithIndexTags(blobContainerClient, localFilePath);
+        //uploadHelper.uploadBlockBlobWithTransferOptions(blobContainerClient, localFilePath);
+        uploadHelper.uploadBlobWithAccessTier(blobContainerClient, localFilePath);
+
+        //int blockSize = 1024*1024*4; //4 MiB
+        //try {
+        //    uploadHelper.uploadBlocks(blobContainerClient, file.getAbsolutePath(), blockSize);
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
         //endregion
 
         //region Test methods for properties, metadata, and tags
