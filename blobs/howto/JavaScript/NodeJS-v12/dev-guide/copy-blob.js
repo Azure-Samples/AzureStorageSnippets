@@ -1,112 +1,133 @@
-const { BlobServiceClient } = require('@azure/storage-blob');
-const path = require('path');
-require('dotenv').config();
+// Azure Storage dependency
+const {
+  BlobServiceClient,
+  BlobLeaseClient,
+  BlockBlobClient,
+  BlobSASPermissions,
+  generateBlobSASQueryParameters,
+  SASProtocol
+} = require('@azure/storage-blob');
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
 
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// For development environment - include environment variables from .env
+require("dotenv").config();
 
-async function createBlobFromString(blobServiceClient, containerName, blobName, blobContent) {
+// TODO: Replace with your actual storage account name
+const accountNameSrc = "<storage-account-name-src>";
+const accountNameDest = "<storage-account-name-dest>";
 
-    const containerClient = blobServiceClient.getContainerClient(containerName);
+async function main() {
+  // create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountNameSrc}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
+  const blobServiceClientDest = new BlobServiceClient(
+    `https://${accountNameDest}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-    const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const sourceBlob = blobServiceClient
+    .getContainerClient("source-container")
+    .getBlockBlobClient("sample-blob.txt");
 
-    // upload blob
-    await blockBlobClient.upload(blobContent, blobContent.length);
-    console.log(`created blob ${blobName}`);
+  const destinationBlob = blobServiceClientDest
+    .getContainerClient("destination-container")
+    .getBlockBlobClient("sample-blob-copy.txt");
+
+  copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobServiceClient);
+
+  const sourceURL = "<source-url>";
+  const destBlob = blobServiceClient
+    .getContainerClient("sample-container")
+    .getBlockBlobClient("sample-blob-copy.txt");
+
+  copyFromExternalSource(sourceURL, destBlob);
 }
 
-async function copyBlob(
-    blobServiceClient, 
-    sourceBlobContainer, 
-    sourceBlobName, 
-    destinationBlobContainer,
-    destinationBlobName,) {
+// <Snippet_copy_from_azure_async>
+async function copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobServiceClient) {
+  // Lease the source blob to prevent changes during the copy operation
+  const sourceBlobLease = new BlobLeaseClient(sourceBlob);
 
-    // create container clients
-    const sourceContainerClient = blobServiceClient.getContainerClient(sourceBlobContainer); 
-    const destinationContainerClient = blobServiceClient.getContainerClient(destinationBlobContainer);   
-    
-    // create blob clients
-    const sourceBlobClient = await sourceContainerClient.getBlobClient(sourceBlobName);
-    const destinationBlobClient = await destinationContainerClient.getBlobClient(destinationBlobName);
+  // Create a SAS token that's valid for 1 hour
+  const sasToken = await generateUserDelegationSAS(sourceBlob, blobServiceClient);
+  const sourceBlobSASURL = sourceBlob.url + "?" + sasToken;
 
-    // start copy
-    const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url);
-    console.log('start copy from A to B');
+  try {
+    await sourceBlobLease.acquireLease(-1);
 
-    // wait until done
+    // Start the copy operation and wait for it to complete
+    const copyPoller = await destinationBlob.beginCopyFromURL(sourceBlobSASURL);
     await copyPoller.pollUntilDone();
-}
-async function copyThenAbortBlob(
-    blobServiceClient, 
-    sourceBlobContainer, 
-    sourceBlobName, 
-    destinationBlobContainer,
-    destinationBlobName,) {
-
-    // create container clients
-    const sourceContainerClient = blobServiceClient.getContainerClient(sourceBlobContainer); 
-    const destinationContainerClient = blobServiceClient.getContainerClient(destinationBlobContainer);   
-    
-    // create blob clients
-    const sourceBlobClient = await sourceContainerClient.getBlobClient(sourceBlobName);
-    const destinationBlobClient = await destinationContainerClient.getBlobClient(destinationBlobName);
-
-    // start copy
-    const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url);
-    console.log('start copy from A to C');
-
-    // cancel operation after starting it -
-    // sample file may be too small to be canceled.
-    try {
-      await copyPoller.cancelOperation();
-      console.log('request to cancel copy from A to C');
-
-      // calls to get the result now throw PollerCancelledError
-      await copyPoller.getResult();
-    } catch (err) {
-      if (err.name === 'PollerCancelledError') {
-        console.log('The copy was cancelled.');
-      }
-    }
+  } catch (error) {
+    // Handle the exception
+  } finally {
+    // Release the lease once the copy operation completes
+    await sourceBlobLease.releaseLease();
+  }
 }
 
-async function main(blobServiceClient) {
+async function generateUserDelegationSAS(sourceBlob, blobServiceClient) {
+  // Get a user delegation key for the Blob service that's valid for 1 hour, as an example
+  const delegationKeyStart = new Date();
+  const delegationKeyExpiry = new Date(Date.now() + 3600000);
+  const userDelegationKey = await blobServiceClient.getUserDelegationKey(
+    delegationKeyStart,
+    delegationKeyExpiry
+  );
 
-    // create container
-    const timestamp = Date.now();
-    const containerNameA = `copy-blob-a-${timestamp}`;
-    const containerNameB = `copy-blob-b-${timestamp}`;
+  // Create a SAS token that's valid for 1 hour, as an example
+  const sasTokenStart = new Date();
+  const sasTokenExpiry = new Date(Date.now() + 3600000);
+  const blobName = sourceBlob.name;
+  const containerName = sourceBlob.containerName;
+  const sasOptions = {
+    blobName,
+    containerName,
+    permissions: BlobSASPermissions.parse("r"),
+    startsOn: sasTokenStart,
+    expiresOn: sasTokenExpiry,
+    protocol: SASProtocol.HttpsAndHttp
+  };
 
-    const containerOptions = {
-        access: 'container'
-    }; 
+  const sasToken = generateBlobSASQueryParameters(
+    sasOptions,
+    userDelegationKey,
+    blobServiceClient.accountName
+  ).toString();
 
-    await blobServiceClient.createContainer(containerNameA, containerOptions);
-    console.log(`created container ${containerNameA}`);
-    
-    await blobServiceClient.createContainer(containerNameB, containerOptions);
-    console.log(`created container ${containerNameB}`);
-
-    const blobNameA = `a-from-string.txt`;
-    const blobNameB = `b-from-string.txt`;
-    const blobNameC = `c-from-string.txt`;
-    const blobContent = `Hello from a string`;
-
-    // create blob from string
-    await createBlobFromString(blobServiceClient, containerNameA, blobNameA, blobContent);
-
-    // copy blob A to B
-    await copyBlob(blobServiceClient, containerNameA, blobNameA, containerNameB, blobNameB);
-
-    // copy blob A to C then abort
-    await copyThenAbortBlob(blobServiceClient, containerNameA, blobNameA, containerNameB, blobNameC);
+  return sasToken.toString();
 }
-main(client)
+// </Snippet_copy_from_azure_async>
+
+// <Snippet_copy_blob_external_source_async>
+async function copyFromExternalSource(sourceURL, destinationBlob) {
+  const copyPoller = await destinationBlob.beginCopyFromURL(sourceURL);
+  await copyPoller.pollUntilDone();
+}
+// </Snippet_copy_blob_external_source_async>
+
+// <Snippet_check_copy_status_async>
+async function checkCopyStatus(destinationBlob) {
+  const properties = await destinationBlob.getProperties();
+  console.log(properties.copyStatus);
+}
+// </Snippet_check_copy_status_async>
+
+// <Snippet_abort_copy_async>
+async function abortCopy(destinationBlob) {
+  const properties = await destinationBlob.getProperties();
+
+  // Check the copy status and abort if pending
+  if (properties.copyStatus === "pending") {
+    await destinationBlob.abortCopyFromURL(properties.copyId);
+  }
+}
+// </Snippet_abort_copy_async>
+
+main()
     .then(() => console.log('done'))
     .catch((ex) => console.log(ex.message));

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.IO.Compression;
 using System.Text;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -11,14 +12,16 @@ namespace BlobDevGuideBlobs
     {
         public static async Task UploadBlobSamples(BlobServiceClient blobServiceClient)
         {
-            //BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
-            //string localFilePath = "<local-file-path>";
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("sample-container");
+            string localFilePath = @"<local-file-path>";
 
             //await UploadFromFileAsync(containerClient, localFilePath);
             //await UploadFromStreamAsync(containerClient, localFilePath);
             //await UploadFromBinaryDataAsync(containerClient, localFilePath);
-
             //await UploadFromStringAsync(containerClient, "sample-blob.txt");
+            //await UploadWithAccessTierAsync(containerClient, localFilePath);
+            //await UploadWithChecksumAsync(containerClient, localFilePath);
+            await UploadWithTransferOptionsAsync(containerClient, localFilePath);
         }
 
         // <Snippet_UploadFile>
@@ -176,5 +179,79 @@ namespace BlobDevGuideBlobs
             await blobClient.CommitBlockListAsync(blockIDArray);
         }
         // </Snippet_UploadBlocks>
+
+        // <Snippet_UploadWithAccessTier>
+        public static async Task UploadWithAccessTierAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlockBlobClient blockBlobClient = containerClient.GetBlockBlobClient(fileName);
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                AccessTier = AccessTier.Cool
+            };
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+            await blockBlobClient.UploadAsync(fileStream, uploadOptions);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithAccessTier>
+
+        // <Snippet_UploadWithChecksum>
+        public static async Task UploadWithChecksumAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            var validationOptions = new UploadTransferValidationOptions
+            {
+                ChecksumAlgorithm = StorageChecksumAlgorithm.Auto
+            };
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                TransferValidation = validationOptions
+            };
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+            await blobClient.UploadAsync(fileStream, uploadOptions);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithChecksum>
+
+        // <Snippet_UploadWithTransferOptions>
+        public static async Task UploadWithTransferOptionsAsync(
+            BlobContainerClient containerClient,
+            string localFilePath)
+        {
+            string fileName = Path.GetFileName(localFilePath);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            var transferOptions = new StorageTransferOptions
+            {
+                // Set the maximum number of parallel transfer workers
+                MaximumConcurrency = 2,
+
+                // Set the initial transfer length to 8 MiB
+                InitialTransferSize = 8 * 1024 * 1024,
+
+                // Set the maximum length of a transfer to 4 MiB
+                MaximumTransferSize = 4 * 1024 * 1024
+            };
+
+            var uploadOptions = new BlobUploadOptions()
+            {
+                TransferOptions = transferOptions
+            };
+
+            FileStream fileStream = File.OpenRead(localFilePath);
+            await blobClient.UploadAsync(fileStream, uploadOptions);
+            fileStream.Close();
+        }
+        // </Snippet_UploadWithTransferOptions>
     }
 }

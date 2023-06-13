@@ -161,6 +161,34 @@ namespace dotnet_v12
 
         #endregion
 
+        #region Restore a soft-deleted directory
+
+        // ---------------------------------------------------------
+        // Restore a soft-deleted directory
+        //----------------------------------------------------------
+
+        // <Snippet_RestoreDirectory>
+        public async Task RestoreDirectory(DataLakeFileSystemClient fileSystemClient, string directoryName)
+        {
+            DataLakeDirectoryClient directoryClient =
+                fileSystemClient.GetDirectoryClient(directoryName);
+
+            // List deleted paths
+            List<PathDeletedItem> deletedItems = new List<PathDeletedItem>();
+            await foreach (PathDeletedItem deletedItem in fileSystemClient.GetDeletedPathsAsync(directoryName))
+            {
+                deletedItems.Add(deletedItem);
+            }
+
+            // Restore deleted directory
+            Response<DataLakePathClient> restoreResponse = await fileSystemClient.UndeletePathAsync(
+                deletedItems[0].Path,
+                deletedItems[0].DeletionId);
+        }
+        // </Snippet_RestoreDirectory>
+
+        #endregion
+
         #region List directory contents
 
         // ----------------------------------------------------------
@@ -339,6 +367,7 @@ namespace dotnet_v12
             Console.WriteLine("6) Upload files to a directory");
             Console.WriteLine("7) Upload files to a directory in bulk");
             Console.WriteLine("8) Download a file from a directory");
+            Console.WriteLine("9) Restore a soft-deleted directory");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
@@ -414,6 +443,14 @@ namespace dotnet_v12
                 case "8":
 
                     await DownloadFile2(fileSystemClient);
+
+                    Console.WriteLine("Press enter to continue");
+                    Console.ReadLine();
+                    return true;
+
+                case "9":
+
+                    await RestoreDirectory(fileSystemClient, "my-directory");
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();

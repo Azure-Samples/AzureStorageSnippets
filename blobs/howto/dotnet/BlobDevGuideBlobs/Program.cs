@@ -10,15 +10,39 @@ var blobServiceClient = new BlobServiceClient(
         new Uri("https://<storage-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
+#region Create user delegation SAS
+/*
+await CreateSAS.CreateUserDelegationSASSamples(blobServiceClient);
+*/
+#endregion
+
+#region Create service SAS
+/*
+await CreateSAS.CreateServiceSASSamples(blobServiceClient);
+*/
+#endregion
+
+#region Create account SAS
+/*
+await CreateSAS.CreateAccountSASSamples(blobServiceClient);
+*/
+#endregion
+
+#region Stored access policy
+/*
+await CreateSAS.StoredAccessPolicySamples(blobServiceClient);
+*/
+#endregion
+
 #region Upload blob
 /*
-UploadBlob.UploadBlobSamples(blobServiceClient);
+await UploadBlob.UploadBlobSamples(blobServiceClient);
 */
 #endregion
 
 #region Download blob
 /*
-DownloadBlob.DownloadBlobSamples(blobServiceClient);
+await DownloadBlob.DownloadBlobSamples(blobServiceClient);
 */
 #endregion
 
