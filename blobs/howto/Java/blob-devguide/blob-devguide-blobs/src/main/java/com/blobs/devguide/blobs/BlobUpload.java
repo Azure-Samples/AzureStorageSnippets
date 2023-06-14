@@ -53,7 +53,8 @@ public class BlobUpload {
 
     // <Snippet_UploadBlobTags>
     public void uploadBlockBlobWithIndexTags(BlobContainerClient blobContainerClient, Path filePath) {
-        BlobClient blobClient = blobContainerClient.getBlobClient(filePath.getFileName().toString());
+        String fileName = filePath.getFileName().toString();
+        BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
 
         Map<String, String> tags = new HashMap<String, String>();
         tags.put("Content", "image");
