@@ -60,7 +60,7 @@ public class BlobUpload {
 
         Duration timeout = Duration.ofSeconds(10);
 
-        BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(localFilePath.getAbsolutePath());
+        BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(localFilePath.getPath());
         options.setTags(tags);
 
         try {
@@ -115,7 +115,7 @@ public class BlobUpload {
         ParallelTransferOptions parallelTransferOptions = new ParallelTransferOptions()
                 .setBlockSizeLong((long) (4 * 1024 * 1024)) // 4 MiB block size
                 .setMaxConcurrency(2)
-                .setMaxSingleUploadSizeLong((long) 8); // 8 MiB max size for single shot upload
+                .setMaxSingleUploadSizeLong((long) 8); // 8 MiB max size for single request upload
 
         BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(localFilePath.getPath());
         options.setParallelTransferOptions(parallelTransferOptions);
