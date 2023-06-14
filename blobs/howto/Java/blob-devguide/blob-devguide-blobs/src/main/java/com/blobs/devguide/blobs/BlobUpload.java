@@ -8,8 +8,12 @@ import com.azure.storage.blob.options.BlobUploadFromFileOptions;
 import com.azure.storage.blob.specialized.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 
@@ -48,8 +52,9 @@ public class BlobUpload {
     // </Snippet_UploadBlobFile>
 
     // <Snippet_UploadBlobTags>
-    public void uploadBlockBlobWithIndexTags(BlobContainerClient blobContainerClient) {
-        BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob");
+    public void uploadBlockBlobWithIndexTags(BlobContainerClient blobContainerClient, Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
 
         Map<String, String> tags = new HashMap<String, String>();
         tags.put("Content", "image");
@@ -57,7 +62,7 @@ public class BlobUpload {
 
         Duration timeout = Duration.ofSeconds(10);
 
-        BlobUploadFromFileOptions options = new BlobUploadFromFileOptions("local-file.png");
+        BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(filePath.toString());
         options.setTags(tags);
 
         try {
@@ -68,4 +73,67 @@ public class BlobUpload {
         }
     }
     // </Snippet_UploadBlobTags>
+
+    // <Snippet_UploadBlocks>
+    public void uploadBlocks(BlobContainerClient blobContainerClient, Path filePath, int blockSize) throws IOException {
+        String fileName = filePath.getFileName().toString();
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(fileName).getBlockBlobClient();
+    
+        FileInputStream fileStream = new FileInputStream(filePath.toString());
+        List<String> blockIDArrayList = new ArrayList<>();
+        byte[] buffer = new byte[blockSize];
+        int bytesRead;
+
+        while ((bytesRead = fileStream.read(buffer, 0, blockSize)) != -1) {
+
+            try (ByteArrayInputStream stream = new ByteArrayInputStream(buffer)) {
+                String blockID = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
+    
+                blockIDArrayList.add(blockID);
+                blobClient.stageBlock(blockID, stream, buffer.length);
+            }
+        }
+    
+        blobClient.commitBlockList(blockIDArrayList);
+
+        fileStream.close();
+    }
+    // </Snippet_UploadBlocks>
+
+    // <Snippet_UploadBlobWithTransferOptions>
+    public void uploadBlockBlobWithTransferOptions(BlobContainerClient blobContainerClient, Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
+
+        ParallelTransferOptions parallelTransferOptions = new ParallelTransferOptions()
+                .setBlockSizeLong((long) (4 * 1024 * 1024)) // 4 MiB block size
+                .setMaxConcurrency(2)
+                .setMaxSingleUploadSizeLong((long) 8 * 1024 * 1024); // 8 MiB max size for single request upload
+
+        BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(filePath.toString());
+        options.setParallelTransferOptions(parallelTransferOptions);
+
+        try {
+            Response<BlockBlobItem> blockBlob = blobClient.uploadFromFileWithResponse(options, null, null);
+        } catch (UncheckedIOException ex) {
+            System.err.printf("Failed to upload from file: %s%n", ex.getMessage());
+        }
+    }
+    // </Snippet_UploadBlobWithTransferOptions>
+
+    // <Snippet_UploadBlobWithAccessTier>
+    public void uploadBlobWithAccessTier(BlobContainerClient blobContainerClient, Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
+
+        BlobUploadFromFileOptions options = new BlobUploadFromFileOptions(filePath.toString())
+                .setTier(AccessTier.COOL);
+
+        try {
+            Response<BlockBlobItem> blockBlob = blobClient.uploadFromFileWithResponse(options, null, null);
+        } catch (UncheckedIOException ex) {
+            System.err.printf("Failed to upload from file: %s%n", ex.getMessage());
+        }
+    }
+    // </Snippet_UploadBlobWithAccessTier>
 }
