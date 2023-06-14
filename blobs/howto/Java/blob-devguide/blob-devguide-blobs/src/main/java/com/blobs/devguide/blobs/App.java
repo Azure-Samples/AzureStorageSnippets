@@ -2,6 +2,8 @@ package com.blobs.devguide.blobs;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.azure.core.credential.*;
 import com.azure.identity.*;
@@ -45,19 +47,19 @@ public class App {
         BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
 
         //region Test upload methods
-        File localFilePath = new File("filepath/local-file.png");
+        Path filePath = Paths.get("filepath/local-file.png");
 
-        BlobUpload uploadHelper = new BlobUpload();
+        //BlobUpload uploadHelper = new BlobUpload();
         //uploadHelper.uploadDataToBlob(blobContainerClient);
         //uploadHelper.uploadBlobFromStream(blobContainerClient);
         //uploadHelper.uploadBlobFromFile(blobContainerClient);
-        //uploadHelper.uploadBlockBlobWithIndexTags(blobContainerClient, localFilePath);
-        //uploadHelper.uploadBlockBlobWithTransferOptions(blobContainerClient, localFilePath);
-        uploadHelper.uploadBlobWithAccessTier(blobContainerClient, localFilePath);
+        //uploadHelper.uploadBlockBlobWithIndexTags(blobContainerClient, filePath);
+        //uploadHelper.uploadBlockBlobWithTransferOptions(blobContainerClient, filePath);
+        //uploadHelper.uploadBlobWithAccessTier(blobContainerClient, filePath);
 
         //int blockSize = 1024*1024*4; //4 MiB
         //try {
-        //    uploadHelper.uploadBlocks(blobContainerClient, file.getAbsolutePath(), blockSize);
+        //    uploadHelper.uploadBlocks(blobContainerClient, filePath, blockSize);
         //} catch (IOException e) {
         //    e.printStackTrace();
         //}
