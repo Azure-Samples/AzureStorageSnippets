@@ -149,7 +149,8 @@ namespace BlobDevGuideBlobs
             // Create a SAS token for the blob resource that's also valid for 1 day
             BlobSasBuilder sasBuilder = new BlobSasBuilder()
             {
-                BlobContainerName = blobClient.Name,
+                BlobContainerName = blobClient.BlobContainerName,
+                BlobName = blobClient.Name,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow,
                 ExpiresOn = DateTimeOffset.UtcNow.AddDays(1)
