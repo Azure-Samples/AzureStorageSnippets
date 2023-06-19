@@ -11,64 +11,30 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 const client = BlobServiceClient.fromConnectionString(connString);
 
 // <Snippet_UploadBlob>
-// containerName: string
+// containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
-// localFileWithPath: fully qualified path and file name
-// uploadOptions: {
-//   metadata: { reviewer: 'john', reviewDate: '2022-04-01' }, 
-//   tags: {project: 'xyz', owner: 'accounts-payable'}
-// }
-async function createBlobFromLocalPath(containerClient, blobName, localFileWithPath, uploadOptions){
-
-  // create blob client from container client
+// localFilePath: fully qualified path and file name
+async function uploadBlobFromLocalPath(containerClient, blobName, localFilePath){
+  // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
-  // upload file to blob storage
-  await blockBlobClient.uploadFile(localFileWithPath, uploadOptions);
-  console.log(`${blobName} succeeded`);
+  // Upload file to blob storage
+  await blockBlobClient.uploadFile(localFilePath);
 }
 // </Snippet_UploadBlob>
 
-
 async function main(blobServiceClient){
  
-    let blobs=[];
+  let blobs=[];
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `create-blob-from-local-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  const containerClient = await blobServiceClient.getContainerClient('sample-container');
 
-  const containerOptions = {
-    access: 'container'
-  };
+  // Get fully qualified path of file
+  const localFilePath = path.join('file-path', 'sample-blob.txt');
 
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-  console.log('container creation succeeded');
-
-  // get fully qualified path of file
-  // Create file `my-local-file.txt` in same directory as this file
-  const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
-
-  // create 10 blobs with Promise.all
+  // Create 10 blobs with Promise.all
   for (let i=0; i<10; i++){
-
-    const uploadOptions = {
-
-      // not indexed for searching
-      metadata: {
-        owner: 'PhillyProject'
-      },
-
-      // indexed for searching
-      tags: {
-        createdBy: 'YOUR-NAME',
-        createdWith: `StorageSnippetsForDocs-${i}`,
-        createdOn: (new Date()).toDateString()
-      }
-    }
-
-    blobs.push(createBlobFromLocalPath(containerClient, `${containerName}-${i}.txt`, localFileWithPath, uploadOptions));
+    blobs.push(uploadBlobFromLocalPath(containerClient, `sample-${i}.txt`, localFilePath));
   }
   await Promise.all(blobs);
 
