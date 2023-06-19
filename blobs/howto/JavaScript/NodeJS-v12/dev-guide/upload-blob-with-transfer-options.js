@@ -9,20 +9,18 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-//<Snippet_UploadBlobIndexTags>
+//<Snippet_UploadBlobTransferOptions>
 // containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
 // localFilePath: fully qualified path and file name
-async function uploadWithIndexTags(containerClient, blobName, localFilePath) {
+async function uploadWithTransferOptions(containerClient, blobName, localFilePath) {
   // Specify index tags for blob
   const uploadOptions = {
-    // Specify index tags
-    tags: {
-      'Sealed': 'false',
-      'Content': 'image',
-      'Date': '2023-06-01',
-    }
-  }
+    // Specify data transfer options
+    blockSize: 4 * 1024 * 1024, // 4 Mib max block size
+    concurrency: 2, // maximum number of parallel transfer workers
+    maxSingleShotSize: 8 * 1024 * 1024, // 8 MiB initial transfer size
+  } 
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
@@ -30,7 +28,7 @@ async function uploadWithIndexTags(containerClient, blobName, localFilePath) {
   // Upload blob with index tags
   await blockBlobClient.uploadFile(localFilePath, uploadOptions);
 }
-//</Snippet_UploadBlobIndexTags>
+//</Snippet_UploadBlobTransferOptions>
 
 async function main(blobServiceClient) {
   const containerClient = await blobServiceClient.getContainerClient('sample-container');
@@ -39,7 +37,7 @@ async function main(blobServiceClient) {
   const localFilePath = path.join('file-path', 'sample-blob.txt');
 
   // Upload blob
-  const blockBlobClient = await uploadWithIndexTags(containerClient, 'sample-blob.txt', localFilePath);
+  const blockBlobClient = await uploadWithTransferOptions(containerClient, 'sample-blob.txt', localFilePath);
 }
 main(client)
   .then(() => console.log('done'))

@@ -26,9 +26,6 @@ async function uploadWithAccessTier(containerClient, blobName, localFilePath) {
 
   // Upload file to cool tier in Blob Storage
   await blockBlobClient.uploadFile(localFilePath, uploadOptions);
-
-  // Return client to continue with other operations
-  return blockBlobClient;
 }
 //</Snippet_UploadAccessTier>
 
