@@ -15,7 +15,7 @@ const client = BlobServiceClient.fromConnectionString(connString);
 // <Snippet_UploadBlob>
 // containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
-// readableStream: Node.js Readable stream
+// readableStream: Node.js Readable stream, for example, a stream returned from fs.createReadStream()
 async function uploadBlobFromReadStream(containerClient, blobName, readableStream) {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
