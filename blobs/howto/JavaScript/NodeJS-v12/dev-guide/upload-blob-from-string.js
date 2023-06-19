@@ -9,65 +9,22 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 const client = BlobServiceClient.fromConnectionString(connString);
 
 // <Snippet_UploadBlob>
-// containerClient: container client
+// containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
 // fileContentsAsString: blob content
-// uploadOptions: {
-//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' }, 
-//    tags: {project: 'xyz', owner: 'accounts-payable'} 
-//  }
-async function createBlobFromString(containerClient, blobName, fileContentsAsString, uploadOptions){
-
+async function uploadBlobFromString(containerClient, blobName, fileContentsAsString){
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // Upload string
-  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
-
-  // do something with blob
-  const getTagsResponse = await blockBlobClient.getTags();
-  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
+  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
 }
 // </Snippet_UploadBlob>
 
-async function main(blobServiceClient){
- 
-    let blobs=[];
+async function main(blobServiceClient) {
+  const containerClient = await blobServiceClient.getContainerClient('sample-container');
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `createblobfromstring-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-
-  const containerOptions = {
-    access: 'container'
-  };  
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  console.log('container creation succeeded');
-
-  // create 10 blobs with Promise.all
-  for (let i=0; i<10; i++){
-
-    const uploadOptions = {
-
-      // not indexed for searching
-      metadata: {
-        owner: 'PhillyProject'
-      },
-  
-      // indexed for searching
-      tags: {
-        createdBy: 'YOUR-NAME',
-        createdWith: `StorageSnippetsForDocs-${i}`,
-        createdOn: (new Date()).toDateString()
-      }
-    }
-
-    blobs.push(createBlobFromString(containerClient, `${containerName}-${i}.txt`, `Hello from a string ${i}`, uploadOptions));
-  }
-  await Promise.all(blobs);
-
+  uploadBlobFromString(containerClient, 'sample-blob.txt', 'Hello string!');
 }
 main(client)
 .then(() => console.log('done'))
