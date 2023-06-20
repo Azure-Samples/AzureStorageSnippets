@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { Transform } = require('stream');
 
 const { BlobServiceClient } = require('@azure/storage-blob');
 
@@ -13,93 +12,27 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
-// <Snippet_Transform>
-// Transform stream
-// Reasons to transform:
-// 1. Sanitize the data - remove PII
-// 2. Compress or uncompress
-const myTransform = new Transform({
-  transform(chunk, encoding, callback) {
-    // see what is in the artificially
-    // small chunk
-    console.log(chunk);
-    callback(null, chunk);
-  },
-  decodeStrings: false
-});
-// </Snippet_Transform>
-
-
 // <Snippet_UploadBlob>
-// containerName: string
+// containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
-// readableStream: Node.js Readable stream
-// uploadOptions: {
-//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' },  
-//    tags: {project: 'xyz', owner: 'accounts-payable'}, 
-//  }
-async function createBlobFromReadStream(containerClient, blobName, readableStream, uploadOptions) {
-
+// readableStream: Node.js Readable stream, for example, a stream returned from fs.createReadStream()
+async function uploadBlobFromReadStream(containerClient, blobName, readableStream) {
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
-  // Size of every buffer allocated, also 
-  // the block size in the uploaded block blob. 
-  // Default value is 8MB
-  const bufferSize = 4 * 1024 * 1024;
-
-  // Max concurrency indicates the max number of 
-  // buffers that can be allocated, positive correlation 
-  // with max uploading concurrency. Default value is 5
-  const maxConcurrency = 20;
-
-  // use transform per chunk - only to see chunck
-  const transformedReadableStream = readableStream.pipe(myTransform);
-
-  // Upload stream
-  await blockBlobClient.uploadStream(transformedReadableStream, bufferSize, maxConcurrency, uploadOptions);
-
-  // do something with blob
-  const getTagsResponse = await blockBlobClient.getTags();
-  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
+  // Upload data to block blob using a readable stream
+  await blockBlobClient.uploadStream(readableStream);
 }
 // </Snippet_UploadBlob>
 async function main(blobServiceClient) {
+  const containerClient = await blobServiceClient.getContainerClient('sample-container');
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `create-blob-from-stream-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-  const { containerClient } = await blobServiceClient.createContainer(containerName);
+  // Get fully qualified path of file
+  const localFilePath = path.join('file-path', 'sample-blob.txt');
 
-  console.log('container creation succeeded');
+  const readableStream = fs.createReadStream(localFilePath);
 
-  // get fully qualified path of file
-  // Create file `my-local-file.txt` in same directory as this file
-  const localFileWithPath = path.join(__dirname, `my-local-file.txt`);
-
-  // highWaterMark: artificially low value to demonstrate appendBlob
-  // encoding: just to see the chunk as it goes by
-  const streamOptions = { highWaterMark: 20, encoding: 'utf-8' }
-
-  const readableStream = fs.createReadStream(localFileWithPath, streamOptions);
-
-  const uploadOptions = {
-
-    // not indexed for searching
-    metadata: {
-      owner: 'PhillyProject'
-    },
-
-    // indexed for searching
-    tags: {
-      createdBy: 'YOUR-NAME',
-      createdWith: `StorageSnippetsForDocs`,
-      createdOn: (new Date()).toDateString()
-    }
-  }
-
-  await createBlobFromReadStream(containerClient, `${containerName}.txt`, readableStream, uploadOptions);
+  await uploadBlobFromReadStream(containerClient, 'sample-blob.txt', readableStream);
 
 }
 main(client)

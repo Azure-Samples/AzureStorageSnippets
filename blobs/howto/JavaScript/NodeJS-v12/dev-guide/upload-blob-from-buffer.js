@@ -12,27 +12,16 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 const client = BlobServiceClient.fromConnectionString(connString);
 
 // <Snippet_UploadBlob>
-// containerName: string
+// containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
-// buffer: blob content
-// uploadOptions: {
-//    blockSize: destination block blob size in bytes,
-//    concurrency: concurrency of parallel uploading - must be greater than or equal to 0,
-//    maxSingleShotSize: blob size threshold in bytes to start concurrency uploading
-//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' },  
-//    tags: {project: 'xyz', owner: 'accounts-payable'} 
-//  }
-async function createBlobFromBuffer(containerClient, blobName, buffer, uploadOptions) {
+// buffer: blob contents as a buffer, for example, from fs.readFile()
+async function uploadBlobFromBuffer(containerClient, blobName, buffer) {
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   // Upload buffer
-  await blockBlobClient.uploadData(buffer, uploadOptions);
-
-  // do something with blob
-  const getTagsResponse = await blockBlobClient.getTags();
-  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
+  await blockBlobClient.uploadData(buffer);
 }
 // </Snippet_UploadBlob>
 
@@ -40,46 +29,18 @@ async function main(blobServiceClient) {
 
   let blobs = [];
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `createblobfrombuffer-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  const containerClient = await blobServiceClient.getContainerClient('sample-container');
 
-  const containerOptions = {
-    access: 'container'
-  };
-
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  if (containerCreateResponse.errorCode) console.log('container creation failed');
-
-  // get fully qualified path of file
-  // Create image file in same directory as this file
-  const localFileWithPath = path.join(__dirname, `daisies.jpg`);
+  // Get fully qualified path of file
+  const localFilePath = path.join('file-path', 'sample-blob.txt');
 
   // because no type is passed, open file as buffer
-  const buffer = await fs.readFile(localFileWithPath);
+  const buffer = await fs.readFile(localFilePath);
 
   // create blobs with Promise.all
   // include the file extension
   for (let i = 0; i < 10; i++) {
-
-    const uploadOptions = {
-
-      // not indexed for searching
-      metadata: {
-        owner: 'PhillyProject'
-      },
-
-      // indexed for searching
-      tags: {
-        createdBy: 'YOUR-NAME',
-        createdWith: `StorageSnippetsForDocs-${i}`,
-        createdOn: (new Date()).toDateString()
-      }
-    }
-
-    blobs.push(createBlobFromBuffer(containerClient, `${containerName}-${i}.jpg`, buffer, uploadOptions));
+    blobs.push(uploadBlobFromBuffer(containerClient, `sample-${i}.jpg`, buffer));
   }
   await Promise.all(blobs);
 

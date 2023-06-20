@@ -18,7 +18,7 @@ async function uploadWithAccessTier(containerClient) {
 
   const fileContentsAsString = `Hello from a string`
 
-  // upload blob to `hot` access tier
+  // upload blob to `Cool` access tier
   const uploadOptions = {
 
     // access tier setting
@@ -55,7 +55,7 @@ async function main(blobServiceClient) {
   const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
   console.log('container creation succeeded');
 
-  // upload blob to `hot` access tier
+  // upload blob to specific access tier
   const blockBlobClient = await uploadWithAccessTier(containerClient);
 
   // do something with blob
