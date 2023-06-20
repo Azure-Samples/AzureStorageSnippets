@@ -15,17 +15,17 @@ const client = BlobServiceClient.fromConnectionString(connString);
 // <Snippet_UploadBlob>
 // containerClient: ContainerClient object
 // blobName: string, includes file extension if provided
-// readableStream: Node.js Readable stream, for example, a stream returned from fs.createReadStream()
+// readableStream: Readable stream, for example, a stream returned from fs.createReadStream()
 async function uploadBlobFromReadStream(containerClient, blobName, readableStream) {
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // Upload data to block blob using a readable stream
   await blockBlobClient.uploadStream(readableStream);
 }
 // </Snippet_UploadBlob>
 async function main(blobServiceClient) {
-  const containerClient = await blobServiceClient.getContainerClient('sample-container');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
   const localFilePath = path.join('file-path', 'sample-blob.txt');

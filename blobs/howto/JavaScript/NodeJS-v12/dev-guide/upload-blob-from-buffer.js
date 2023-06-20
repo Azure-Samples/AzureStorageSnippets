@@ -18,7 +18,7 @@ const client = BlobServiceClient.fromConnectionString(connString);
 async function uploadBlobFromBuffer(containerClient, blobName, buffer) {
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // Upload buffer
   await blockBlobClient.uploadData(buffer);
@@ -29,7 +29,7 @@ async function main(blobServiceClient) {
 
   let blobs = [];
 
-  const containerClient = await blobServiceClient.getContainerClient('sample-container');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
   const localFilePath = path.join('file-path', 'sample-blob.txt');
