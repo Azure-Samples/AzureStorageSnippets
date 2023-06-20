@@ -1,6 +1,7 @@
 import {
   BlobServiceClient,
   BlockBlobClient,
+  BlockBlobParallelUploadOptions,
   ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
@@ -12,34 +13,35 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-// <Snippet_UploadBlob>
-async function uploadBlobFromLocalPath(
+// <Snippet_UploadBlobIndexTags>
+async function uploadBlobWithIndexTags(
   containerClient: ContainerClient,
   blobName: string,
   localFilePath: string
 ): Promise<void> {
+  // Specify index tags for blob
+  const uploadOptions: BlockBlobParallelUploadOptions = {
+    tags: {
+      'Sealed': 'false',
+      'Content': 'image',
+      'Date': '2023-06-01',
+    }
+  };
+
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  await blockBlobClient.uploadFile(localFilePath);
+  await blockBlobClient.uploadFile(localFilePath, uploadOptions);
 }
-// </Snippet_UploadBlob>
+// </Snippet_UploadBlobIndexTags>
 
 async function main(blobServiceClient: BlobServiceClient): Promise<void> {
-  const blobs: Promise<void>[] = [];
-
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
   const localFilePath = path.join('file-path', 'sample-blob.txt');
 
-  // create 10 blobs with Promise.all
-  for (let i = 0; i < 10; i++) {
-    blobs.push(
-      uploadBlobFromLocalPath(containerClient, `sample${i}.txt`, localFilePath)
-    );
-  }
-  await Promise.all(blobs);
+  uploadBlobWithIndexTags(containerClient, `sample-blob.txt`, localFilePath)
 }
 main(blobServiceClient)
   .then(() => console.log('success'))
