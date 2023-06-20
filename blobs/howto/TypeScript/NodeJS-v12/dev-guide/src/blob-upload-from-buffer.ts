@@ -1,10 +1,7 @@
 import {
   BlobServiceClient,
   BlockBlobClient,
-  BlockBlobParallelUploadOptions,
-  ContainerClient,
-  ContainerCreateOptions,
-  Tags
+  ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import { promises as fs } from 'fs';
@@ -18,92 +15,33 @@ const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 // <Snippet_UploadBlob>
-// containerName: string
-// blobName: string, includes file extension if provided
-// buffer: blob content
-// uploadOptions: {
-//    blockSize: destination block blob size in bytes,
-//    concurrency: concurrency of parallel uploading - must be greater than or equal to 0,
-//    maxSingleShotSize: blob size threshold in bytes to start concurrency uploading
-//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' },
-//    tags: {project: 'xyz', owner: 'accounts-payable'}
-//  }
-async function createBlobFromBuffer(
-  containerClient: ContainerClient,
-  blobName,
-  buffer,
-  uploadOptions: BlockBlobParallelUploadOptions
+async function uploadBlobFromBuffer(
+  containerClient: ContainerClient, blobName: string, buffer: Buffer
 ): Promise<void> {
   // Create blob client from container client
-  const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // Upload buffer
-  const uploadResponse = await blockBlobClient.uploadData(
-    buffer,
-    uploadOptions
-  );
-
-  if (!uploadResponse.errorCode) {
-    // do something with blob
-    const tags: Tags = await getBlobTags(blockBlobClient);
-  }
+  await blockBlobClient.uploadData(buffer);
 }
 // </Snippet_UploadBlob>
 
 async function main(blobServiceClient: BlobServiceClient) {
   const blobs: Promise<void>[] = [];
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `createblobfrombuffer-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
-  const containerOptions: ContainerCreateOptions = {
-    access: 'container'
-  };
-
-  const { containerClient, containerCreateResponse } =
-    await blobServiceClient.createContainer(containerName, containerOptions);
-
-  if (containerCreateResponse.errorCode)
-    console.log('container creation failed');
-
-  // get fully qualified path of file
-  // Create image file in `./files` directory as this file
-  const localFileWithPath = path.join(__dirname, `../files/leaves.jpg`);
+  // Get fully qualified path of file
+  const localFilePath: string = path.join('file-path', 'sample-blob.txt');
 
   // because no type is passed, open file as buffer
-  const buffer: Buffer = await fs.readFile(localFileWithPath);
+  const buffer: Buffer = await fs.readFile(localFilePath);
 
   // create blobs with Promise.all
   // include the file extension
   for (let i = 0; i < 10; i++) {
-    // indexed for searching
-    // Tags: Record<string, string>
-    const tags: Tags = {
-      createdBy: 'YOUR-NAME',
-      createdWith: `StorageSnippetsForDocs-${i}`,
-      createdOn: new Date().toDateString()
-    };
-
-    const uploadOptions: BlockBlobParallelUploadOptions = {
-      // not indexed for searching
-      //  metadata: {[propertyName: string]: string;}
-      metadata: {
-        owner: 'PhillyProject'
-      },
-
-      tags
-    };
-
     blobs.push(
-      createBlobFromBuffer(
-        containerClient,
-        `${containerName}-${i}.jpg`,
-        buffer,
-        uploadOptions
-      )
+      uploadBlobFromBuffer(containerClient,`sample-${i}.txt`,buffer)
     );
   }
   await Promise.all(blobs);

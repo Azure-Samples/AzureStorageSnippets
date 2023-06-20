@@ -1,10 +1,7 @@
 import {
-  BlobGetTagsResponse,
   BlobServiceClient,
   BlockBlobClient,
-  BlockBlobUploadStreamOptions,
-  ContainerClient,
-  Tags
+  ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 import fs from 'fs';
@@ -34,99 +31,31 @@ const myTransform = new Transform({
 // </Snippet_Transform>
 
 // <Snippet_UploadBlob>
-// containerName: string
-// blobName: string, includes file extension if provided
-// readableStream: Node.js Readable stream
-// uploadOptions: {
-//    metadata: { reviewer: 'john', reviewDate: '2022-04-01' },
-//    tags: {project: 'xyz', owner: 'accounts-payable'},
-//  }
-async function createBlobFromReadStream(
+async function uploadBlobFromReadStream(
   containerClient: ContainerClient,
-  blobName,
-  readableStream,
-  uploadOptions: BlockBlobUploadStreamOptions
+  blobName: string,
+  readStream: fs.ReadStream
 ): Promise<void> {
   // Create blob client from container client
-  const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // Size of every buffer allocated, also
-  // the block size in the uploaded block blob.
-  // Default value is 8MB
-  const bufferSize = 4 * 1024 * 1024;
-
-  // Max concurrency indicates the max number of
-  // buffers that can be allocated, positive correlation
-  // with max uploading concurrency. Default value is 5
-  const maxConcurrency = 20;
-
-  // use transform per chunk - only to see chunck
-  const transformedReadableStream = readableStream.pipe(myTransform);
-
-  // Upload stream
-  await blockBlobClient.uploadStream(
-    transformedReadableStream,
-    bufferSize,
-    maxConcurrency,
-    uploadOptions
-  );
-
-  // do something with blob
-  const getTagsResponse: BlobGetTagsResponse = await blockBlobClient.getTags();
-  if (getTagsResponse.errorCode) throw Error(getTagsResponse.errorCode);
-  const tags: Tags = getTagsResponse.tags;
-
-  // Print out name/value pairs
-  Object.keys(tags).map((tag) => console.log(`${[tag]}: ${tags[tag]}`));
+  await blockBlobClient.uploadStream(readStream);
 }
 // </Snippet_UploadBlob>
+
 // <Snippet_useUploadStream>
 async function main(blobServiceClient): Promise<void> {
-  // create container
-  const timestamp = Date.now();
-  const containerName = `create-blob-from-stream-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-  const { containerClient, containerCreateResponse } =
-    await blobServiceClient.createContainer(containerName);
-  if (containerCreateResponse.errorCode)
-    throw Error('container creation failed');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
-  console.log('container creation succeeded');
+  // Get fully qualified path of file
+  const localFilePath: string = path.join('file-path', 'sample-blob.txt');
 
-  // get fully qualified path of file
-  // Create file `my-local-file.txt` in `./files` directory as this file
-  const localFileWithPath = path.join(__dirname, `../files/my-blob`);
+  const readStream: fs.ReadStream = fs.createReadStream(localFilePath);
 
-  // highWaterMark: artificially low value to demonstrate appendBlob
-  // encoding: just to see the chunk as it goes by
-  const bufferEncoding: BufferEncoding = 'utf-8';
-  const streamOptions = { highWaterMark: 20, encoding: bufferEncoding };
-
-  const readableStream = fs.createReadStream(localFileWithPath, streamOptions);
-
-  // Tags: Record<string, string>
-  const tags: Tags = {
-    createdBy: 'YOUR-NAME',
-    createdWith: `StorageSnippetsForDocs`,
-    createdOn: new Date().toDateString()
-  };
-
-  const uploadOptions: BlockBlobUploadStreamOptions = {
-    // not indexed for searching
-    metadata: {
-      owner: 'PhillyProject'
-    },
-
-    // indexed for searching
-    tags
-  };
-
-  await createBlobFromReadStream(
+  await uploadBlobFromReadStream(
     containerClient,
-    `${containerName}.txt`,
-    readableStream,
-    uploadOptions
+    'sample-blob-from-stream.txt',
+    readStream
   );
 }
 // </Snippet_useUploadStream>
