@@ -16,9 +16,8 @@ const client = BlobServiceClient.fromConnectionString(connString);
 // localFilePath: fully qualified path and file name
 async function uploadBlobFromLocalPath(containerClient, blobName, localFilePath){
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // Upload file to blob storage
   await blockBlobClient.uploadFile(localFilePath);
 }
 // </Snippet_UploadBlob>
@@ -27,7 +26,7 @@ async function main(blobServiceClient){
  
   let blobs=[];
 
-  const containerClient = await blobServiceClient.getContainerClient('sample-container');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
   const localFilePath = path.join('file-path', 'sample-blob.txt');

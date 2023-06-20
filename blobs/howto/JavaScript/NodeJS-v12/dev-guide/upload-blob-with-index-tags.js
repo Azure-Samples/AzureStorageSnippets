@@ -16,7 +16,6 @@ const client = BlobServiceClient.fromConnectionString(connString);
 async function uploadWithIndexTags(containerClient, blobName, localFilePath) {
   // Specify index tags for blob
   const uploadOptions = {
-    // Specify index tags
     tags: {
       'Sealed': 'false',
       'Content': 'image',
@@ -25,7 +24,7 @@ async function uploadWithIndexTags(containerClient, blobName, localFilePath) {
   }
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // Upload blob with index tags
   await blockBlobClient.uploadFile(localFilePath, uploadOptions);
@@ -33,7 +32,7 @@ async function uploadWithIndexTags(containerClient, blobName, localFilePath) {
 //</Snippet_UploadBlobIndexTags>
 
 async function main(blobServiceClient) {
-  const containerClient = await blobServiceClient.getContainerClient('sample-container');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
   const localFilePath = path.join('file-path', 'sample-blob.txt');
