@@ -28,7 +28,7 @@ async function uploadWithAccessTier(
 
   const tags: Tags = {};
 
-  // upload blob to `hot` access tier
+  // Upload blob to cool tier
   const uploadOptions: BlockBlobUploadOptions = {
     // access tier setting
     // 'Hot', 'Cool', or 'Archive'
@@ -73,7 +73,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
     throw Error('container creation failed');
   console.log('container creation succeeded');
 
-  // upload blob to `hot` access tier
+  // upload blob to specified access tier
   const blockBlobClient: BlockBlobClient = await uploadWithAccessTier(
     containerClient
   );
