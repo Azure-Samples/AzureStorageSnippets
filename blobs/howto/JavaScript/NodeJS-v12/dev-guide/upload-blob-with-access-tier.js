@@ -14,23 +14,21 @@ const client = BlobServiceClient.fromConnectionString(connString);
 // blobName: string, includes file extension if provided
 // localFilePath: fully qualified path and file name
 async function uploadWithAccessTier(containerClient, blobName, localFilePath) {
-  // Upload blob to `Cool` access tier
+  // Specify access tier
   const uploadOptions = {
-    // Specify access tier
-    // 'Hot', 'Cool', 'Cold', or 'Archive'
     tier: 'Cool',
   }
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // Upload file to cool tier in Blob Storage
+  // Upload blob to cool tier
   await blockBlobClient.uploadFile(localFilePath, uploadOptions);
 }
 //</Snippet_UploadAccessTier>
 
 async function main(blobServiceClient) {
-  const containerClient = await blobServiceClient.getContainerClient('sample-container');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
   const localFilePath = path.join('file-path', 'sample-blob.txt');

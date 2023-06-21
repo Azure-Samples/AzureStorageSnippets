@@ -14,15 +14,14 @@ const client = BlobServiceClient.fromConnectionString(connString);
 // fileContentsAsString: blob content
 async function uploadBlobFromString(containerClient, blobName, fileContentsAsString){
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // Upload string
   await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
 }
 // </Snippet_UploadBlob>
 
 async function main(blobServiceClient) {
-  const containerClient = await blobServiceClient.getContainerClient('sample-container');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   uploadBlobFromString(containerClient, 'sample-blob.txt', 'Hello string!');
 }
