@@ -1,9 +1,11 @@
 import {
   BlobServiceClient,
   BlockBlobClient,
+  BlockBlobParallelUploadOptions,
   ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 // Get BlobServiceClient
@@ -11,23 +13,31 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-// <Snippet_UploadBlob>
-async function uploadBlobFromString(
+// <Snippet_UploadAccessTier>
+async function uploadBlobWithAccessTier(
   containerClient: ContainerClient,
   blobName: string,
-  fileContents: string
+  localFilePath: string
 ): Promise<void> {
+  // Upload blob to 'Cool' access tier
+  const uploadOptions: BlockBlobParallelUploadOptions = {
+    tier: 'Cool'
+  };
+
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  await blockBlobClient.upload(fileContents, fileContents.length);
+  await blockBlobClient.uploadFile(localFilePath, uploadOptions);
 }
-// </Snippet_UploadBlob>
+// </Snippet_UploadAccessTier>
 
-async function main(blobServiceClient): Promise<void> {
-  const containerClient: ContainerClient = blobServiceClient.getContainerClient('sample-container');
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
-  uploadBlobFromString(containerClient, 'sample-blob.txt', 'Hello string!');
+  // Get fully qualified path of file
+  const localFilePath = path.join('file-path', 'sample-blob.txt');
+
+  uploadBlobWithAccessTier(containerClient, `sample-blob.txt`, localFilePath)
 }
 main(blobServiceClient)
   .then(() => console.log('success'))

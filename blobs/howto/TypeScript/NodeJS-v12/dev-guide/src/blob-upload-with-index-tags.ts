@@ -1,12 +1,11 @@
 import {
   BlobServiceClient,
   BlockBlobClient,
+  BlockBlobParallelUploadOptions,
   ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
-import { promises as fs } from 'fs';
 import path from 'path';
-import { getBlobTags } from './blob-set-tags';
 dotenv.config();
 
 // Get BlobServiceClient
@@ -14,37 +13,35 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-// <Snippet_UploadBlob>
-async function uploadBlobFromBuffer(
-  containerClient: ContainerClient, blobName: string, buffer: Buffer
+// <Snippet_UploadBlobIndexTags>
+async function uploadBlobWithIndexTags(
+  containerClient: ContainerClient,
+  blobName: string,
+  localFilePath: string
 ): Promise<void> {
+  // Specify index tags for blob
+  const uploadOptions: BlockBlobParallelUploadOptions = {
+    tags: {
+      'Sealed': 'false',
+      'Content': 'image',
+      'Date': '2023-06-01',
+    }
+  };
+
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // Upload buffer
-  await blockBlobClient.uploadData(buffer);
+  await blockBlobClient.uploadFile(localFilePath, uploadOptions);
 }
-// </Snippet_UploadBlob>
+// </Snippet_UploadBlobIndexTags>
 
-async function main(blobServiceClient: BlobServiceClient) {
-  const blobs: Promise<void>[] = [];
-
+async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath: string = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('file-path', 'sample-blob.txt');
 
-  // because no type is passed, open file as buffer
-  const buffer: Buffer = await fs.readFile(localFilePath);
-
-  // create blobs with Promise.all
-  // include the file extension
-  for (let i = 0; i < 10; i++) {
-    blobs.push(
-      uploadBlobFromBuffer(containerClient,`sample-${i}.txt`,buffer)
-    );
-  }
-  await Promise.all(blobs);
+  uploadBlobWithIndexTags(containerClient, `sample-blob.txt`, localFilePath)
 }
 main(blobServiceClient)
   .then(() => console.log('success'))
