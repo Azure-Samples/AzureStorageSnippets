@@ -18,7 +18,7 @@ await CreateSAS.CreateUserDelegationSASSamples(blobServiceClient);
 
 #region Create service SAS
 /*
-await CreateSAS.CreateServiceSASSamples(blobServiceClient);
+await CreateSAS.CreateServiceSASSamples();
 */
 #endregion
 
