@@ -102,9 +102,12 @@ public class BlobSAS {
     public String createAccountSAS(BlobServiceClient blobServiceClient) {
         // Configure the SAS parameters
         OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
-        AccountSasPermission accountSasPermission = new AccountSasPermission().setReadPermission(true);
-        AccountSasService services = new AccountSasService().setBlobAccess(true);
-        AccountSasResourceType resourceTypes = new AccountSasResourceType().setService(true);
+        AccountSasPermission accountSasPermission = new AccountSasPermission()
+                .setReadPermission(true);
+        AccountSasService services = new AccountSasService()
+                .setBlobAccess(true);
+        AccountSasResourceType resourceTypes = new AccountSasResourceType()
+                .setService(true);
 
         // Generate the account SAS
         AccountSasSignatureValues accountSasValues = new AccountSasSignatureValues(
@@ -138,8 +141,7 @@ public class BlobSAS {
 
         // Assign read permissions to the SAS token
         BlobContainerSasPermission sasPermission = new BlobContainerSasPermission()
-                .setReadPermission(true)
-                .setListPermission(true);
+                .setReadPermission(true);
 
         BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
                 .setStartTime(OffsetDateTime.now().minusMinutes(5));
