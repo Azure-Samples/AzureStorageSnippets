@@ -37,17 +37,22 @@ public class App {
         //sasHelper.useAccountSAS(blobServiceClient);
         //endregion
 
+        //region Create a service SAS
+        //sasHelper.useServiceSASContainer(blobServiceClient);
+        //sasHelper.useServiceSASBlob(blobServiceClient);
+        //endregion
+
         //region Create a service client using a connection string
         // String connectionString = "<Connection string>";
         //BlobServiceClient blobServiceClient = GetBlobServiceClientConnectionString(connectionString);
         //endregion
 
         // This sample assumes a container named 'sample-container' and a blob called 'sampleBlob.txt'
-        BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient("sample-container");
-        BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
+        //BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient("sample-container");
+        //BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
 
         //region Test upload methods
-        Path filePath = Paths.get("filepath/local-file.png");
+        //Path filePath = Paths.get("filepath/local-file.png");
 
         //BlobUpload uploadHelper = new BlobUpload();
         //uploadHelper.uploadDataToBlob(blobContainerClient);

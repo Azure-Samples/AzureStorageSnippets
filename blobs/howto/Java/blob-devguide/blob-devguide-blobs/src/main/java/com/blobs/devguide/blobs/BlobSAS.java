@@ -102,9 +102,12 @@ public class BlobSAS {
     public String createAccountSAS(BlobServiceClient blobServiceClient) {
         // Configure the SAS parameters
         OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
-        AccountSasPermission accountSasPermission = new AccountSasPermission().setReadPermission(true);
-        AccountSasService services = new AccountSasService().setBlobAccess(true);
-        AccountSasResourceType resourceTypes = new AccountSasResourceType().setService(true);
+        AccountSasPermission accountSasPermission = new AccountSasPermission()
+                .setReadPermission(true);
+        AccountSasService services = new AccountSasService()
+                .setBlobAccess(true);
+        AccountSasResourceType resourceTypes = new AccountSasResourceType()
+                .setService(true);
 
         // Generate the account SAS
         AccountSasSignatureValues accountSasValues = new AccountSasSignatureValues(
@@ -119,15 +122,80 @@ public class BlobSAS {
     // </Snippet_CreateAccountSAS>
 
     public void useAccountSAS(BlobServiceClient blobServiceClient) {
+        // <Snippet_UseAccountSAS>
         // Create a SAS token
         String sasToken = createAccountSAS(blobServiceClient);
 
-        // <Snippet_UseAccountSAS>
         // Create a new BlobServiceClient using the SAS token
         BlobServiceClient sasServiceClient = new BlobServiceClientBuilder()
                 .endpoint(blobServiceClient.getAccountUrl())
                 .sasToken(sasToken)
                 .buildClient();
         // </Snippet_UseAccountSAS>
+    }
+
+    // <Snippet_CreateServiceSASContainer>
+    public String createServiceSASContainer(BlobContainerClient containerClient) {
+        // Create a SAS token that's valid for 1 day, as an example
+        OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
+
+        // Assign read permissions to the SAS token
+        BlobContainerSasPermission sasPermission = new BlobContainerSasPermission()
+                .setReadPermission(true);
+
+        BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
+                .setStartTime(OffsetDateTime.now().minusMinutes(5));
+
+        String sasToken = containerClient.generateSas(sasSignatureValues);
+        return sasToken;
+    }
+    // </Snippet_CreateServiceSASContainer>
+
+    // <Snippet_CreateServiceSASBlob>
+    public String createServiceSASBlob(BlobClient blobClient) {
+        // Create a SAS token that's valid for 1 day, as an example
+        OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
+
+        // Assign read permissions to the SAS token
+        BlobSasPermission sasPermission = new BlobSasPermission()
+                .setReadPermission(true);
+
+        BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
+                .setStartTime(OffsetDateTime.now().minusMinutes(5));
+
+        String sasToken = blobClient.generateSas(sasSignatureValues);
+        return sasToken;
+    }  
+    // </Snippet_CreateServiceSASBlob>
+
+    public void useServiceSASContainer(BlobServiceClient blobServiceClient) {
+        // <Snippet_UseServiceSASContainer>
+        // Create a SAS token
+        BlobContainerClient containerClient = blobServiceClient
+                .getBlobContainerClient("sample-container");
+        String sasToken = createServiceSASContainer(containerClient);
+
+        // Create a new BlobContainerClient using the SAS token
+        BlobContainerClient sasContainerClient = new BlobContainerClientBuilder()
+                .endpoint(containerClient.getBlobContainerUrl())
+                .sasToken(sasToken)
+                .buildClient();
+        // </Snippet_UseServiceSASContainer>
+    }
+
+    public void useServiceSASBlob(BlobServiceClient blobServiceClient) {
+        // <Snippet_UseServiceSASBlob>
+        // Create a SAS token
+        BlobClient blobClient = blobServiceClient
+                .getBlobContainerClient("sample-container")
+                .getBlobClient("sample-blob.txt");
+        String sasToken = createServiceSASBlob(blobClient);
+
+        // Create a new BlobClient using the SAS token
+        BlobClient sasBlobClient = new BlobClientBuilder()
+                .endpoint(blobClient.getBlobUrl())
+                .sasToken(sasToken)
+                .buildClient();
+        // </Snippet_UseServiceSASBlob>
     }
 }
