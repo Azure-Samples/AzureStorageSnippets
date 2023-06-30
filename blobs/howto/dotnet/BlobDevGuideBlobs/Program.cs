@@ -7,7 +7,7 @@ using BlobDevGuide;
 using BlobDevGuideBlobs;
 
 var blobServiceClient = new BlobServiceClient(
-        new Uri("https://<storage-account-name>.blob.core.windows.net"),
+        new Uri("https://<storage-account-test>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
 #region Create user delegation SAS
@@ -156,5 +156,18 @@ BlockBlobClient client = blobServiceClient
 string version = "<version-timestamp>";
 
 client = await CopyVersion.CopyVersionOverBaseBlobAsync(client, version);
+*/
+#endregion
+
+#region Rehydrate blob with copy operation
+/*
+// Instantiate BlobClient for the source blob and destination blob
+BlobClient sourceArchiveBlob = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob-archive.txt");
+BlobClient destinationRehydratedBlob = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob-rehydrated.txt");
+await RehydrateBlobUsingCopy.RehydrateBlobUsingCopyAsync(sourceArchiveBlob, destinationRehydratedBlob);
 */
 #endregion
