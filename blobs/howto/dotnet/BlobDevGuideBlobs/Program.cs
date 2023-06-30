@@ -7,7 +7,7 @@ using BlobDevGuide;
 using BlobDevGuideBlobs;
 
 var blobServiceClient = new BlobServiceClient(
-        new Uri("https://<storage-account-test>.blob.core.windows.net"),
+        new Uri("https://<storage-account-name>.blob.core.windows.net"),
         new DefaultAzureCredential());
 
 #region Create user delegation SAS
