@@ -158,3 +158,16 @@ string version = "<version-timestamp>";
 client = await CopyVersion.CopyVersionOverBaseBlobAsync(client, version);
 */
 #endregion
+
+#region Rehydrate blob with copy operation
+/*
+// Instantiate BlobClient for the source blob and destination blob
+BlobClient sourceArchiveBlob = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob-archive.txt");
+BlobClient destinationRehydratedBlob = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob-rehydrated.txt");
+await RehydrateBlobUsingCopy.RehydrateBlobUsingCopyAsync(sourceArchiveBlob, destinationRehydratedBlob);
+*/
+#endregion
