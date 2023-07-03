@@ -161,6 +161,16 @@ client = await CopyVersion.CopyVersionOverBaseBlobAsync(client, version);
 
 #region Rehydrate blob with copy operation
 /*
+BlobClient blobClient = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob.txt");
+
+await AccessTiers.ChangeBlobAccessTierAsync(blobClient);
+*/
+#endregion
+
+#region Rehydrate blob with copy operation
+/*
 // Instantiate BlobClient for the source blob and destination blob
 BlobClient sourceArchiveBlob = blobServiceClient
     .GetBlobContainerClient("sample-container")
@@ -168,6 +178,6 @@ BlobClient sourceArchiveBlob = blobServiceClient
 BlobClient destinationRehydratedBlob = blobServiceClient
     .GetBlobContainerClient("sample-container")
     .GetBlobClient("sample-blob-rehydrated.txt");
-await RehydrateBlobUsingCopy.RehydrateBlobUsingCopyAsync(sourceArchiveBlob, destinationRehydratedBlob);
+await AccessTiers.RehydrateBlobUsingCopyAsync(sourceArchiveBlob, destinationRehydratedBlob);
 */
 #endregion

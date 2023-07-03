@@ -1,15 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs;
 
 namespace BlobDevGuideBlobs
 {
-    class RehydrateBlobUsingCopy
+    class AccessTiers
     {
+        //-------------------------------------------------
+        // Change a blob's access tier
+        //-------------------------------------------------
+        // <Snippet_ChangeAccessTier>
+        public static async Task ChangeBlobAccessTierAsync(
+            BlobClient blobClient)
+        {
+            // Change the access tier of the blob to cool
+            await blobClient.SetAccessTierAsync(AccessTier.Cool);
+        }
+        // </Snippet_ChangeAccessTier>
+
         //-------------------------------------------------
         // Rehydrate a blob using a copy operation
         //-------------------------------------------------
