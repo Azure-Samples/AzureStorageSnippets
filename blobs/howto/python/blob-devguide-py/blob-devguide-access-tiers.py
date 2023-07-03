@@ -8,6 +8,12 @@ from azure.storage.blob import (
 
 class BlobAccessTierSamples(object):
 
+    # <Snippet_change_blob_access_tier>
+    def change_blob_access_tier(self, blob_client: BlobClient):
+        # Change the blob access tier to cool
+        blob_client.set_standard_blob_tier(StandardBlobTier.COOL)
+    # </Snippet_change_blob_access_tier>
+
     # <Snippet_rehydrate_using_copy>
     def rehydrate_blob_using_copy(self, source_archive_blob: BlobClient, destination_rehydrated_blob: BlobClient):
         # Note: the destination blob must have a different name than the source blob
@@ -31,7 +37,11 @@ if __name__ == '__main__':
 
     sample = BlobAccessTierSamples()
 
+    # Change the blob access tier to cool
+    blob_client = blob_service_client.get_blob_client(container="sample-container", blob="sample-blob.txt")
+    sample.change_blob_access_tier(blob_client=blob_client)
+
     # Rehydrate a blob using copy operation
-    source = blob_service_client.get_blob_client(container="sample-container", blob="sample-blob-archive.txt")
-    destination = blob_service_client.get_blob_client(container="sample-container", blob="sample-blob-rehydrated-py.txt")
-    sample.rehydrate_blob_using_copy(source_archive_blob=source, destination_rehydrated_blob=destination)
+    #source = blob_service_client.get_blob_client(container="sample-container", blob="sample-blob-archive.txt")
+    #destination = blob_service_client.get_blob_client(container="sample-container", blob="sample-blob-rehydrated-py.txt")
+    #sample.rehydrate_blob_using_copy(source_archive_blob=source, destination_rehydrated_blob=destination)
