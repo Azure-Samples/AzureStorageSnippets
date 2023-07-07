@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Blob;
 
 import com.azure.core.credential.*;
 import com.azure.identity.*;
@@ -48,8 +49,8 @@ public class App {
         //endregion
 
         // This sample assumes a container named 'sample-container' and a blob called 'sampleBlob.txt'
-        //BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient("sample-container");
-        //BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
+        BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient("sample-container");
+        BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
 
         //region Test upload methods
         //Path filePath = Paths.get("filepath/local-file.png");
@@ -126,6 +127,17 @@ public class App {
         //BlobDelete deleteHelper = new BlobDelete();
         //deleteHelper.deleteBlob(blobClient);
         // deleteHelper.deleteBlobWithSnapshots(blobClient);
+        //endregion
+
+        //region Test methods for setting or changing access tiers
+        BlobAccessTier accessTierHelper = new BlobAccessTier();
+        accessTierHelper.changeBlobAccessTier(blobClient);
+        //BlobClient archiveBlob = blobContainerClient.getBlobClient("sample-blob-archive.txt");
+        //accessTierHelper.rehydrateBlobSetAccessTier(archiveBlob);
+
+        BlobClient sourceArchiveBlob = blobContainerClient.getBlobClient("sample-blob-archive.txt");
+        BlobClient destinationRehydratedBlob = blobContainerClient.getBlobClient("sample-blob-rehydrated-java.txt");
+        accessTierHelper.rehydrateBlobUsingCopy(sourceArchiveBlob, destinationRehydratedBlob);
         //endregion
     }
 
