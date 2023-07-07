@@ -15,6 +15,18 @@ public class BlobAccessTier {
     }
     // </Snippet_ChangeAccessTier>
 
+    // <Snippet_RehydrateUsingSetAccessTier>
+    public void rehydrateBlobSetAccessTier(BlobClient blobClient) {
+        // Rehydrate the blob to hot tier using a standard rehydrate priority
+        blobClient.setAccessTierWithResponse(
+            AccessTier.HOT,
+            RehydratePriority.STANDARD,
+            null, 
+            null, 
+            null);
+    }
+    // </Snippet_RehydrateUsingSetAccessTier>
+
     // <Snippet_RehydrateUsingCopy>
     public void rehydrateBlobUsingCopy(
         BlobClient sourceArchiveBlob,

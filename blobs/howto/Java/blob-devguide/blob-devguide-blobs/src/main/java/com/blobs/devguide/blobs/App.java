@@ -132,6 +132,8 @@ public class App {
         //region Test methods for setting or changing access tiers
         BlobAccessTier accessTierHelper = new BlobAccessTier();
         accessTierHelper.changeBlobAccessTier(blobClient);
+        //BlobClient archiveBlob = blobContainerClient.getBlobClient("sample-blob-archive.txt");
+        //accessTierHelper.rehydrateBlobSetAccessTier(archiveBlob);
 
         BlobClient sourceArchiveBlob = blobContainerClient.getBlobClient("sample-blob-archive.txt");
         BlobClient destinationRehydratedBlob = blobContainerClient.getBlobClient("sample-blob-rehydrated-java.txt");
