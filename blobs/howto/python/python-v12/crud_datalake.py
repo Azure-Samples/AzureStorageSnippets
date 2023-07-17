@@ -23,7 +23,7 @@
 
 
 
-import os, uuid, sys
+import os
 from azure.storage.filedatalake import (
     DataLakeServiceClient,
     DataLakeDirectoryClient,
@@ -115,35 +115,31 @@ class ManageDataLake:
     # </Snippet_DeleteDirectory>
 
     # ------------------------------------------------
+    # Append data to a file
+    # ------------------------------------------------
+
+    # <Snippet_AppendData>
+    def append_data_to_file(self, directory_client: DataLakeDirectoryClient, file_name: str):
+        file_client = directory_client.get_file_client(file_name)
+        file_size = file_client.get_file_properties().size
+        
+        data = b"Data to append to end of file"
+        file_client.append_data(data, offset=file_size, length=len(data))
+
+        file_client.flush_data(file_size + len(data))
+    # </Snippet_AppendData>
+
+    # ------------------------------------------------
     # Upload a file to a directory
     # ------------------------------------------------
 
     # <Snippet_UploadFile>
     def upload_file_to_directory(self, directory_client: DataLakeDirectoryClient, local_path: str, file_name: str):
-        file_client = directory_client.create_file(file_name)
-        
-        with open(file=os.path.join(local_path, file_name), mode="rb") as data:
-            file_contents = data.read()
-
-        file_client.append_data(
-            data=file_contents, offset=0, length=len(file_contents))
-
-        file_client.flush_data(len(file_contents))
-    # </Snippet_UploadFile>
-
-    # ------------------------------------------------
-    # Upload a file to a directory in bulk
-    # ------------------------------------------------
-
-    # <Snippet_UploadFileBulk>
-    def upload_file_to_directory_bulk(self, directory_client: DataLakeDirectoryClient, local_path: str, file_name: str):
         file_client = directory_client.get_file_client(file_name)
 
         with open(file=os.path.join(local_path, file_name), mode="rb") as data:
-            file_contents = data.read()
-
-        file_client.upload_data(file_contents, overwrite=True)
-    # </Snippet_UploadFileBulk>
+            file_client.upload_data(data, overwrite=True)
+    # </Snippet_UploadFile>
 
     # ------------------------------------------------
     # Download a file from a directory
@@ -192,9 +188,17 @@ if __name__ == '__main__':
 
     directory_client = sample.create_directory(file_system_client, directory_path)
 
-    sample.rename_directory(directory_client, "renamed-sample-directory")
+    #sample.rename_directory(directory_client, "renamed-sample-directory")
+
+    input("Press Enter to upload...")
 
     sample.upload_file_to_directory(directory_client, local_path, local_file_name)
+
+    input("Press Enter to append...")
+
+    sample.append_data_to_file(directory_client, local_path, local_file_name)
+
+    input("Press Enter to continue...")
 
     sample.download_file_from_directory(directory_client, local_path, local_file_name)
 
