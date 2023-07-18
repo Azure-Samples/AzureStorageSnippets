@@ -188,17 +188,11 @@ if __name__ == '__main__':
 
     directory_client = sample.create_directory(file_system_client, directory_path)
 
-    #sample.rename_directory(directory_client, "renamed-sample-directory")
-
-    input("Press Enter to upload...")
+    sample.rename_directory(directory_client, "renamed-sample-directory")
 
     sample.upload_file_to_directory(directory_client, local_path, local_file_name)
 
-    input("Press Enter to append...")
-
-    sample.append_data_to_file(directory_client, local_path, local_file_name)
-
-    input("Press Enter to continue...")
+    sample.append_data_to_file(directory_client, local_file_name)
 
     sample.download_file_from_directory(directory_client, local_path, local_file_name)
 
