@@ -42,5 +42,16 @@ namespace dotnet_v12
                                     new DefaultAzureCredential());
         }
         // </Snippet_AuthorizeWithAAD>
+
+        // <Snippet_AuthorizeWithSAS>
+        public static void GetDataLakeServiceClientSAS(ref DataLakeServiceClient dataLakeServiceClient,
+            String accountName, String sasToken)
+        {
+            string dfsUri = "https://" + accountName + ".dfs.core.windows.net";
+
+            dataLakeServiceClient = new DataLakeServiceClient(
+                new Uri($"{dfsUri}?{sasToken}"));
+         }
+        // </Snippet_AuthorizeWithSAS>
     }
 }
