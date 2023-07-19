@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
 using Azure.Identity;
 using Azure.Storage;
 using Azure.Storage.Files.DataLake;
@@ -49,9 +50,9 @@ namespace dotnet_v12
         {
             string dfsUri = "https://" + accountName + ".dfs.core.windows.net";
 
-            dataLakeServiceClient = new DataLakeServiceClient(
-                new Uri($"{dfsUri}?{sasToken}"));
-         }
+            dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
+                                    new AzureSasCredential(sasToken));
+        }
         // </Snippet_AuthorizeWithSAS>
     }
 }
