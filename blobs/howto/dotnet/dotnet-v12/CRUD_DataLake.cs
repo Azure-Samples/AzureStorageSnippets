@@ -398,7 +398,7 @@ namespace dotnet_v12
             Console.Write("\r\nSelect an option: ");
 
             // Uncomment to test SAS authorization
-            //Authorize_DataLake.GetDataLakeServiceClientSAS(ref dataLakeServiceClient, Constants.storageAccountName, "<sas-token");
+            //Authorize_DataLake.GetDataLakeServiceClientSAS(ref dataLakeServiceClient, Constants.storageAccountName, "<sas-token>");
 
             // Uncomment to test shared key authorization
             Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, Constants.accountKey);
@@ -419,8 +419,8 @@ namespace dotnet_v12
             string subdirectoryNameNew = "renamed-sample-directory";
             string fileName = "testfile.txt";
 
-            string localPath = @"C:\Users\pauljewell\OneDrive - Microsoft\Desktop\Blob\testfile.txt";
-            string localPathAppend = @"C:\Users\pauljewell\OneDrive - Microsoft\Desktop\Blob\appendfile.txt";
+            string localPath = @"<local-path>";
+            string localPathAppend = @"<local-path-for-append>";
 
             switch (Console.ReadLine())
             {
