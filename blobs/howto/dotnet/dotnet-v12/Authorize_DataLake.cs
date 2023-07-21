@@ -16,16 +16,17 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_AuthorizeWithKey>
-        public static void GetDataLakeServiceClient(ref DataLakeServiceClient dataLakeServiceClient,
-            string accountName, string accountKey)
+        public static DataLakeServiceClient GetDataLakeServiceClient(string accountName, string accountKey)
         {
             StorageSharedKeyCredential sharedKeyCredential =
                 new StorageSharedKeyCredential(accountName, accountKey);
 
-            string dfsUri = "https://" + accountName + ".dfs.core.windows.net";
+            string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            dataLakeServiceClient = new DataLakeServiceClient
+            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient
                 (new Uri(dfsUri), sharedKeyCredential);
+
+            return dataLakeServiceClient;
         }
         // </Snippet_AuthorizeWithKey>
 
@@ -34,24 +35,26 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_AuthorizeWithAAD>
-        public static void GetDataLakeServiceClient(ref DataLakeServiceClient dataLakeServiceClient,
-            String accountName)
+        public static DataLakeServiceClient GetDataLakeServiceClient(string accountName)
         {
-            string dfsUri = "https://" + accountName + ".dfs.core.windows.net";
+            string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
+            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
                                     new DefaultAzureCredential());
+
+            return dataLakeServiceClient;
         }
         // </Snippet_AuthorizeWithAAD>
 
         // <Snippet_AuthorizeWithSAS>
-        public static void GetDataLakeServiceClientSAS(ref DataLakeServiceClient dataLakeServiceClient,
-            String accountName, String sasToken)
+        public static DataLakeServiceClient GetDataLakeServiceClientSAS(string accountName, string sasToken)
         {
-            string dfsUri = "https://" + accountName + ".dfs.core.windows.net";
+            string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
+            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
                                     new AzureSasCredential(sasToken));
+
+            return dataLakeServiceClient;
         }
         // </Snippet_AuthorizeWithSAS>
     }
