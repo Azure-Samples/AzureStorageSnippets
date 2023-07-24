@@ -20,6 +20,7 @@ using Azure.Storage.Files.DataLake.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -36,10 +37,11 @@ namespace dotnet_v12
         //-------------------------------------------------------------------
 
         // <Snippet_CreateContainer>
-        public async Task<DataLakeFileSystemClient> CreateFileSystem
-            (DataLakeServiceClient serviceClient)
+        public async Task<DataLakeFileSystemClient> CreateFileSystem(
+            DataLakeServiceClient serviceClient,
+            string fileSystemName)
         {
-            return await serviceClient.CreateFileSystemAsync("my-file-system");
+            return await serviceClient.CreateFileSystemAsync(fileSystemName);
         }
         // </Snippet_CreateContainer>
 
@@ -52,8 +54,9 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_GetContainer>
-        public DataLakeFileSystemClient GetFileSystem
-            (DataLakeServiceClient serviceClient, string fileSystemName)
+        public DataLakeFileSystemClient GetFileSystem(
+            DataLakeServiceClient serviceClient,
+            string fileSystemName)
         {
             DataLakeFileSystemClient fileSystemClient =
                 serviceClient.GetFileSystemClient(fileSystemName);
@@ -71,16 +74,15 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_CreateDirectory>
-        public async Task<DataLakeDirectoryClient> CreateDirectory
-            (DataLakeServiceClient serviceClient, string fileSystemName)
+        public async Task<DataLakeDirectoryClient> CreateDirectory(
+            DataLakeFileSystemClient fileSystemClient,
+            string directoryName,
+            string subdirectoryName)
         {
-            DataLakeFileSystemClient fileSystemClient =
-                serviceClient.GetFileSystemClient(fileSystemName);
-
             DataLakeDirectoryClient directoryClient =
-                await fileSystemClient.CreateDirectoryAsync("my-directory");
+                await fileSystemClient.CreateDirectoryAsync(directoryName);
 
-            return await directoryClient.CreateSubDirectoryAsync("my-subdirectory");
+            return await directoryClient.CreateSubDirectoryAsync(subdirectoryName);
         }
         // </Snippet_CreateDirectory>
 
@@ -112,13 +114,16 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_RenameDirectory>
-        public async Task<DataLakeDirectoryClient>
-            RenameDirectory(DataLakeFileSystemClient fileSystemClient)
+        public async Task<DataLakeDirectoryClient> RenameDirectory(
+            DataLakeFileSystemClient fileSystemClient,
+            string directoryPath,
+            string subdirectoryName,
+            string subdirectoryNameNew)
         {
             DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("my-directory/my-subdirectory");
+                fileSystemClient.GetDirectoryClient(string.Join('/', directoryPath, subdirectoryName));
 
-            return await directoryClient.RenameAsync("my-directory/my-subdirectory-renamed");
+            return await directoryClient.RenameAsync(string.Join('/', directoryPath, subdirectoryNameNew));
         }
         // </Snippet_RenameDirectory>
 
@@ -131,13 +136,16 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_MoveDirectory>
-        public async Task<DataLakeDirectoryClient> MoveDirectory
-            (DataLakeFileSystemClient fileSystemClient)
+        public async Task<DataLakeDirectoryClient> MoveDirectory(
+            DataLakeFileSystemClient fileSystemClient,
+            string directoryPathFrom,
+            string directoryPathTo,
+            string subdirectoryName)
         {
             DataLakeDirectoryClient directoryClient =
-                 fileSystemClient.GetDirectoryClient("my-directory/my-subdirectory-renamed");
+                 fileSystemClient.GetDirectoryClient(string.Join('/', directoryPathFrom, subdirectoryName));
 
-            return await directoryClient.RenameAsync("my-directory-2/my-subdirectory-renamed");
+            return await directoryClient.RenameAsync(string.Join('/', directoryPathTo, subdirectoryName));
         }
         // </Snippet_MoveDirectory>
 
@@ -150,12 +158,14 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_DeleteDirectory>
-        public void DeleteDirectory(DataLakeFileSystemClient fileSystemClient)
+        public async Task DeleteDirectory(
+            DataLakeFileSystemClient fileSystemClient,
+            string directoryName)
         {
             DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("my-directory");
+                fileSystemClient.GetDirectoryClient(directoryName);
 
-            directoryClient.Delete();
+            await directoryClient.DeleteAsync();
         }
         // </Snippet_DeleteDirectory>
 
@@ -168,7 +178,9 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_RestoreDirectory>
-        public async Task RestoreDirectory(DataLakeFileSystemClient fileSystemClient, string directoryName)
+        public async Task RestoreDirectory(
+            DataLakeFileSystemClient fileSystemClient,
+            string directoryName)
         {
             DataLakeDirectoryClient directoryClient =
                 fileSystemClient.GetDirectoryClient(directoryName);
@@ -196,10 +208,12 @@ namespace dotnet_v12
         // ----------------------------------------------------------
 
         // <Snippet_ListFilesInDirectory>
-        public async Task ListFilesInDirectory(DataLakeFileSystemClient fileSystemClient)
+        public async Task ListFilesInDirectory(
+            DataLakeFileSystemClient fileSystemClient,
+            string directoryName)
         {
             IAsyncEnumerator<PathItem> enumerator =
-                fileSystemClient.GetPathsAsync("my-directory").GetAsyncEnumerator();
+                fileSystemClient.GetPathsAsync(directoryName).GetAsyncEnumerator();
 
             await enumerator.MoveNextAsync();
 
@@ -222,55 +236,51 @@ namespace dotnet_v12
 
         #endregion
 
-        #region Upload files to a directory
+        #region Upload a file to a directory
 
         // ---------------------------------------------------------
-        // Upload files to the directory.
+        // Upload a file to the directory
         //----------------------------------------------------------
 
         // <Snippet_UploadFile>
-        public async Task UploadFile(DataLakeFileSystemClient fileSystemClient)
+        public async Task UploadFile(
+            DataLakeDirectoryClient directoryClient,
+            string fileName,
+            string localPath)
         {
-            DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("my-directory");
+            DataLakeFileClient fileClient = 
+                directoryClient.GetFileClient(fileName);
 
-            DataLakeFileClient fileClient = await directoryClient.CreateFileAsync("uploaded-file.txt");
+            FileStream fileStream = File.OpenRead(localPath);
 
-            FileStream fileStream =
-                File.OpenRead("C:\\Users\\contoso\\Temp\\file-to-upload.txt");
-
-            long fileSize = fileStream.Length;
-
-            await fileClient.AppendAsync(fileStream, offset: 0);
-
-            await fileClient.FlushAsync(position: fileSize);
-
+            await fileClient.UploadAsync(content: fileStream, overwrite: true);
         }
         // </Snippet_UploadFile>
 
         #endregion
 
-        #region Upload files to a directory in bulk
+        #region Append data to a file
 
         // ---------------------------------------------------------
-        // Upload files to the directory - bulk uploads
+        // Append data to a file
         //----------------------------------------------------------
 
-        // <Snippet_UploadFileBulk>
-        public async Task UploadFileBulk(DataLakeFileSystemClient fileSystemClient)
+        // <Snippet_AppendDataToFile>
+        public async Task AppendDataToFile(
+            DataLakeDirectoryClient directoryClient,
+            string fileName,
+            Stream stream)
         {
-            DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("my-directory");
+            DataLakeFileClient fileClient = 
+                directoryClient.GetFileClient(fileName);
 
-            DataLakeFileClient fileClient = directoryClient.GetFileClient("uploaded-file.txt");
+            long fileSize = fileClient.GetProperties().Value.ContentLength;
 
-            FileStream fileStream =
-                File.OpenRead("C:\\Users\\contoso\\file-to-upload.txt");
+            await fileClient.AppendAsync(stream, offset: fileSize);
 
-            await fileClient.UploadAsync(fileStream);
-
+            await fileClient.FlushAsync(position: fileSize + stream.Length);
         }
-        // </Snippet_UploadFileBulk>
+        // </Snippet_AppendDataToFile>
 
         #endregion
 
@@ -315,20 +325,19 @@ namespace dotnet_v12
         //----------------------------------------------------------
 
         // <Snippet_DownloadBinaryFromDirectory>
-        public async Task DownloadFile(DataLakeFileSystemClient fileSystemClient)
+        public async Task DownloadFile(
+            DataLakeDirectoryClient directoryClient,
+            string fileName,
+            string localPath)
         {
-            DataLakeDirectoryClient directoryClient =
-                fileSystemClient.GetDirectoryClient("my-directory");
-
             DataLakeFileClient fileClient =
-                directoryClient.GetFileClient("my-image.png");
+                directoryClient.GetFileClient(fileName);
 
             Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
 
             BinaryReader reader = new BinaryReader(downloadResponse.Value.Content);
 
-            FileStream fileStream =
-                File.OpenWrite("C:\\Users\\contoso\\my-image-downloaded.png");
+            FileStream fileStream = File.OpenWrite(localPath);
 
             int bufferSize = 4096;
 
@@ -364,29 +373,48 @@ namespace dotnet_v12
             Console.WriteLine("3) Rename a directory");
             Console.WriteLine("4) Delete a directory");
             Console.WriteLine("5) List directory contents");
-            Console.WriteLine("6) Upload files to a directory");
-            Console.WriteLine("7) Upload files to a directory in bulk");
+            Console.WriteLine("6) Upload a file to a directory");
+            Console.WriteLine("7) Append data to a file");
             Console.WriteLine("8) Download a file from a directory");
             Console.WriteLine("9) Restore a soft-deleted directory");
             Console.WriteLine("X) Exit to main menu");
             Console.Write("\r\nSelect an option: ");
 
-            Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, Constants.accountKey);
+            // Uncomment to test SAS authorization
+            //DataLakeServiceClient dataLakeServiceClient = 
+            //    Authorize_DataLake.GetDataLakeServiceClientSAS(Constants.storageAccountName, "<sas-token>");
 
-            // Uncomment if you want to test AD Authorization.
-            //   Authorize_DataLake.GetDataLakeServiceClient(ref dataLakeServiceClient, Constants.storageAccountName, 
-            //       Constants.clientID, Constants.clientSecret, Constants.tenantID);
+            // Uncomment to test shared key authorization
+            DataLakeServiceClient dataLakeServiceClient = 
+                Authorize_DataLake.GetDataLakeServiceClient(Constants.storageAccountName, Constants.accountKey);
+
+            // Uncomment if you want to test AD Authorization
+            //DataLakeServiceClient dataLakeServiceClient = 
+            //    Authorize_DataLake.GetDataLakeServiceClient(Constants.storageAccountName);
 
             // Get file system client
 
+            string fileSystemName = "sample-filesystem";
+
             DataLakeFileSystemClient fileSystemClient =
-                GetFileSystem(dataLakeServiceClient, Constants.containerName);
-            
+                GetFileSystem(dataLakeServiceClient, fileSystemName);
+
+            string directoryName = "sample-directory";
+
+            DataLakeDirectoryClient directoryClient = 
+                fileSystemClient.GetDirectoryClient(directoryName);
+
+            string subdirectoryName = "sample-subdirectory";
+            string subdirectoryNameNew = "renamed-sample-directory";
+            string fileName = "testfile.txt";
+
+            string localPath = @"<local-path>";
+
             switch (Console.ReadLine())
             {
                 case "1":
 
-                    await CreateFileSystem(dataLakeServiceClient);
+                    await CreateFileSystem(dataLakeServiceClient, fileSystemName);
 
                     Console.WriteLine("Press enter to continue");   
                     Console.ReadLine();          
@@ -394,7 +422,7 @@ namespace dotnet_v12
                 
                 case "2":
 
-                    await CreateDirectory(dataLakeServiceClient, Constants.containerName);
+                    await CreateDirectory(fileSystemClient, directoryName, subdirectoryName);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();              
@@ -402,7 +430,7 @@ namespace dotnet_v12
 
                 case "3":
 
-                    await MoveDirectory(fileSystemClient);
+                    await RenameDirectory(fileSystemClient, directoryName, subdirectoryName, subdirectoryNameNew);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -410,7 +438,7 @@ namespace dotnet_v12
 
                 case "4":
 
-                    DeleteDirectory(fileSystemClient);
+                    await DeleteDirectory(fileSystemClient, directoryName);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -418,7 +446,7 @@ namespace dotnet_v12
 
                 case "5":
 
-                    await ListFilesInDirectory(fileSystemClient);
+                    await ListFilesInDirectory(fileSystemClient, directoryName);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -426,15 +454,20 @@ namespace dotnet_v12
 
                 case "6":
 
-                    await UploadFile(fileSystemClient);
+                    await UploadFile(directoryClient, fileName, localPath);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
                     return true;
 
                 case "7":
+                    // Create a stream for testing purposes
+                    Stream stream;
+                    string dataToAppend = "Data to append";
+                    byte[] byteArray = Encoding.ASCII.GetBytes(dataToAppend);
+                    stream = new MemoryStream(byteArray);
 
-                    await UploadFileBulk(fileSystemClient);
+                    await AppendDataToFile(directoryClient, fileName, stream);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
@@ -442,7 +475,7 @@ namespace dotnet_v12
 
                 case "8":
 
-                    await DownloadFile2(fileSystemClient);
+                    await DownloadFile(directoryClient, fileName, localPath);
 
                     Console.WriteLine("Press enter to continue");
                     Console.ReadLine();
