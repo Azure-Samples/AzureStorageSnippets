@@ -23,8 +23,9 @@ namespace dotnet_v12
 
             string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient
-                (new Uri(dfsUri), sharedKeyCredential);
+            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(
+                new Uri(dfsUri),
+                sharedKeyCredential);
 
             return dataLakeServiceClient;
         }
@@ -39,8 +40,9 @@ namespace dotnet_v12
         {
             string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
-                                    new DefaultAzureCredential());
+            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(
+                new Uri(dfsUri),
+                new DefaultAzureCredential());
 
             return dataLakeServiceClient;
         }
@@ -51,8 +53,9 @@ namespace dotnet_v12
         {
             string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(new Uri(dfsUri), 
-                                    new AzureSasCredential(sasToken));
+            DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClient(
+                new Uri(dfsUri),
+                new AzureSasCredential(sasToken));
 
             return dataLakeServiceClient;
         }
