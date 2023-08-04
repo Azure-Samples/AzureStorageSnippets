@@ -6,6 +6,8 @@ import java.security.InvalidKeyException;
 import javax.xml.crypto.Data;
 
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.util.BinaryData;
 import com.azure.storage.file.datalake.*;
@@ -200,23 +202,13 @@ public class CRUD_DataLake {
     // ----------------------------------------------------------
     
     //<Snippet_DownloadFile>
-    public void DownloadFile(DataLakeFileSystemClient fileSystemClient)
-      throws FileNotFoundException, java.io.IOException{
+    public void DownloadFile(
+        DataLakeDirectoryClient directoryClient,
+        String fileName){
 
-        DataLakeDirectoryClient directoryClient =
-            fileSystemClient.getDirectoryClient("my-directory");
+        DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
 
-        DataLakeFileClient fileClient = 
-            directoryClient.getFileClient("uploaded-file.txt");
-
-        File file = new File("C:\\Users\\contoso\\downloadedFile.txt");
-
-        OutputStream targetStream = new FileOutputStream(file);
-        
-        fileClient.read(targetStream);
-
-        targetStream.close();
-       
+        fileClient.readToFile("filepath/local-file.png");       
     }
     //</Snippet_DownloadFile>
 
