@@ -1,6 +1,4 @@
 com\datalake\manage\CRUD_DataLake.class
 com\datalake\manage\ACL_DataLake.class
-com\datalake\manage\App.class
 com\datalake\manage\Constants.class
-com\datalake\manage\Authorize_DataLake.class
 com\datalake\manage\Security.class
