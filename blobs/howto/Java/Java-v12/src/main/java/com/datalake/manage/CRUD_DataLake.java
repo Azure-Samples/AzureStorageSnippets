@@ -3,8 +3,6 @@ package com.datalake.manage;
 import java.io.*;
 import java.security.InvalidKeyException;
 
-import javax.xml.crypto.Data;
-
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
@@ -12,7 +10,6 @@ import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.util.BinaryData;
 import com.azure.storage.file.datalake.*;
 import com.azure.storage.file.datalake.models.*;
-
 
 public class CRUD_DataLake {
     
@@ -25,7 +22,7 @@ public class CRUD_DataLake {
             DataLakeServiceClient serviceClient,
             String fileSystemName) {
 
-        DataLakeFileSystemClient fileSystemClient = serviceClient.getFileSystemClient(fileSystemName);
+        DataLakeFileSystemClient fileSystemClient = serviceClient.createFileSystem(fileSystemName);
 
         return fileSystemClient;
     }
@@ -128,7 +125,10 @@ public class CRUD_DataLake {
         DataLakeDirectoryClient directoryClient =
             fileSystemClient.getDirectoryClient(directoryName);
 
-        directoryClient.delete();
+        // Set to true to delete all paths beneath the directory
+        boolean recursive = true;
+
+        directoryClient.deleteWithResponse(recursive, null, null, null);
     }
     //</Snippet_DeleteDirectory>
 
@@ -175,7 +175,7 @@ public class CRUD_DataLake {
 
         DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
 
-        fileClient.uploadFromFile("filepath/local-file.png");
+        fileClient.uploadFromFile("filePath/sample-file.txt");
     }
     //</Snippet_UploadFile>
 
@@ -187,7 +187,7 @@ public class CRUD_DataLake {
     public void AppendDataToFile(
         DataLakeDirectoryClient directoryClient){
 
-        DataLakeFileClient fileClient = directoryClient.getFileClient("uploaded-file.txt");
+        DataLakeFileClient fileClient = directoryClient.getFileClient("sample-file.txt");
         long fileSize = fileClient.getProperties().getFileSize();
 
         String sampleData = "Data to append to end of file";
@@ -208,7 +208,7 @@ public class CRUD_DataLake {
 
         DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
 
-        fileClient.readToFile("filepath/local-file.png");       
+        fileClient.readToFile("filePath/sample-file.txt", true);       
     }
     //</Snippet_DownloadFile>
 
@@ -225,14 +225,15 @@ public class CRUD_DataLake {
             //    (Constants.storageAccountName, Constants.accountKey);
             
             // Uncomment if you want to test SAS authorization.
-            String sasToken = "<SAS_TOKEN>";
-            DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient
-                (Constants.storageAccountName, sasToken);
+            //String sasToken = "<SAS_TOKEN>";
+            //DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient
+            //    (Constants.storageAccountName, sasToken);
 
             // Uncomment if you want to test AD Authorization.
-            // DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient(accountName);
+             DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient(Constants.storageAccountName);
 
             DataLakeFileSystemClient fileSystemClient = GetFileSystem(dataLakeServiceClient, Constants.containerName);
+            DataLakeDirectoryClient directoryClient = fileSystemClient.getDirectoryClient(Constants.directoryName);
 
             // Listening for commands from the console
             System.out.print("\033[H\033[2J");  
@@ -241,8 +242,8 @@ public class CRUD_DataLake {
             System.out.println("Enter a command");
 
             System.out.println("(1) Add file system (2) Add directory | (3) Rename directory | " +
-            "(4) Delete directory | (5) Upload a file to a directory | (6) Upload in bulk | " + 
-            " (7) List files in directory | (8) Get files from directory | (9) Exit");
+            "(4) Delete directory | (5) Upload a file to a directory | (6) List files in directory | " + 
+            " (7) Download file from directory | (8) Append data to file in directory | (9) Exit");
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -254,28 +255,28 @@ public class CRUD_DataLake {
                 switch(input){
 
                     case "1":
-                       fileSystemClient = CreateFileSystem(dataLakeServiceClient);
+                       fileSystemClient = CreateFileSystem(dataLakeServiceClient, "sample-filesystem");
                     break;
                     case "2":
-                        CreateDirectory(dataLakeServiceClient, Constants.containerName);
+                        CreateDirectory(fileSystemClient, Constants.directoryName, Constants.subDirectoryName);
                     break;
                     case "3":
-                        RenameDirectory(fileSystemClient);
+                        RenameDirectory(fileSystemClient, Constants.directoryName, Constants.subDirectoryName, "renamed-subdirectory");
                         break;
                     case "4":
-                        DeleteDirectory(fileSystemClient);
+                        DeleteDirectory(fileSystemClient, Constants.directoryName);
                         break;
                     case "5":
-                        UploadFile(fileSystemClient);
+                        UploadFile(directoryClient, Constants.fileName);
                     break;
                     case "6":
-                        ListFilesInDirectory(fileSystemClient);
+                        ListFilesInDirectory(fileSystemClient, Constants.directoryName);
                     break;
                     case "7":
-                        DownloadFile(fileSystemClient);
+                        DownloadFile(directoryClient, Constants.fileName);
                     break;
                     case "8":
-                       UploadFileBulk(fileSystemClient);
+                       AppendDataToFile(directoryClient);
                     break;
                     case "9":
                     return;
