@@ -12,12 +12,12 @@ import com.azure.storage.file.datalake.*;
 import com.azure.storage.file.datalake.models.*;
 
 public class CRUD_DataLake {
-    
+
     // ----------------------------------------------------------
     // Create a file system
     // ----------------------------------------------------------
-    
-    //<Snippet_CreateFileSystem>
+
+    // <Snippet_CreateFileSystem>
     public DataLakeFileSystemClient CreateFileSystem(
             DataLakeServiceClient serviceClient,
             String fileSystemName) {
@@ -26,21 +26,20 @@ public class CRUD_DataLake {
 
         return fileSystemClient;
     }
-    //</Snippet_CreateFileSystem>
+    // </Snippet_CreateFileSystem>
 
     // ----------------------------------------------------------
     // Get a file system
     // ----------------------------------------------------------
 
-    //<Snippet_GetFileSystem>
-    public DataLakeFileSystemClient GetFileSystem
-    (DataLakeServiceClient serviceClient, String fileSystemName){
-        
+    // <Snippet_GetFileSystem>
+    public DataLakeFileSystemClient GetFileSystem(DataLakeServiceClient serviceClient, String fileSystemName) {
+
         DataLakeFileSystemClient fileSystemClient = serviceClient.getFileSystemClient(fileSystemName);
 
         return fileSystemClient;
     }
-    //</Snippet_GetFileSystem>
+    // </Snippet_GetFileSystem>
 
     // ----------------------------------------------------------
     // Create directory
@@ -57,27 +56,25 @@ public class CRUD_DataLake {
         return directoryClient.createSubdirectory(subDirectoryName);
     }
     // </Snippet_CreateDirectory>
-    
+
     // ----------------------------------------------------------
     // Get a directory
     // ----------------------------------------------------------
 
-    //<Snippet_GetDirectory>
-    public DataLakeDirectoryClient GetDirectory
-    (DataLakeFileSystemClient fileSystemClient, String directoryName){
+    // <Snippet_GetDirectory>
+    public DataLakeDirectoryClient GetDirectory(DataLakeFileSystemClient fileSystemClient, String directoryName) {
 
-        DataLakeDirectoryClient directoryClient =
-            fileSystemClient.getDirectoryClient(directoryName);
+        DataLakeDirectoryClient directoryClient = fileSystemClient.getDirectoryClient(directoryName);
 
         return directoryClient;
     }
-    //</Snippet_GetDirectory>
-    
+    // </Snippet_GetDirectory>
+
     // ---------------------------------------------------------
     // Rename a directory
-    //----------------------------------------------------------
+    // ----------------------------------------------------------
 
-    //<Snippet_RenameDirectory>
+    // <Snippet_RenameDirectory>
     public DataLakeDirectoryClient RenameDirectory(
             DataLakeFileSystemClient fileSystemClient,
             String directoryPath,
@@ -91,13 +88,13 @@ public class CRUD_DataLake {
                 fileSystemClient.getFileSystemName(),
                 String.join("/", directoryPath, subdirectoryNameNew));
     }
-    //</Snippet_RenameDirectory>
-  
+    // </Snippet_RenameDirectory>
+
     // ---------------------------------------------------------
     // Move a directory
-    //----------------------------------------------------------
+    // ----------------------------------------------------------
 
-    //<Snippet_MoveDirectory>
+    // <Snippet_MoveDirectory>
     public DataLakeDirectoryClient MoveDirectory(
             DataLakeFileSystemClient fileSystemClient,
             String directoryPathFrom,
@@ -108,84 +105,80 @@ public class CRUD_DataLake {
                 .getDirectoryClient(String.join("/", directoryPathFrom, subdirectoryName));
 
         return directoryClient.rename(
-            fileSystemClient.getFileSystemName(),
-            String.join("/", directoryPathTo, subdirectoryName));
+                fileSystemClient.getFileSystemName(),
+                String.join("/", directoryPathTo, subdirectoryName));
     }
-    //</Snippet_MoveDirectory>
-  
+    // </Snippet_MoveDirectory>
+
     // ----------------------------------------------------------
     // Delete directory
     // ----------------------------------------------------------
 
-    //<Snippet_DeleteDirectory>
+    // <Snippet_DeleteDirectory>
     public void DeleteDirectory(
-        DataLakeFileSystemClient fileSystemClient,
-        String directoryName){
-        
-        DataLakeDirectoryClient directoryClient =
-            fileSystemClient.getDirectoryClient(directoryName);
+            DataLakeFileSystemClient fileSystemClient,
+            String directoryName) {
+
+        DataLakeDirectoryClient directoryClient = fileSystemClient.getDirectoryClient(directoryName);
 
         // Set to true to delete all paths beneath the directory
         boolean recursive = true;
 
         directoryClient.deleteWithResponse(recursive, null, null, null);
     }
-    //</Snippet_DeleteDirectory>
+    // </Snippet_DeleteDirectory>
 
     // ----------------------------------------------------------
     // List directory contents
     // ----------------------------------------------------------
 
-    //<Snippet_ListFilesInDirectory>
+    // <Snippet_ListFilesInDirectory>
     public void ListFilesInDirectory(
-        DataLakeFileSystemClient fileSystemClient,
-        String directoryName){
-        
+            DataLakeFileSystemClient fileSystemClient,
+            String directoryName) {
+
         ListPathsOptions options = new ListPathsOptions();
         options.setPath(directoryName);
-     
-        PagedIterable<PathItem> pagedIterable = 
-        fileSystemClient.listPaths(options, null);
+
+        PagedIterable<PathItem> pagedIterable = fileSystemClient.listPaths(options, null);
 
         java.util.Iterator<PathItem> iterator = pagedIterable.iterator();
         PathItem item = iterator.next();
 
-        while (item != null)
-        {
+        while (item != null) {
             System.out.println(item.getName());
 
-            if (!iterator.hasNext())
-            {
+            if (!iterator.hasNext()) {
                 break;
             }
             item = iterator.next();
         }
 
     }
-    //</Snippet_ListFilesInDirectory>
+    // </Snippet_ListFilesInDirectory>
 
     // ----------------------------------------------------------
     // Upload files to directory
     // ----------------------------------------------------------
 
-    //<Snippet_UploadFile>
+    // <Snippet_UploadFile>
     public void UploadFile(
-        DataLakeDirectoryClient directoryClient,
-        String fileName){
+            DataLakeDirectoryClient directoryClient,
+            String fileName) {
 
         DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
 
         fileClient.uploadFromFile("filePath/sample-file.txt");
     }
-    //</Snippet_UploadFile>
+    // </Snippet_UploadFile>
 
     // ----------------------------------------------------------
     // Upload files in bulk
     // ----------------------------------------------------------
 
-    //<Snippet_AppendDataToFile>
+    // <Snippet_AppendDataToFile>
     public void AppendDataToFile(
-        DataLakeDirectoryClient directoryClient){
+            DataLakeDirectoryClient directoryClient) {
 
         DataLakeFileClient fileClient = directoryClient.getFileClient("sample-file.txt");
         long fileSize = fileClient.getProperties().getFileSize();
@@ -195,55 +188,58 @@ public class CRUD_DataLake {
 
         fileClient.flush(fileSize + sampleData.length(), true);
     }
-    //</Snippet_AppendDataToFile>
-   
+    // </Snippet_AppendDataToFile>
+
     // ----------------------------------------------------------
     // Download a file from a directory (binary)
     // ----------------------------------------------------------
-    
-    //<Snippet_DownloadFile>
+
+    // <Snippet_DownloadFile>
     public void DownloadFile(
-        DataLakeDirectoryClient directoryClient,
-        String fileName){
+            DataLakeDirectoryClient directoryClient,
+            String fileName) {
 
         DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
 
-        fileClient.readToFile("filePath/sample-file.txt", true);       
+        fileClient.readToFile("filePath/sample-file.txt", true);
     }
-    //</Snippet_DownloadFile>
+    // </Snippet_DownloadFile>
 
     // ----------------------------------------------------------
     // Driver Menu
     // ----------------------------------------------------------
 
-    public void ShowMenu() throws java.lang.Exception, URISyntaxException, InvalidKeyException{
-        
+    public void ShowMenu() throws java.lang.Exception, URISyntaxException, InvalidKeyException {
+
         try {
 
             // Uncomment if you want to test shared key authorization.
-            //DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient
-            //    (Constants.storageAccountName, Constants.accountKey);
-            
+            // DataLakeServiceClient dataLakeServiceClient =
+            // Authorize_DataLake.GetDataLakeServiceClient
+            // (Constants.storageAccountName, Constants.accountKey);
+
             // Uncomment if you want to test SAS authorization.
-            //String sasToken = "<SAS_TOKEN>";
-            //DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient
-            //    (Constants.storageAccountName, sasToken);
+            // String sasToken = "<SAS_TOKEN>";
+            // DataLakeServiceClient dataLakeServiceClient =
+            // Authorize_DataLake.GetDataLakeServiceClient
+            // (Constants.storageAccountName, sasToken);
 
             // Uncomment if you want to test AD Authorization.
-             DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake.GetDataLakeServiceClient(Constants.storageAccountName);
+            DataLakeServiceClient dataLakeServiceClient = Authorize_DataLake
+                    .GetDataLakeServiceClient(Constants.storageAccountName);
 
             DataLakeFileSystemClient fileSystemClient = GetFileSystem(dataLakeServiceClient, Constants.containerName);
             DataLakeDirectoryClient directoryClient = fileSystemClient.getDirectoryClient(Constants.directoryName);
 
             // Listening for commands from the console
-            System.out.print("\033[H\033[2J");  
+            System.out.print("\033[H\033[2J");
             System.out.flush();
 
             System.out.println("Enter a command");
 
             System.out.println("(1) Add file system (2) Add directory | (3) Rename directory | " +
-            "(4) Delete directory | (5) Upload a file to a directory | (6) List files in directory | " + 
-            " (7) Download file from directory | (8) Append data to file in directory | (9) Exit");
+                    "(4) Delete directory | (5) Upload a file to a directory | (6) List files in directory | " +
+                    " (7) Download file from directory | (8) Append data to file in directory | (9) Exit");
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -252,34 +248,35 @@ public class CRUD_DataLake {
                 System.out.println("# Enter a command : ");
                 String input = reader.readLine();
 
-                switch(input){
+                switch (input) {
 
                     case "1":
-                       fileSystemClient = CreateFileSystem(dataLakeServiceClient, "sample-filesystem");
-                    break;
+                        fileSystemClient = CreateFileSystem(dataLakeServiceClient, "sample-filesystem");
+                        break;
                     case "2":
                         CreateDirectory(fileSystemClient, Constants.directoryName, Constants.subDirectoryName);
-                    break;
+                        break;
                     case "3":
-                        RenameDirectory(fileSystemClient, Constants.directoryName, Constants.subDirectoryName, "renamed-subdirectory");
+                        RenameDirectory(fileSystemClient, Constants.directoryName, Constants.subDirectoryName,
+                                "renamed-subdirectory");
                         break;
                     case "4":
                         DeleteDirectory(fileSystemClient, Constants.directoryName);
                         break;
                     case "5":
                         UploadFile(directoryClient, Constants.fileName);
-                    break;
+                        break;
                     case "6":
                         ListFilesInDirectory(fileSystemClient, Constants.directoryName);
-                    break;
+                        break;
                     case "7":
                         DownloadFile(directoryClient, Constants.fileName);
-                    break;
+                        break;
                     case "8":
-                       AppendDataToFile(directoryClient);
-                    break;
+                        AppendDataToFile(directoryClient);
+                        break;
                     case "9":
-                    return;
+                        return;
                     default:
                         break;
                 }
