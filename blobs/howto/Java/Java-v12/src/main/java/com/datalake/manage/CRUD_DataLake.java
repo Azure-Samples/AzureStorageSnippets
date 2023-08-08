@@ -175,7 +175,12 @@ public class CRUD_DataLake {
     // ----------------------------------------------------------
     // Upload files in bulk
     // ----------------------------------------------------------
+    //<Snippet_UploadFileBulk>
+    //</Snippet_UploadFileBulk>
 
+    // ----------------------------------------------------------
+    // Append data to file
+    // ----------------------------------------------------------
     // <Snippet_AppendDataToFile>
     public void AppendDataToFile(
             DataLakeDirectoryClient directoryClient) {
