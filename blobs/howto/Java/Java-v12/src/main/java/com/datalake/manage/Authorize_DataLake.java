@@ -1,10 +1,8 @@
 package com.datalake.manage;
 
-import com.azure.identity.ClientSecretCredential;
-import com.azure.identity.ClientSecretCredentialBuilder;
+import com.azure.identity.*;
 import com.azure.storage.common.StorageSharedKeyCredential;
-import com.azure.storage.file.datalake.DataLakeServiceClient;
-import com.azure.storage.file.datalake.DataLakeServiceClientBuilder;
+import com.azure.storage.file.datalake.*;
 
 public class Authorize_DataLake {
     
@@ -15,33 +13,47 @@ public class Authorize_DataLake {
     //<Snippet_AuthorizeWithKey>
     static public DataLakeServiceClient GetDataLakeServiceClient
     (String accountName, String accountKey){
-
         StorageSharedKeyCredential sharedKeyCredential =
             new StorageSharedKeyCredential(accountName, accountKey);
 
-        DataLakeServiceClientBuilder builder = new DataLakeServiceClientBuilder();
+        DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClientBuilder()
+            .endpoint("https://" + accountName + ".dfs.core.windows.net")
+            .credential(sharedKeyCredential)
+            .buildClient();
 
-        builder.credential(sharedKeyCredential);
-        builder.endpoint("https://" + accountName + ".dfs.core.windows.net");
-
-        return builder.buildClient();
+        return dataLakeServiceClient;
     }  
     //</Snippet_AuthorizeWithKey>
+
+    // ---------------------------------------------------------
+    // Connect to the storage account - use SAS
+    // ----------------------------------------------------------
+    
+    //<Snippet_AuthorizeWithSAS>
+    static public DataLakeServiceClient GetDataLakeServiceClientSAS(String accountName, String sasToken){
+        DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClientBuilder()
+            .endpoint("https://" + accountName + ".dfs.core.windows.net")
+            .sasToken(sasToken)
+            .buildClient();
+
+        return dataLakeServiceClient;
+    }  
+    //</Snippet_AuthorizeWithSAS>
     
     // ---------------------------------------------------------
     // Connect to the storage account - use service principal and Azure AD
     // ----------------------------------------------------------
     
     //<Snippet_AuthorizeWithAzureAD>
-    static public DataLakeServiceClient GetDataLakeServiceClient
-        (String accountName, String clientId, String ClientSecret, String tenantID){
-
-        String endpoint = "https://" + accountName + ".dfs.core.windows.net";
-        
+    static public DataLakeServiceClient GetDataLakeServiceClient(String accountName){
         DefaultAzureCredential defaultCredential = new DefaultAzureCredentialBuilder().build();
 
-        DataLakeServiceClientBuilder builder = new DataLakeServiceClientBuilder();
-        return builder.credential(defaultCredential).endpoint(endpoint).buildClient();
+        DataLakeServiceClient dataLakeServiceClient = new DataLakeServiceClientBuilder()
+            .endpoint("https://" + accountName + ".dfs.core.windows.net")
+            .credential(defaultCredential)
+            .buildClient();
+
+        return dataLakeServiceClient;
     } 
     //</Snippet_AuthorizeWithAzureAD> 
     
