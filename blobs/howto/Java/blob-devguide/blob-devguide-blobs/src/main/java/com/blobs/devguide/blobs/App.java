@@ -50,7 +50,7 @@ public class App {
 
         // This sample assumes a container named 'sample-container' and a blob called 'sampleBlob.txt'
         BlobContainerClient blobContainerClient = blobServiceClient.getBlobContainerClient("sample-container");
-        BlobClient blobClient = blobContainerClient.getBlobClient("sampleBlob.txt");
+        BlobClient blobClient = blobContainerClient.getBlobClient("sample-blob");
 
         //region Test upload methods
         //Path filePath = Paths.get("filepath/local-file.png");
@@ -117,6 +117,7 @@ public class App {
 
         //region Test methods for downloading blobs
         //BlobDownload downloadHelper = new BlobDownload();
+        //downloadHelper.downloadBlobWithTransferOptions(blobClient);
         // downloadHelper.downloadBlobToFile(blobClient);
         // downloadHelper.downloadBlobToStream(blobClient);
         //downloadHelper.downloadBlobToText(blobClient);
