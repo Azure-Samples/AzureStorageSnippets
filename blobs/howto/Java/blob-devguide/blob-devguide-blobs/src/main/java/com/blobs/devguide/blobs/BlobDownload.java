@@ -1,16 +1,12 @@
 package com.blobs.devguide.blobs;
 
 import com.azure.storage.blob.*;
-import com.azure.storage.blob.models.BlockBlobItem;
 import com.azure.storage.common.*;
 import com.azure.storage.blob.options.BlobDownloadToFileOptions;
-import com.azure.storage.blob.options.BlobUploadFromFileOptions;
 import com.azure.storage.blob.specialized.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Path;
 
 public class BlobDownload {
     // <Snippet_DownloadBLobFile>
