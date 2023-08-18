@@ -1,6 +1,8 @@
 package com.blobs.devguide.blobs;
 
 import com.azure.storage.blob.*;
+import com.azure.storage.common.*;
+import com.azure.storage.blob.options.BlobDownloadToFileOptions;
 import com.azure.storage.blob.specialized.*;
 
 import java.io.ByteArrayOutputStream;
@@ -42,4 +44,17 @@ public class BlobDownload {
         }
     }
     // </Snippet_ReadBlobStream>
+
+    // <Snippet_DownloadBlobWithTransferOptions>
+    public void downloadBlobWithTransferOptions(BlobClient blobClient) {
+        ParallelTransferOptions parallelTransferOptions = new ParallelTransferOptions()
+                .setBlockSizeLong((long) (4 * 1024 * 1024)) // 4 MiB block size
+                .setMaxConcurrency(1);
+
+        BlobDownloadToFileOptions options = new BlobDownloadToFileOptions("<localFilePath>");
+        options.setParallelTransferOptions(parallelTransferOptions);
+
+        blobClient.downloadToFileWithResponse(options, null, null);
+    }
+    // </Snippet_DownloadBlobWithTransferOptions>
 }
