@@ -49,7 +49,7 @@ public class BlobDownload {
     public void downloadBlobWithTransferOptions(BlobClient blobClient) {
         ParallelTransferOptions parallelTransferOptions = new ParallelTransferOptions()
                 .setBlockSizeLong((long) (4 * 1024 * 1024)) // 4 MiB block size
-                .setMaxConcurrency(2);
+                .setMaxConcurrency(1);
 
         BlobDownloadToFileOptions options = new BlobDownloadToFileOptions("<localFilePath>");
         options.setParallelTransferOptions(parallelTransferOptions);
