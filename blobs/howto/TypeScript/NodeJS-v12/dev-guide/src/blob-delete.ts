@@ -26,7 +26,7 @@ async function deleteBlob(
 ): Promise<void> {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+    containerClient.getBlockBlobClient(blobName);
 
   // include: Delete the base blob and all of its snapshots.
   // only: Delete only the blob's snapshots and not the blob itself.
@@ -48,7 +48,8 @@ async function deleteBlobIfItExists(
   blobName
 ): Promise<void> {
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient =
+    containerClient.getBlockBlobClient(blobName);
 
   // include: Delete the base blob and all of its snapshots.
   // only: Delete only the blob's snapshots and not the blob itself.
@@ -70,7 +71,7 @@ async function undeleteBlob(
 ): Promise<void> {
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+    containerClient.getBlockBlobClient(blobName);
 
   const options: BlobUndeleteOptions = {};
   const blobUndeleteResponse: BlobUndeleteResponse =
@@ -92,9 +93,8 @@ async function createBlobFromString(
   uploadOptions: BlockBlobUploadOptions
 ): Promise<void> {
   // Create blob client from container client
-  const blockBlobClient: BlockBlobClient = await client.getBlockBlobClient(
-    blobName
-  );
+  const blockBlobClient: BlockBlobClient = 
+    client.getBlockBlobClient(blobName);
 
   console.log(`uploading blob ${blobName}`);
 
