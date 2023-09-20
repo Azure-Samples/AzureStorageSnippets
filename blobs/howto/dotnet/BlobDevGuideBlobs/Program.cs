@@ -181,3 +181,17 @@ BlobClient destinationRehydratedBlob = blobServiceClient
 await AccessTiers.RehydrateBlobUsingCopyAsync(sourceArchiveBlob, destinationRehydratedBlob);
 */
 #endregion
+
+#region Delete/restore blob operations
+/*
+BlobClient blobClient = blobServiceClient
+    .GetBlobContainerClient("sample-container")
+    .GetBlobClient("sample-blob.txt");
+
+// Delete blob
+await DeleteBlob.DeleteBlobAsync(blobClient);
+await DeleteBlob.DeleteBlobSnapshotsAsync(blobClient);
+//await DeleteBlob.RestoreBlobs(blobClient.GetParentBlobContainerClient());
+//DeleteBlob.RestoreBlobWithVersioning(blobClient.GetParentBlobContainerClient(), blobClient);
+*/
+#endregion
