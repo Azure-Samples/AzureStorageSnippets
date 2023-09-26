@@ -60,7 +60,10 @@ namespace dotnet_v12
                 },
             };
 
-            BlobServiceClient blobServiceClient = new BlobServiceClient(accountUri, new DefaultAzureCredential(), blobOptions);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(
+                accountUri,
+                new DefaultAzureCredential(),
+                blobOptions);
             // </Snippet_RetryOptions>
 
             return blobServiceClient;
@@ -83,16 +86,14 @@ namespace dotnet_v12
                     NetworkTimeout = TimeSpan.FromSeconds(100)
                 },
 
-                // If the GeoRedundantSecondaryUri property is set, the secondary Uri will be used for 
-                // GET or HEAD requests during retries.
-                // If the status of the response from the secondary Uri is a 404, then subsequent retries
-                // for the request will not use the secondary Uri again, as this indicates that the resource 
-                // may not have propagated there yet.
-                // Otherwise, subsequent retries will alternate back and forth between primary and secondary Uri.
+                // Set the secondary storage URI
                 GeoRedundantSecondaryUri = secondaryAccountUri
             };
 
-            BlobServiceClient blobServiceClient = new BlobServiceClient(accountUri, new DefaultAzureCredential(), blobOptionsGRS);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(
+                accountUri,
+                new DefaultAzureCredential(),
+                blobOptionsGRS);
             // </Snippet_RetryOptionsGRS>
 
             return blobServiceClient;
