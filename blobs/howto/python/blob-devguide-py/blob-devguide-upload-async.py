@@ -96,7 +96,7 @@ class BlobSamples(object):
 
 async def main():
     # TODO: Replace <storage-account-name> with your actual storage account name
-    account_url = "https://xstorageaccounttest.blob.core.windows.net"
+    account_url = "https://<storage-account-name>.blob.core.windows.net"
     credential = DefaultAzureCredential()
 
     # Create the BlobServiceClient object
