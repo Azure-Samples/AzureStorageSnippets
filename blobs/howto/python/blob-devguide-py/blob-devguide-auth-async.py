@@ -1,6 +1,6 @@
 import os, uuid
-from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient
+from azure.identity.aio import DefaultAzureCredential
+from azure.storage.blob.aio import BlobServiceClient
 
 class AuthSamples(object):
 
