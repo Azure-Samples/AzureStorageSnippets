@@ -48,7 +48,7 @@ class BlobSamples(object):
             block_id_list = []
 
             while True:
-                buffer = await file_stream.read(block_size)
+                buffer = file_stream.read(block_size)
                 if not buffer:
                     break
 
@@ -63,17 +63,17 @@ class BlobSamples(object):
     # <Snippet_upload_blob_transfer_options>
     async def upload_blob_transfer_options(self, account_url: str, container_name: str, blob_name: str):
         # Create a BlobClient object with data transfer options for upload
-        blob_client = BlobClient(
+        async with BlobClient(
             account_url=account_url, 
             container_name=container_name, 
             blob_name=blob_name,
             credential=DefaultAzureCredential(),
             max_block_size=1024*1024*4, # 4 MiB
             max_single_put_size=1024*1024*8 # 8 MiB
-        )
+        ) as blob_client:
         
-        with open(file=os.path.join(r'file_path', blob_name), mode="rb") as data:
-            blob_client = await blob_client.upload_blob(data=data, overwrite=True, max_concurrency=2)
+            with open(file=os.path.join(r'file_path', blob_name), mode="rb") as data:
+                await blob_client.upload_blob(data=data, overwrite=True, max_concurrency=2)
     # </Snippet_upload_blob_transfer_options>
 
     # <Snippet_upload_blob_access_tier>
