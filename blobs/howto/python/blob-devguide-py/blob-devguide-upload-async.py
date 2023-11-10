@@ -95,11 +95,11 @@ class BlobSamples(object):
     # </Snippet_upload_blob_transfer_validation>
 
 async def main():
+    sample = BlobSamples()
+
     # TODO: Replace <storage-account-name> with your actual storage account name
     account_url = "https://<storage-account-name>.blob.core.windows.net"
     credential = DefaultAzureCredential()
-
-    sample = BlobSamples()
 
     async with BlobServiceClient(account_url, credential=credential) as blob_service_client:
         await sample.upload_blob_data(blob_service_client, "sample-container")
