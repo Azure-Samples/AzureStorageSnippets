@@ -94,6 +94,7 @@ class BlobSamples(object):
             blob_client = await blob_client.upload_blob(data=data, overwrite=True, validate_content=True)
     # </Snippet_upload_blob_transfer_validation>
 
+# <Snippet_create_client_async>
 async def main():
     sample = BlobSamples()
 
@@ -103,17 +104,7 @@ async def main():
 
     async with BlobServiceClient(account_url, credential=credential) as blob_service_client:
         await sample.upload_blob_data(blob_service_client, "sample-container")
-        #await sample.upload_blob_stream(blob_service_client, "sample-container")
-        #await sample.upload_blob_file(blob_service_client, "sample-container")
-        #await sample.upload_blob_tags(blob_service_client, "sample-container")
-        #await sample.upload_blob_transfer_options(account_url, "sample-container", "sample-blob.txt")
-        #await sample.upload_blob_access_tier(blob_service_client, "sample-container", "sample-blob.txt")
-        #await sample.upload_blob_transfer_validation(blob_service_client, "sample-container", "sample-blob.txt")
-
-        container_client = blob_service_client.get_container_client(container="sample-container")
-        #file_path = os.path.join(r'file_path', 'file_name')
-        #block_size = 1024*1024*4 # 4 MiB
-        #await sample.upload_blocks(container_client, file_path, block_size)
 
 if __name__ == '__main__':
     asyncio.run(main())
+# </Snippet_create_client_async>
