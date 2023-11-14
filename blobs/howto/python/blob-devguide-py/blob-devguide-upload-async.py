@@ -103,7 +103,7 @@ async def main():
     credential = DefaultAzureCredential()
 
     async with BlobServiceClient(account_url, credential=credential) as blob_service_client:
-        await sample.upload_blob_data(blob_service_client, "sample-container")
+        await sample.upload_blob_file(blob_service_client, "sample-container")
 
 if __name__ == '__main__':
     asyncio.run(main())
