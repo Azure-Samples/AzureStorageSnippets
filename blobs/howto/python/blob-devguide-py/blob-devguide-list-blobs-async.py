@@ -44,7 +44,7 @@ async def main():
     credential = DefaultAzureCredential()
 
     async with BlobServiceClient(account_url, credential=credential) as blob_service_client:
-        sample.list_blobs_flat(blob_service_client, "sample-container")
+        await sample.list_blobs_flat(blob_service_client, "sample-container")
 
 if __name__ == '__main__':
     asyncio.run(main())
