@@ -1,8 +1,6 @@
-import os, uuid
-import time
-from azure.core.exceptions import HttpResponseError, ResourceExistsError
+from azure.core.exceptions import ResourceExistsError
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient
+from azure.storage.blob import BlobServiceClient
 
 class ContainerSamples(object):
 
