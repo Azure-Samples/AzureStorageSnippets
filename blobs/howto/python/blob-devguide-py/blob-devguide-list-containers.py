@@ -5,7 +5,6 @@ class ContainerSamples(object):
 
     # <Snippet_list_containers>
     def list_containers(self, blob_service_client: BlobServiceClient):
-        i=0
         containers = blob_service_client.list_containers(include_metadata=True)
         for container in containers:
             print(container['name'], container['metadata'])
