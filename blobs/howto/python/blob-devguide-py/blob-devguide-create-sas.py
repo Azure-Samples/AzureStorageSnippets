@@ -6,6 +6,7 @@ from azure.storage.blob import (
     ContainerClient,
     BlobClient,
     BlobSasPermissions,
+    ContainerSasPermissions,
     ResourceTypes,
     AccountSasPermissions,
     UserDelegationKey,
@@ -113,7 +114,7 @@ class SASSamples(object):
             account_name=container_client.account_name,
             container_name=container_client.container_name,
             user_delegation_key=user_delegation_key,
-            permission=BlobSasPermissions(read=True),
+            permission=ContainerSasPermissions(read=True),
             expiry=expiry_time,
             start=start_time
         )
@@ -146,7 +147,7 @@ class SASSamples(object):
             account_name=container_client.account_name,
             container_name=container_client.container_name,
             account_key=account_key,
-            permission=BlobSasPermissions(read=True),
+            permission=ContainerSasPermissions(read=True),
             expiry=expiry_time,
             start=start_time
         )
