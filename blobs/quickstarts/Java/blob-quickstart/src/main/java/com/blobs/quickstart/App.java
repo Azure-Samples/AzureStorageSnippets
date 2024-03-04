@@ -37,8 +37,9 @@ public class App
         // </Snippet_CreateContainer>
 
         // <Snippet_UploadBlobFromFile>
-        // Create a local file in the ./data/ directory for uploading and downloading
+        // Create the ./data/ directory and a file for uploading and downloading
         String localPath = "./data/";
+        new File(localPath).mkdirs();
         String fileName = "quickstart" + java.util.UUID.randomUUID() + ".txt";
 
         // Get a reference to a blob
