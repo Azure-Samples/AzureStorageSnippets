@@ -57,6 +57,6 @@ class AuthSamples(object):
 if __name__ == '__main__':
     sample = AuthSamples()
     blob_service_client = sample.get_blob_service_client_token_credential()
-    #blob_service_client = sample.get_blob_service_client_sas(sas_token=<sas_token_str>)
+    blob_service_client = sample.get_blob_service_client_sas(sas_token="<add_sas_here>")
     blob_service_client = sample.get_blob_service_client_account_key()
     blob_service_client = sample.get_blob_service_client_connection_string()
