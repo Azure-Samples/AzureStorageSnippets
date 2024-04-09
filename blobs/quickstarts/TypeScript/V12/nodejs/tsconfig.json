@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ES5",
+        "outDir": "dist/",
+        "rootDir": "./src",
+        "strict": false,
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    }
+}
