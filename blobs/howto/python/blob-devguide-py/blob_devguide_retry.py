@@ -22,7 +22,7 @@ class RetrySamples(object):
         # Create the BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url, credential=credential, retry_policy=retry)
         # </Snippet_retry_linear>
-        
+
         return blob_service_client
 
 
@@ -36,6 +36,12 @@ if __name__ == '__main__':
     client_exp = sample.retry_policy_exponential()
     client_lin = sample.retry_policy_linear()
 
-    # Do something with the client
+    containers = client_exp.list_containers()
+    for c in containers:
+        print(c.name)
+
+    containers = client_lin.list_containers()
+    for c in containers:
+        print(c.name)
 
     
