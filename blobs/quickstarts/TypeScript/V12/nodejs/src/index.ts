@@ -2,7 +2,7 @@
 // index.js
 import { BlobServiceClient, ContainerCreateResponse } from '@azure/storage-blob';
 import { v4 as uuidv4 } from 'uuid';
-import { config as dotenvConfig } from 'dotenv';
+import 'dotenv/config'
 // </snippet_ImportLibrary>
 
 // <snippet_StorageAcctInfo_without_secrets>

@@ -2,9 +2,10 @@
 // index.js
 import { BlobServiceClient } from '@azure/storage-blob';
 import { v4 as uuidv4 } from 'uuid';
+import 'dotenv/config';
 // </snippet_ImportLibrary>
 // <snippet_StorageAcctInfo_without_secrets>
-const { DefaultAzureCredential } = require('@azure/identity');
+import { DefaultAzureCredential } from '@azure/identity';
 // </snippet_StorageAcctInfo_without_secrets>
 // <snippet_ConvertStreamToText>
 // Convert stream to text

@@ -2,10 +2,10 @@
 // index.ts
 import { BlobServiceClient, ContainerCreateResponse } from '@azure/storage-blob';
 import { v4 as uuidv4 } from 'uuid';
-import { config as dotenvConfig } from 'dotenv';
-
-dotenvConfig();
+import 'dotenv/config'
 // </snippet_ImportLibrary>
+
+console.log(process.env)
 
 // <snippet_ConvertStreamToText>
 async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
