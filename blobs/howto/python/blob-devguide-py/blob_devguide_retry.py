@@ -6,7 +6,8 @@ class RetrySamples(object):
     def retry_policy_default(self):
         # <Snippet_retry_default>
         # Create the BlobServiceClient object
-        blob_service_client = BlobServiceClient(account_url, credential=credential, retry_total=5)
+        blob_service_client = BlobServiceClient(account_url, credential=credential, retry_total=5,
+                                                retry_connection=5, retry_read=5, retry_status=5)
         # </Snippet_retry_default>
 
         return blob_service_client
@@ -14,7 +15,7 @@ class RetrySamples(object):
     def retry_policy_exponential(self):
         # <Snippet_retry_exponential>
         # Specify retry policy parameters
-        retry = ExponentialRetry(initial_backoff=10, increment_base=4, retry_total=5)
+        retry = ExponentialRetry(initial_backoff=10, increment_base=4, retry_total=3)
 
         # Create the BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url, credential=credential, retry_policy=retry)
@@ -25,7 +26,7 @@ class RetrySamples(object):
     def retry_policy_linear(self):
         # <Snippet_retry_linear>
         # Specify retry policy parameters
-        retry = LinearRetry(backoff=10, retry_total=5, retry_to_secondary=True)
+        retry = LinearRetry(backoff=10, retry_total=3, retry_to_secondary=True)
 
         # Create the BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url, credential=credential, retry_policy=retry)
