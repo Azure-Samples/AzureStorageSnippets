@@ -28,6 +28,7 @@ async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
     const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
     if (!accountName) throw Error('Azure Storage accountName not found');
 
+    // Add `Storage Blob Data Contributor` role assignment to the identity
     const blobServiceClient = new BlobServiceClient(
       `https://${accountName}.blob.core.windows.net`,
       new DefaultAzureCredential()
