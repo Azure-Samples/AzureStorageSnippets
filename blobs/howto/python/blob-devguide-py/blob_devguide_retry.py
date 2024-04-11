@@ -3,10 +3,18 @@ from azure.storage.blob import BlobServiceClient, ExponentialRetry, LinearRetry
 
 class RetrySamples(object):
 
+    def retry_policy_default(self):
+        # <Snippet_retry_default>
+        # Create the BlobServiceClient object
+        blob_service_client = BlobServiceClient(account_url, credential=credential, retry_total=5)
+        # </Snippet_retry_default>
+
+        return blob_service_client
+
     def retry_policy_exponential(self):
         # <Snippet_retry_exponential>
         # Specify retry policy parameters
-        retry = ExponentialRetry(initial_backoff=10, increment_base=4, max_attempts=5)
+        retry = ExponentialRetry(initial_backoff=10, increment_base=4, retry_total=5)
 
         # Create the BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url, credential=credential, retry_policy=retry)
@@ -17,7 +25,7 @@ class RetrySamples(object):
     def retry_policy_linear(self):
         # <Snippet_retry_linear>
         # Specify retry policy parameters
-        retry = LinearRetry(backoff=10, max_attempts=5, retry_to_secondary=True)
+        retry = LinearRetry(backoff=10, retry_total=5, retry_to_secondary=True)
 
         # Create the BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url, credential=credential, retry_policy=retry)
@@ -33,15 +41,10 @@ if __name__ == '__main__':
 
     sample = RetrySamples()
 
+    client_def = sample.retry_policy_default()
     client_exp = sample.retry_policy_exponential()
     client_lin = sample.retry_policy_linear()
 
-    containers = client_exp.list_containers()
-    for c in containers:
-        print(c.name)
-
-    containers = client_lin.list_containers()
-    for c in containers:
-        print(c.name)
+    # Do something with the client
 
     
