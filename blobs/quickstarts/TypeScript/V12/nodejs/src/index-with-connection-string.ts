@@ -1,11 +1,9 @@
 // <snippet_ImportLibrary>
 // index.ts
-import { BlobServiceClient, ContainerCreateResponse } from '@azure/storage-blob';
+import { BlobServiceClient, ContainerCreateResponse, BlockBlobClient, BlockBlobUploadResponse, ContainerDeleteResponse, BlobDownloadResponseParsed } from '@azure/storage-blob';
 import { v4 as uuidv4 } from 'uuid';
 import 'dotenv/config'
 // </snippet_ImportLibrary>
-
-console.log(process.env)
 
 // <snippet_ConvertStreamToText>
 async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
@@ -20,13 +18,13 @@ async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
 
 try {
   // <snippet_StorageAcctInfo_without_secrets>
-  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
-  if (!accountName) throw Error('Azure Storage accountName not found');
+  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING as string; 
+  if (!connectionString) throw Error('Azure Storage connectionString not found');
   // </snippet_StorageAcctInfo_without_secrets>
 
   // <snippet_StorageAcctInfo_create_client>
   const blobServiceClient = BlobServiceClient.fromConnectionString(
-    accountName
+    connectionString
   );
   // </snippet_StorageAcctInfo_create_client>
 
@@ -40,7 +38,6 @@ try {
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
   const createContainerResponse: ContainerCreateResponse = await containerClient.create();
-  console.log(JSON.stringify(createContainerResponse, null, 2));
   console.log(
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
@@ -48,14 +45,14 @@ try {
 
   // <snippet_UploadBlobs>
   const blobName = 'quickstart' + uuidv4(); + '.txt';
-  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   console.log(
     `\nUploading to Azure storage as blob\n\tname: ${blobName}:\n\tURL: ${blockBlobClient.url}`
   );
 
   const data = 'Hello, World!';
-  const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
+  const uploadBlobResponse: BlockBlobUploadResponse = await blockBlobClient.upload(data, data.length);
   console.log(
     `Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`
   );
@@ -65,7 +62,7 @@ try {
   console.log('\nListing blobs...');
 
   for await (const blob of containerClient.listBlobsFlat()) {
-    const tempBlockBlobClient = containerClient.getBlockBlobClient(blob.name);
+    const tempBlockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blob.name);
 
     console.log(
       `\n\tname: ${blob.name}\n\tURL: ${tempBlockBlobClient.url}\n`
@@ -74,7 +71,10 @@ try {
   // </snippet_ListBlobs>
 
   // <snippet_DownloadBlobs>
-  const downloadBlockBlobResponse = await blockBlobClient.download(0);
+  const offset = 0;         // start at beginning
+  const length = undefined; // read all
+
+  const downloadBlockBlobResponse: BlobDownloadResponseParsed = await blockBlobClient.download(offset, length);
   console.log('\nDownloaded blob content...');
   console.log(
     '\t',
@@ -85,7 +85,7 @@ try {
   // <snippet_DeleteContainer>
   console.log('\nDeleting container...');
 
-  const deleteContainerResponse = await containerClient.delete();
+  const deleteContainerResponse: ContainerDeleteResponse = await containerClient.delete();
   console.log(
     'Container was deleted successfully. requestId: ',
     deleteContainerResponse.requestId
