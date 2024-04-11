@@ -1,0 +1,29 @@
+{
+    "name": "blob-quickstart-v12",
+    "version": "1.0.0",
+    "description": "Use the @azure/storage-blob SDK version 12 to interact with Azure Blob storage",
+    "main": "blob-quickstart-v12.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node --esm src/index.ts"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@azure/identity": "^2.1.0",
+        "@azure/storage-blob": "^12.8.0",
+        "@types/dotenv": "^8.2.0",
+        "dotenv": "^16.4.5",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "@types/node": "^20.12.2",
+        "@types/uuid": "^9.0.8",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.3"
+    },
+    "ts-node": {
+        "esm": true
+      }
+}
