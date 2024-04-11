@@ -115,7 +115,7 @@ async function main() {
     // </snippet_DeleteContainer>
 
   } catch (err) {
-    console.err(`Error: ${err.message}`);
+    console.error(`Error: ${err.message}`);
   }
 }
 // <snippet_ConvertStreamToText>
