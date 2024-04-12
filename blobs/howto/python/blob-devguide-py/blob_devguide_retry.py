@@ -7,7 +7,7 @@ class RetrySamples(object):
         # <Snippet_retry_default>
         # Create the BlobServiceClient object
         blob_service_client = BlobServiceClient(account_url, credential=credential, retry_total=5,
-                                                retry_connection=5, retry_read=5, retry_status=5)
+                                                retry_connect=5, retry_read=5, retry_status=5)
         # </Snippet_retry_default>
 
         return blob_service_client
