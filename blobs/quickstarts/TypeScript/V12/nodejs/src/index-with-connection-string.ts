@@ -17,10 +17,10 @@ async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
 // </snippet_ConvertStreamToText>
 
 try {
-  // <snippet_StorageAcctInfo_without_secrets>
+  // <snippet_StorageAcctInfo__with_secrets>
   const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING as string; 
   if (!connectionString) throw Error('Azure Storage connectionString not found');
-  // </snippet_StorageAcctInfo_without_secrets>
+  // </snippet_StorageAcctInfo__with_secrets>
 
   // <snippet_StorageAcctInfo_create_client>
   const blobServiceClient = BlobServiceClient.fromConnectionString(
