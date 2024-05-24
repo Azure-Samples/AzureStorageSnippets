@@ -24,7 +24,7 @@ async function uploadWithTransferOptions(containerClient, blobName, localFilePat
   // Create blob client from container client
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // Upload blob with index tags
+  // Upload blob with transfer options
   await blockBlobClient.uploadFile(localFilePath, uploadOptions);
 }
 //</Snippet_UploadBlobTransferOptions>
