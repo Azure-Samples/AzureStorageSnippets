@@ -1,4 +1,4 @@
-﻿//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------
 // Microsoft Developer & Platform Evangelism
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -228,7 +228,7 @@ namespace dotnet_v12
         //-------------------------------------------------
         public async Task CopyFileToBlobAsync(string shareName, string sourceFilePath, string containerName, string blobName)
         {
-            // Get a file SAS from the method created ealier
+            // Get a file SAS from the method created earlier
             Uri fileSasUri = GetFileSasUri(shareName, sourceFilePath, DateTime.UtcNow.AddHours(24), ShareFileSasPermissions.Read);
 
             // Get a reference to the file we created previously
@@ -267,7 +267,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareServiceClient = new ShareServiceClient(connectionString);
 
             // Instantiate a ShareClient which will be used to access the file share
@@ -292,7 +292,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareServiceClient = new ShareServiceClient(connectionString);
 
             // Display each share and the snapshots on each share
@@ -313,7 +313,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareServiceClient = new ShareServiceClient(connectionString);
 
             foreach (ShareItem item in shareServiceClient.GetShares(ShareTraits.All, ShareStates.Snapshots))
@@ -338,7 +338,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareService = new ShareServiceClient(connectionString);
 
             // Get a ShareClient
@@ -387,7 +387,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareService = new ShareServiceClient(connectionString);
 
             // Get a ShareClient
@@ -421,7 +421,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareService = new ShareServiceClient(connectionString);
 
             // Get a ShareClient
@@ -452,7 +452,7 @@ namespace dotnet_v12
             // Get the connection string from app settings
             string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
 
-            // Instatiate a ShareServiceClient
+            // Instantiate a ShareServiceClient
             ShareServiceClient shareService = new ShareServiceClient(connectionString);
 
             // Set metrics properties for File service
@@ -492,11 +492,11 @@ namespace dotnet_v12
 
             // Display the properties
             Console.WriteLine();
-            Console.WriteLine($"HourMetrics.InludeApis: {serviceProperties.HourMetrics.IncludeApis}");
+            Console.WriteLine($"HourMetrics.IncludeApis: {serviceProperties.HourMetrics.IncludeApis}");
             Console.WriteLine($"HourMetrics.RetentionPolicy.Days: {serviceProperties.HourMetrics.RetentionPolicy.Days}");
             Console.WriteLine($"HourMetrics.Version: {serviceProperties.HourMetrics.Version}");
             Console.WriteLine();
-            Console.WriteLine($"MinuteMetrics.InludeApis: {serviceProperties.MinuteMetrics.IncludeApis}");
+            Console.WriteLine($"MinuteMetrics.IncludeApis: {serviceProperties.MinuteMetrics.IncludeApis}");
             Console.WriteLine($"MinuteMetrics.RetentionPolicy.Days: {serviceProperties.MinuteMetrics.RetentionPolicy.Days}");
             Console.WriteLine($"MinuteMetrics.Version: {serviceProperties.MinuteMetrics.Version}");
             Console.WriteLine();
