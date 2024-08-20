@@ -1,8 +1,10 @@
+# <Snippet_imports>
 import os, uuid
 import time
 from azure.core.exceptions import HttpResponseError, ResourceExistsError
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient
+# </Snippet_imports>
 
 class ContainerSamples(object):
 

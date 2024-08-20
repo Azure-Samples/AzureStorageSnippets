@@ -1,8 +1,8 @@
-import io
-import os
+# <Snippet_imports>
 from azure.core.exceptions import HttpResponseError, ResourceExistsError
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, BlobLeaseClient, BlobPrefix, ContentSettings
+# </Snippet_imports>
 
 class BlobSamples(object):
 

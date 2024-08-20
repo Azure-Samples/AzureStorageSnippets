@@ -1,5 +1,5 @@
+# <Snippet_imports>
 import datetime
-import time
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import (
     BlobServiceClient,
@@ -8,6 +8,7 @@ from azure.storage.blob import (
     BlobSasPermissions,
     generate_blob_sas
 )
+# </Snippet_imports>
 
 class BlobCopySamples(object):
 

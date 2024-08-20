@@ -1,8 +1,10 @@
+# <Snippet_imports>
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import (
     BlobServiceClient,
     BlobClient,
 )
+# </Snippet_imports>
 
 class BlobCopySamples(object):
 

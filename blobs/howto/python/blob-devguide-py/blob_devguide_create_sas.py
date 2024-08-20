@@ -1,5 +1,5 @@
+# <Snippet_imports>
 import datetime
-import os, uuid
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import (
     BlobServiceClient,
@@ -14,6 +14,7 @@ from azure.storage.blob import (
     generate_container_sas,
     generate_blob_sas
 )
+# </Snippet_imports>
 
 class SASSamples(object):
 

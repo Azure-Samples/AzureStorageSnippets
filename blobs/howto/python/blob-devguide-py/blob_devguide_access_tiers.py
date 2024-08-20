@@ -1,3 +1,4 @@
+# <Snippet_imports>
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import (
     BlobServiceClient,
@@ -5,6 +6,7 @@ from azure.storage.blob import (
     StandardBlobTier,
     RehydratePriority
 )
+# </Snippet_imports>
 
 class BlobAccessTierSamples(object):
 
