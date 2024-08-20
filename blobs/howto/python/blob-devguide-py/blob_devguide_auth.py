@@ -1,6 +1,8 @@
-import os, uuid
+# <Snippet_imports>
+import os
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
+# </Snippet_imports>
 
 class AuthSamples(object):
 

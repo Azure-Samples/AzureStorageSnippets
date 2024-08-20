@@ -1,9 +1,11 @@
+# <Snippet_imports>
 import asyncio
 from azure.identity.aio import DefaultAzureCredential
 from azure.storage.blob.aio import (
     BlobServiceClient,
     BlobClient,
 )
+# </Snippet_imports>
 
 class BlobCopySamples(object):
 

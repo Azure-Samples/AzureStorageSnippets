@@ -1,7 +1,9 @@
+# <Snippet_imports>
 import asyncio
 from azure.identity.aio import DefaultAzureCredential
 from azure.storage.blob.aio import BlobServiceClient
 from azure.core.exceptions import ResourceExistsError
+# </Snippet_imports>
 
 class ContainerSamples(object):
 

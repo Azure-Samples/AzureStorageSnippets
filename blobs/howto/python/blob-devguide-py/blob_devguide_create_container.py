@@ -1,6 +1,8 @@
+# <Snippet_imports>
 from azure.core.exceptions import ResourceExistsError
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
+# </Snippet_imports>
 
 class ContainerSamples(object):
 

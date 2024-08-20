@@ -1,5 +1,7 @@
+# <Snippet_imports>
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobLeaseClient
+# </Snippet_imports>
 
 class ContainerSamples(object):
 

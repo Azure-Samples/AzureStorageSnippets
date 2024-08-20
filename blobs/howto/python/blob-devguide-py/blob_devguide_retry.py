@@ -1,5 +1,7 @@
+# <Snippet_imports>
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, ExponentialRetry, LinearRetry
+# </Snippet_imports>
 
 class RetrySamples(object):
 

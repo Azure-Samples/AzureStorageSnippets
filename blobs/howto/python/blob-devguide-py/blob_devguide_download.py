@@ -1,8 +1,9 @@
+# <Snippet_imports>
 import io
 import os
-import uuid
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient, ContainerClient, BlobBlock, BlobClient
+from azure.storage.blob import BlobServiceClient, BlobClient
+# </Snippet_imports>
 
 class BlobSamples(object):
 

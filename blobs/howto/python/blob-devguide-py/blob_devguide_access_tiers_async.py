@@ -1,3 +1,4 @@
+# <Snippet_imports>
 import asyncio
 from azure.storage.blob import (
     StandardBlobTier,
@@ -8,6 +9,7 @@ from azure.storage.blob.aio import (
     BlobServiceClient,
     BlobClient
 )
+# </Snippet_imports>
 
 class BlobAccessTierSamples(object):
 
