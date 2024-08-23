@@ -1,11 +1,13 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
 import com.azure.core.util.polling.LongRunningOperationStatus;
 import com.azure.core.util.polling.PollResponse;
 import com.azure.core.util.polling.SyncPoller;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 import com.azure.storage.blob.options.BlobBeginCopyOptions;
+//</Snippet_Imports>
 
 public class BlobAccessTier {
     // <Snippet_ChangeAccessTier>

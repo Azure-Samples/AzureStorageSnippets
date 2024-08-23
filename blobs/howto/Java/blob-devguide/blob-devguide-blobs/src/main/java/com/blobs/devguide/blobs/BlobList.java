@@ -1,8 +1,10 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
 import com.azure.core.http.rest.*;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
+//</Snippet_Imports>
 
 public class BlobList {
     // <Snippet_ListBlobsFlat>

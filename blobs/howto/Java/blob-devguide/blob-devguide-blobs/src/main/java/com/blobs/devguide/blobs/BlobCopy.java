@@ -1,5 +1,6 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
 import com.azure.core.util.polling.*;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
@@ -10,6 +11,7 @@ import com.azure.storage.blob.specialized.*;
 
 import java.time.*;
 import java.util.*;
+//</Snippet_Imports>
 
 public class BlobCopy {
     // <Snippet_CopyBlobURL>

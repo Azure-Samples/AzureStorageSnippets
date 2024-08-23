@@ -1,7 +1,9 @@
 package com.blobs.devguide.containers;
 
+//<Snippet_Imports>
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.specialized.*;
+//</Snippet_Imports>
 
 public class ContainerLease {
     // <Snippet_AcquireLeaseContainer>

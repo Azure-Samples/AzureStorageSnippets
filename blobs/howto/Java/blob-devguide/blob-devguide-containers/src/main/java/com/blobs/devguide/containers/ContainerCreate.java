@@ -1,6 +1,8 @@
 package com.blobs.devguide.containers;
 
+//<Snippet_Imports>
 import com.azure.storage.blob.*;
+//</Snippet_Imports>
 
 public class ContainerCreate {
     // <Snippet_CreateContainer>

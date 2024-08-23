@@ -1,9 +1,11 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 
 import java.util.*;
+//</Snippet_Imports>
 
 public class BlobPropertiesMetadataTags {
     // <Snippet_SetBlobProperties>
