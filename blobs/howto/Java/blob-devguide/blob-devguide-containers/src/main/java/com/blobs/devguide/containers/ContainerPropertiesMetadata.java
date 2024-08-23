@@ -1,8 +1,10 @@
 package com.blobs.devguide.containers;
 
+//<Snippet_Imports>
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 import java.util.*;
+//</Snippet_Imports>
 
 public class ContainerPropertiesMetadata {
     // <Snippet_GetContainerProperties>

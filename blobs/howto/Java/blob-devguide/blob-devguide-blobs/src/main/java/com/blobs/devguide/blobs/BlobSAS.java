@@ -1,5 +1,6 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.*;
 import com.azure.storage.blob.sas.*;
@@ -9,6 +10,7 @@ import com.azure.storage.common.sas.AccountSasService;
 import com.azure.storage.common.sas.AccountSasSignatureValues;
 
 import java.time.OffsetDateTime;
+//</Snippet_Imports>
 
 public class BlobSAS {
     // <Snippet_RequestUserDelegationKey>

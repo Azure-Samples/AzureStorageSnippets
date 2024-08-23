@@ -1,5 +1,6 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
 import com.azure.core.http.rest.*;
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.*;
@@ -8,7 +9,6 @@ import com.azure.storage.blob.options.BlobUploadFromFileOptions;
 import com.azure.storage.blob.specialized.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
+//</Snippet_Imports>
 
 public class BlobUpload {
     // <Snippet_UploadBlobData>

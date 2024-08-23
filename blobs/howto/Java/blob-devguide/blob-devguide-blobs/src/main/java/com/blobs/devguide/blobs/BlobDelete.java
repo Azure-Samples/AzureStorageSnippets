@@ -1,15 +1,16 @@
 package com.blobs.devguide.blobs;
 
+//<Snippet_Imports>
+import com.azure.core.http.rest.*;
+import com.azure.core.util.*;
+import com.azure.storage.blob.*;
+import com.azure.storage.blob.models.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import com.azure.core.http.rest.*;
-import com.azure.core.util.*;
-import com.azure.storage.blob.*;
-import com.azure.storage.blob.models.*;
+//</Snippet_Imports>
 
 public class BlobDelete {
     // <Snippet_DeleteBlob>
