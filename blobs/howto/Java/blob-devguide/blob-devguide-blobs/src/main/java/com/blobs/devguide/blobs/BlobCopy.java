@@ -167,22 +167,6 @@ public class BlobCopy {
     }
     // </Snippet_CopyBlobOptions>
 
-    // <Snippet_CopyFromAzure_PutBlobFromURL>
-    public void copyFromSourceInAzure(BlobClient sourceBlob, BlockBlobClient destinationBlob) {
-        // Get the source blob URL and create the destination blob
-        // set overwrite param to true if you want to overwrite an existing blob
-        destinationBlob.uploadFromUrl(sourceBlob.getBlobUrl(), false);
-    }
-    // </Snippet_CopyFromAzure_PutBlobFromURL>
-
-    // <Snippet_CopyFromExternalSource_PutBlobFromURL>
-    public void copyFromExternalSource(String sourceURL, BlockBlobClient destinationBlob) {
-        // Create the destination blob from the source URL
-        // set overwrite param to true if you want to overwrite an existing blob
-        destinationBlob.uploadFromUrl(sourceURL, false);
-    }
-    // </Snippet_CopyFromExternalSource_PutBlobFromURL>
-
     // <Snippet_CopyWithinStorageAccount_CopyBlob>
     public void copyBlobWithinStorageAccount(BlobClient sourceBlob, BlockBlobClient destinationBlob) {
         // Lease the source blob to prevent changes during the copy operation
