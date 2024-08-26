@@ -152,11 +152,11 @@ public class App {
                 .credential(new DefaultAzureCredentialBuilder().build())
                 .buildClient();
 
-        // If needed, you can create a ContainerClient from the BlobServiceClient
+        // If needed, you can create a BlobContainerClient object from the BlobServiceClient
         BlobContainerClient containerClient = blobServiceClient
                 .getBlobContainerClient("<container-name>");
 
-        // If needed, you can create a BlobClient from the BlobContainerClient
+        // If needed, you can create a BlobClient object from the BlobContainerClient
         BlobClient blobClient = containerClient
                 .getBlobClient("<blob-name>");
         // </Snippet_GetServiceClientAzureAD>
