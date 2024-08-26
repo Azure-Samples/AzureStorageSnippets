@@ -91,19 +91,19 @@ public class App {
         //endregion
 
         //region Test methods for copy blob operations
-        //BlobCopy copyHelper = new BlobCopy();
-        //BlobContainerClient sourceContainer = blobServiceClient.getBlobContainerClient("source-container");
-        //BlobClient sourceBlob = blobContainerClient.getBlobClient("sample-blob.txt");
-        //BlobContainerClient destinationContainer = blobServiceClient.getBlobContainerClient("destination-container");
-        //BlockBlobClient destinationBlob = destinationContainer.getBlobClient("sample-blob-copy.txt").getBlockBlobClient();
-        //copyHelper.copyFromSourceInAzure(sourceBlob, destinationBlob);
-        //String sourceURL = "<source-object-url>";
-        //copyHelper.copyFromExternalSource(sourceURL, destinationBlob);
-        //copyHelper.copyBlobWithinStorageAccount(sourceBlob, destinationBlob);
-        //copyHelper.copyBlobAcrossStorageAccounts(sourceBlob, destinationBlob);
+        // BlobCopy copyHelper = new BlobCopy();
+        // BlobCopyPutFromURL copyPutFromURLHelper = new BlobCopyPutFromURL();
+        // BlobContainerClient sourceContainer = blobServiceClient.getBlobContainerClient("source-container");
+        // BlobClient sourceBlob = blobContainerClient.getBlobClient("sample-blob.txt");
+        // BlobContainerClient destinationContainer = blobServiceClient.getBlobContainerClient("destination-container");
+        // BlockBlobClient destinationBlob = destinationContainer.getBlobClient("sample-blob-copy.txt").getBlockBlobClient();
+        // copyPutFromURLHelper.copyFromSourceInAzure(sourceBlob, destinationBlob);
+        // String sourceURL = "<source-object-url>";
+        // copyPutFromURLHelper.copyFromExternalSource(sourceURL, destinationBlob);
+        // copyHelper.copyBlobWithinStorageAccount(sourceBlob, destinationBlob);
+        // copyHelper.copyBlobAcrossStorageAccounts(sourceBlob, destinationBlob);
         // copyHelper.copyBlob_beginCopy(blobServiceClient);
         // copyHelper.copyBlobWithOptions(blobServiceClient);
-        // copyHelper.abortCopy(blobServiceClient);
         //endregion
 
         //region Test methods for listing blobs
