@@ -142,20 +142,27 @@ public class App {
         //endregion
     }
 
-    // <Snippet_GetServiceClientAzureAD>
+    
     public static BlobServiceClient GetBlobServiceClientTokenCredential() {
-        TokenCredential credential = new DefaultAzureCredentialBuilder().build();
-
+        // <Snippet_GetServiceClientAzureAD>
         // Azure SDK client builders accept the credential as a parameter
         // TODO: Replace <storage-account-name> with your actual storage account name
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .endpoint("https://<storage-account-name>.blob.core.windows.net/")
-                .credential(credential)
+                .credential(new DefaultAzureCredentialBuilder().build())
                 .buildClient();
+
+        // If needed, you can create a ContainerClient from the BlobServiceClient
+        BlobContainerClient containerClient = blobServiceClient
+                .getBlobContainerClient("<container-name>");
+
+        // If needed, you can create a BlobClient from the BlobContainerClient
+        BlobClient blobClient = containerClient
+                .getBlobClient("<blob-name>");
+        // </Snippet_GetServiceClientAzureAD>
 
         return blobServiceClient;
     }
-    // </Snippet_GetServiceClientAzureAD>
 
     // <Snippet_GetServiceClientSAS>
     public static BlobServiceClient GetBlobServiceClientSAS(String sasToken) {
