@@ -11,7 +11,7 @@ async function main() {
 
 
   } catch (err) {
-    console.err(`Error: ${err.message}`);
+    console.error(`Error: ${err.message}`);
   }
 }
 
