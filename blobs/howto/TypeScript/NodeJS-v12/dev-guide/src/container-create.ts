@@ -18,32 +18,16 @@ async function createContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
 ): Promise<ContainerClient> {
-  // public access at container level
-  const options: ContainerCreateOptions = {
-    access: 'container'
-  };
-
-  // creating client also creates container
   const {
     containerClient,
     containerCreateResponse
   }: {
     containerClient: ContainerClient;
     containerCreateResponse: ContainerCreateResponse;
-  } = await blobServiceClient.createContainer(containerName, options);
+  } = await blobServiceClient.createContainer(containerName);
 
   if (containerCreateResponse.errorCode)
     throw Error(containerCreateResponse.errorCode);
-
-  console.log(`container ${containerName} created`);
-
-  // do something with container
-  // ...
-  // containerClient.listBlobsFlat({    includeMetadata: true,
-  // includeSnapshots: false,
-  // includeTags: true,
-  // includeVersions: false,
-  // prefix: ''});
 
   return containerClient;
 }
@@ -63,7 +47,7 @@ async function main(blobServiceClient): Promise<void> {
 
   // Do something with containerClient
 
-  // only 1 $root per blob storage resource
+  // only 1 $root per storage account
   const containerRootName = '$root';
 
   // create root container

@@ -9,22 +9,13 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// <snippet_create_container>
 async function createContainer(blobServiceClient, containerName){
-
-  // public access at container level
-  const options = {
-    access: 'container'
-  };
-
-  // creating client also creates container
   const containerClient = await blobServiceClient.createContainer(containerName, options);
-  console.log(`container ${containerName} created`);
-
-  // do something with container
-  // ...
 
   return containerClient;
 }
+// </snippet_create_container>
 
 async function main(blobServiceClient){
 
@@ -36,7 +27,7 @@ async function main(blobServiceClient){
   // create containers
   await createContainer(blobServiceClient, containerName);
 
-  // only 1 $root per blob storage resource
+  // only 1 $root per storage account
   const containerRootName = '$root';
 
   // create root container
