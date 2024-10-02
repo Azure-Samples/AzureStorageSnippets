@@ -10,11 +10,12 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
 
 // delete container immediately on blobServiceClient
-async function deleteContainerImmediately(blobServiceClient, containerName) {
+// <snippet_delete_container_immediately>
+async function deleteContainer(blobServiceClient, containerName) {
   
   return await blobServiceClient.deleteContainer(containerName);
-
 }
+// </snippet_delete_container_immediately>
 
 // soft delete container on ContainerClient
 async function deleteContainerSoft(containerClient) {
@@ -23,10 +24,10 @@ async function deleteContainerSoft(containerClient) {
 
 }
 
+// <snippet_deleteContainersWithPrefix>
 async function deleteContainersWithPrefix(blobServiceClient, prefix) {
 
   const containerOptions = {
-    // only delete containers not deleted
     includeDeleted: false,
     includeMetadata: false,
     includeSystem: true,
@@ -40,17 +41,18 @@ async function deleteContainersWithPrefix(blobServiceClient, prefix) {
 
       await containerClient.delete();
   
-      console.log(`deleted ${containerItem.name} container - success`);
+      console.log(`Deleted ${containerItem.name} container - success`);
     }catch(ex){
-      console.log(`deleted ${containerItem.name} container - failed - ${ex.message}`);
+      console.log(`Deleted ${containerItem.name} container - failed - ${ex.message}`);
     }
   }
 }
+// </snippet_deleteContainersWithPrefix>
 
 // Undelete specific container - last version
+// <snippet_undeleteContainer>
 async function undeleteContainer(blobServiceClient, containerName) {
-
-  // version to undelete
+  // Version to restore
   let containerVersion;
 
   const containerOptions = {
@@ -58,12 +60,8 @@ async function undeleteContainer(blobServiceClient, containerName) {
     prefix: containerName
   }
 
-  // container listing returns version (timestamp) in the ContainerItem
+  // Find the deleted container and restore it
   for await (const containerItem of blobServiceClient.listContainers(containerOptions)) {
-
-    // if there are multiple deleted versions of the same container,
-    // the versions are in asc time order
-    // the last version is the most recent
     if (containerItem.name === containerName) {
       containerVersion = containerItem.version;
     }
@@ -72,17 +70,9 @@ async function undeleteContainer(blobServiceClient, containerName) {
   const containerClient = await blobServiceClient.undeleteContainer(
     containerName,
     containerVersion,
-
-    // optional/new container name - if unused, original container name is used
-    //newContainerName 
   );
-
-  // undelete was successful
-  console.log(`${containerName} is undeleted`);
-
-  // do something with containerClient
-  // ...
 }
+// </snippet_undeleteContainer>
 async function createContainer(blobServiceClient, containerName) {
 
   // public access at container level
@@ -113,7 +103,7 @@ async function main(blobServiceClient) {
   await Promise.all(containers);
 
   // delete 1 container immediately with BlobServiceClient
-  await deleteContainerImmediately(blobServiceClient, `${containerName}-1`);
+  await deleteContainer(blobServiceClient, `${containerName}-1`);
 
   // soft deletes take 30 seconds - waiting now so that undelete won't throw error
   await sleep(30000);

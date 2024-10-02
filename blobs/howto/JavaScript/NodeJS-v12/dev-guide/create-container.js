@@ -11,7 +11,7 @@ const client = BlobServiceClient.fromConnectionString(connString);
 
 // <snippet_create_container>
 async function createContainer(blobServiceClient, containerName){
-  const containerClient = await blobServiceClient.createContainer(containerName, options);
+  const containerClient = await blobServiceClient.createContainer(containerName);
 
   return containerClient;
 }

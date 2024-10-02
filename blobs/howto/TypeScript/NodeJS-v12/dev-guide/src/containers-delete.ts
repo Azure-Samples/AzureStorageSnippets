@@ -24,8 +24,7 @@ const sleep = (waitTimeInMs) =>
   new Promise((resolve) => setTimeout(resolve, waitTimeInMs));
 
 // <snippet_delete_container_immediately>
-// delete container immediately on blobServiceClient
-async function deleteContainerImmediately(
+async function deleteContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
 ): Promise<ContainerDeleteResponse> {
@@ -48,7 +47,6 @@ async function deleteContainersWithPrefix(
   prefix: string
 ): Promise<void> {
   const containerOptions: ServiceListContainersOptions = {
-    // only delete containers not deleted
     includeDeleted: false,
     includeMetadata: false,
     includeSystem: true,
@@ -66,11 +64,11 @@ async function deleteContainersWithPrefix(
 
       await containerClient.delete(containerDeleteMethodOptions);
 
-      console.log(`deleted ${containerItem.name} container - success`);
+      console.log(`Deleted ${containerItem.name} container - success`);
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.log(
-          `deleted ${containerItem.name} container - failed - ${err.message}`
+          `Deleted ${containerItem.name} container - failed - ${err.message}`
         );
       }
     }
@@ -78,8 +76,8 @@ async function deleteContainersWithPrefix(
 }
 // </snippet_deleteContainersWithPrefix>
 
-// <snippet_undeleteContainer>
 // Undelete specific container - last version
+// <snippet_undeleteContainer>
 async function undeleteContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
@@ -92,13 +90,10 @@ async function undeleteContainer(
     prefix: containerName
   };
 
-  // container listing returns version (timestamp) in the ContainerItem
+  // Find the deleted container and restore it
   for await (const containerItem of blobServiceClient.listContainers(
     containerOptions
   )) {
-    // if there are multiple deleted versions of the same container,
-    // the versions are in asc time order
-    // the last version is the most recent
     if (containerItem.name === containerName) {
       containerVersion = containerItem.version as string;
     }
@@ -116,26 +111,8 @@ async function undeleteContainer(
     } = await blobServiceClient.undeleteContainer(
       containerName,
       containerVersion,
-
-      // optional/new container name - if unused, original container name is used
-      //newContainerName
       serviceUndeleteContainerOptions
     );
-
-    // Check delete
-    if (containerUndeleteResponse.errorCode)
-      throw Error(containerUndeleteResponse.errorCode);
-
-    // undelete was successful
-    console.log(`${containerName} is undeleted`);
-
-    // do something with containerClient
-    // ...
-    // containerClient.listBlobsFlat({    includeMetadata: true,
-    // includeSnapshots: false,
-    // includeTags: true,
-    // includeVersions: false,
-    // prefix: ''});
   }
 }
 // </snippet_undeleteContainer>
