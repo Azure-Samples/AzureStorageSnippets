@@ -6,38 +6,34 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
+// <snippet_getContainerProperties>
 async function getContainerProperties(containerClient) {
+  try {
+    const containerProperties = await containerClient.getProperties();
 
-  const properties = await containerClient.getProperties();
-  console.log(containerClient.containerName + ' properties: ');
-
-  for (const property in properties) {
-
-    switch (property) {
-      // nested properties are stringified
-      case 'metadata':
-      //case 'objectReplicationRules':
-        console.log(`    ${property}: ${JSON.stringify(properties[property])}`);
-        break;
-      default:
-        console.log(`    ${property}: ${properties[property]}`);
-        break;
-    }
+    console.log(`Public access type: ${containerProperties.blobPublicAccess}`);
+    console.log(`Lease status: ${containerProperties.leaseStatus}`);
+    console.log(`Lease state: ${containerProperties.leaseState}`);
+    console.log(`Has immutability policy: ${containerProperties.hasImmutabilityPolicy}`);
+  } catch (err) {
+    // Handle the error
   }
 }
+// </snippet_getContainerProperties>
 
-/*
-const metadata = {
-  // values must be strings
-  lastFileReview: currentDate.toString(),
-  reviewer: `johnh`
-}
-*/
-async function setContainerMetadata(containerClient, metadata) {
-
+// <snippet_setContainerMetadata>
+async function setContainerMetadata(containerClient) {
+  const metadata = {
+    // values must be strings
+    lastFileReview: "currentDate",
+    reviewer: "reviewerName"
+  };
+  
   await containerClient.setMetadata(metadata);
 
 }
+// </snippet_setContainerMetadata>
+
 async function main(blobServiceClient) {
 
   // create container
@@ -52,22 +48,13 @@ async function main(blobServiceClient) {
 
   console.log('container creation succeeded');
 
-  const currentDate = new Date().toLocaleDateString();
-
-  const containerMetadata = {
-    // values must be strings
-    lastFileReview: currentDate,
-    reviewer: `johnh`
-  }
-
-  await setContainerMetadata(containerClient, containerMetadata);
+  await setContainerMetadata(containerClient);
 
   // properties including metadata
   await getContainerProperties(containerClient);
 
 
 }
-
 
 main(blobServiceClient)
   .then(() => console.log(`done`))
