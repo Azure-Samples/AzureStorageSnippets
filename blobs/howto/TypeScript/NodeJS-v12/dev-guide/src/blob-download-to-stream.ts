@@ -37,8 +37,8 @@ async function createBlobFromString(
 // <snippet_downloadBlobAsStream>
 async function downloadBlobAsStream(
   containerClient: ContainerClient,
-  blobName,
-  writableStream
+  blobName: string,
+  writableStream: fs.WriteStream
 ) {
   const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
 
@@ -46,7 +46,6 @@ async function downloadBlobAsStream(
 
   if (!downloadResponse.errorCode && downloadResponse?.readableStreamBody) {
     downloadResponse.readableStreamBody.pipe(writableStream);
-    console.log(`download of ${blobName} succeeded`);
   }
 }
 // </snippet_downloadBlobAsStream>

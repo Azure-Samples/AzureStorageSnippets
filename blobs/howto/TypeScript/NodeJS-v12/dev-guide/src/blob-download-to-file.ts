@@ -37,17 +37,12 @@ async function createBlobFromString(
 // <snippet_downloadBlobToFile>
 async function downloadBlobToFile(
   containerClient: ContainerClient,
-  blobName,
-  fileNameWithPath
+  blobName: string,
+  filePath: string
 ): Promise<void> {
   const blobClient = await containerClient.getBlobClient(blobName);
 
-  const downloadResult = await blobClient.downloadToFile(fileNameWithPath);
-  if (!downloadResult.errorCode) {
-    console.log(
-      `download of ${blobName} success ${downloadResult.blobCommittedBlockCount}`
-    );
-  }
+  const downloadResult = await blobClient.downloadToFile(filePath);
 }
 // </snippet_downloadBlobToFile>
 

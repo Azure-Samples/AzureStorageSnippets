@@ -16,6 +16,7 @@ async function createBlobFromString(client, blobName, fileContentsAsString) {
     console.log(`created blob ${blobName}`);
 }
 
+// <snippet_downloadBlobToString>
 async function downloadBlobToString(containerClient, blobName) {
 
     const blobClient = await containerClient.getBlobClient(blobName);
@@ -38,6 +39,7 @@ async function streamToBuffer(readableStream) {
         readableStream.on('error', reject);
     });
 }
+// </snippet_downloadBlobToString>
 
 async function main(blobServiceClient) {
 

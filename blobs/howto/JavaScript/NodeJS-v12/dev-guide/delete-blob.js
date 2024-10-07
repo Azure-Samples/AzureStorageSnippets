@@ -8,22 +8,22 @@ if (!connString) throw Error("Azure Storage Connection string not found");
 // Client
 const client = BlobServiceClient.fromConnectionString(connString);
 
+// <snippet_deleteBlob>
 async function deleteBlob(containerClient, blobName){
 
-  // include: Delete the base blob and all of its snapshots.
-  // only: Delete only the blob's snapshots and not the blob itself.
+  // include: Delete the base blob and all of its snapshots
+  // only: Delete only the blob's snapshots and not the blob itself
   const options = {
-    deleteSnapshots: 'include' // or 'only'
+    deleteSnapshots: 'include'
   }
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.delete(options);
-
-  console.log(`deleted blob ${blobName}`);
-
 }
+// </snippet_deleteBlob>
+
 async function deleteBlobIfItExists(containerClient, blobName){
 
   // include: Delete the base blob and all of its snapshots.
@@ -40,16 +40,16 @@ async function deleteBlobIfItExists(containerClient, blobName){
   console.log(`deleted blob ${blobName}`);
 
 }
+
+// <snippet_undeleteBlob>
 async function undeleteBlob(containerClient, blobName){
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.undelete();
-
-  console.log(`undeleted blob ${blobName}`);
-
 }
+// </snippet_undeleteBlob>
 
 // containerName: string
 // blobName: string, includes file extension if provided

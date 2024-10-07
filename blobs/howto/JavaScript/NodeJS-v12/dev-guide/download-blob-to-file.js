@@ -17,13 +17,14 @@ async function createBlobFromString(containerClient, blobName, fileContentsAsStr
     console.log(`created blob ${blobName}`);
 }
 
-async function downloadBlobToFile(containerClient, blobName, fileNameWithPath) {
+// <snippet_downloadBlobToFile>
+async function downloadBlobToFile(containerClient, blobName, filePath) {
 
     const blobClient = await containerClient.getBlobClient(blobName);
     
-    await blobClient.downloadToFile(fileNameWithPath);
-    console.log(`download of ${blobName} success`);
+    await blobClient.downloadToFile(filePath);
 }
+// </snippet_downloadBlobToFile>
 
 async function main(blobServiceClient) {
 

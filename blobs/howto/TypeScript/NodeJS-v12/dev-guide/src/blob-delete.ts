@@ -28,18 +28,13 @@ async function deleteBlob(
   const blockBlobClient: BlockBlobClient =
     await containerClient.getBlockBlobClient(blobName);
 
-  // include: Delete the base blob and all of its snapshots.
-  // only: Delete only the blob's snapshots and not the blob itself.
+  // include: Delete the base blob and all of its snapshots
+  // only: Delete only the blob's snapshots and not the blob itself
   const options: BlobDeleteOptions = {
-    deleteSnapshots: 'include' // or 'only'
+    deleteSnapshots: 'include'
   };
-  const blobDeleteResponse: BlobDeleteResponse = await blockBlobClient.delete(
-    options
-  );
-
-  if (!blobDeleteResponse.errorCode) {
-    console.log(`deleted blob ${blobName}`);
-  }
+  const blobDeleteResponse: BlobDeleteResponse = 
+    await blockBlobClient.delete(options);
 }
 // </snippet_deleteBlob>
 // <snippet_deleteBlobIfExists>
@@ -75,10 +70,6 @@ async function undeleteBlob(
   const options: BlobUndeleteOptions = {};
   const blobUndeleteResponse: BlobUndeleteResponse =
     await blockBlobClient.undelete(options);
-
-  if (!blobUndeleteResponse.errorCode) {
-    console.log(`undeleted blob ${blobName}`);
-  }
 }
 // </snippet_undeleteBlob>
 

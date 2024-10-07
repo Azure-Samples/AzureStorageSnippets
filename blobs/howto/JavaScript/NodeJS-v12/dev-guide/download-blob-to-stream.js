@@ -17,6 +17,8 @@ async function createBlobFromString(containerClient, blobName, fileContentsAsStr
     await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
     console.log(`created blob ${blobName}`);
 }
+
+// <snippet_downloadBlobAsStream>
 async function downloadBlobAsStream(containerClient, blobName, writableStream) {
 
     const blobClient = await containerClient.getBlobClient(blobName);
@@ -24,8 +26,8 @@ async function downloadBlobAsStream(containerClient, blobName, writableStream) {
     const downloadResponse = await blobClient.download();
 
     downloadResponse.readableStreamBody.pipe(writableStream);
-    console.log(`download of ${blobName} succeeded`);
 }
+// </snippet_downloadBlobAsStream>
 
 async function main(blobServiceClient) {
 

@@ -36,7 +36,7 @@ async function createBlobFromString(
 // <snippet_downloadBlobToString>
 async function downloadBlobToString(
   containerClient: ContainerClient,
-  blobName
+  blobName: string
 ): Promise<void> {
   const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
 
@@ -52,6 +52,7 @@ async function downloadBlobToString(
     }
   }
 }
+
 async function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
