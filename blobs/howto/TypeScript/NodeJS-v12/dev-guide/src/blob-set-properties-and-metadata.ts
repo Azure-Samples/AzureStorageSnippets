@@ -5,7 +5,8 @@ import {
   BlockBlobClient,
   BlockBlobUploadOptions,
   ContainerCreateOptions,
-  Metadata
+  Metadata,
+  BlobHTTPHeaders
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -17,114 +18,52 @@ const blobServiceClient: BlobServiceClient =
 
 // <snippet_setBlobMetadata>
 async function setBlobMetadata(
-  blobClient: BlobClient,
-  metadata: Metadata
+  blobClient: BlobClient
 ): Promise<void> {
-  /*
-    metadata= {
-        reviewedBy: 'Bob',
-        releasedBy: 'Jill',
-    }
-*/
-  const metadataResults = await blobClient.setMetadata(metadata);
+  const metadata: Metadata = {
+    docType: 'text',
+    category: 'reference'
+  };
 
-  if (!metadataResults.errorCode) {
-    console.log(`metadata set successfully ${metadataResults.date}`);
-  }
+  await blobClient.setMetadata(metadata);
 }
 // </snippet_setBlobMetadata>
 
 // <snippet_setHTTPHeaders>
-async function setHTTPHeaders(blobClient: BlobClient, headers): Promise<void> {
-  /*
-  headers= {
-      blobContentType: 'text/plain',
-      blobContentLanguage: 'en-us',
-      blobContentEncoding: 'utf-8',
-      // all other http properties are cleared
-    }
-  */
+async function setHTTPHeaders(
+  blobClient: BlobClient
+): Promise<void> {
+  // Get existing properties
+  const properties = await blobClient.getProperties();
 
-  const headerResults = await blobClient.setHTTPHeaders(headers);
+  // Set the blobContentType and blobContentLanguage headers
+  // Populate the remaining headers from the existing properties
+  const blobHeaders: BlobHTTPHeaders = {
+    blobContentType: 'text/plain',
+    blobContentLanguage: 'en-us',
+    blobContentEncoding: properties.contentEncoding,
+    blobCacheControl: properties.cacheControl,
+    blobContentDisposition: properties.contentDisposition,
+    blobContentMD5: properties.contentMD5
+  };
 
-  if (!headerResults.errorCode) {
-    console.log(`headers set successfully ${headerResults.date}`);
-  }
+  await blobClient.setHTTPHeaders(blobHeaders);
 }
 // </snippet_setHTTPHeaders>
 
 // <snippet_getProperties>
-async function getProperties(blobClient: BlobClient): Promise<void> {
+async function getProperties(
+  blobClient: BlobClient
+): Promise<void> {
   const propertiesResponse: BlobGetPropertiesResponse =
     await blobClient.getProperties();
 
-  if (!propertiesResponse.errorCode) {
-    console.log(blobClient.name + ' properties: ');
-
-    for (const property in propertiesResponse) {
-      switch (property) {
-        // nested properties are stringified and returned as strings
-        case 'metadata':
-        case 'objectReplicationRules':
-          console.log(
-            `    ${property}: ${JSON.stringify(propertiesResponse[property])}`
-          );
-          break;
-        default:
-          console.log(`    ${property}: ${propertiesResponse[property]}`);
-          break;
-      }
-    }
-  }
+  console.log(`blobType: ${propertiesResponse.blobType}`);
+  console.log(`contentType: ${propertiesResponse.contentType}`);
+  console.log(`contentLength: ${propertiesResponse.contentLength}`);
+  console.log(`lastModified: ${propertiesResponse.lastModified}`);
 }
 // </snippet_getProperties>
-
-/*
-my-blob.txt properties:
-    lastModified: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
-    createdOn: Mon Mar 20 2023 11:04:17 GMT-0700 (Pacific Daylight Time)
-    metadata: {"releasedby":"Jill","reviewedby":"Bob"}
-    objectReplicationPolicyId: undefined
-    objectReplicationRules: {}
-    blobType: BlockBlob
-    copyCompletedOn: undefined
-    copyStatusDescription: undefined
-    copyId: undefined
-    copyProgress: undefined
-    copySource: undefined
-    copyStatus: undefined
-    isIncrementalCopy: undefined
-    destinationSnapshot: undefined
-    leaseDuration: undefined
-    leaseState: available
-    leaseStatus: unlocked
-    contentLength: 19
-    contentType: text/plain
-    etag: "0x8DB296D85EED062"
-    contentMD5: undefined
-    isServerEncrypted: true
-    encryptionKeySha256: undefined
-    encryptionScope: undefined
-    accessTier: Hot
-    accessTierInferred: true
-    archiveStatus: undefined
-    accessTierChangedOn: undefined
-    versionId: undefined
-    isCurrentVersion: undefined
-    tagCount: undefined
-    expiresOn: undefined
-    isSealed: undefined
-    rehydratePriority: undefined
-    lastAccessed: undefined
-    immutabilityPolicyExpiresOn: undefined
-    immutabilityPolicyMode: undefined
-    legalHold: undefined
-    errorCode: undefined
-    body: true
-    _response: [object Object]
-    objectReplicationDestinationPolicyId: undefined
-    objectReplicationSourceProperties:
-*/
 
 // containerName: string
 // blobName: string, includes file extension if provided
@@ -174,16 +113,6 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const blob = {
     name: `my-blob.txt`,
     text: `Hello from a string`,
-    // indexed for searching
-    properties: {
-      blobContentType: 'text/plain',
-      blobContentLanguage: 'en-us',
-      blobContentEncoding: 'utf-8'
-    },
-    metadata: {
-      reviewedBy: 'Bob',
-      releasedBy: 'Jill'
-    }
   };
 
   const options: BlockBlobUploadOptions | undefined = undefined;
@@ -196,7 +125,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   );
 
   await setBlobMetadata(blobClient, blob.metadata);
-  await setHTTPHeaders(blobClient, blob.properties);
+  await setHTTPHeaders(blobClient);
   await getProperties(blobClient);
 }
 

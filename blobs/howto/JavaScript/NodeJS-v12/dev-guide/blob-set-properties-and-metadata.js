@@ -6,53 +6,48 @@ if (!connString) throw Error('Azure Storage Connection string not found');
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
 
-/*
-metadata= {
-    reviewedBy: 'Bob',
-    releasedBy: 'Jill',
-}
-*/
+// <snippet_setBlobMetadata>
 async function setBlobMetadata(blobClient, metadata) {
+  metadata = {
+    docType: 'text',
+    category: 'reference'
+  };
 
   await blobClient.setMetadata(metadata);
-
-  console.log(`metadata set successfully`);
-
 }
-/*
-properties= {
-      blobContentType: 'text/plain',
-      blobContentLanguage: 'en-us',
-      blobContentEncoding: 'utf-8',
-      // all other http properties are cleared
-    }
-*/
+// </snippet_setBlobMetadata>
+
+// <snippet_setHTTPHeaders>
 async function setHTTPHeaders(blobClient, headers) {
+  // Get existing properties
+  const properties = await blobClient.getProperties();
 
-  await blobClient.setHTTPHeaders(headers);
+  // Set the blobContentType and blobContentLanguage headers
+  // Populate the remaining headers from the existing properties
+  blobHeaders = {
+    blobContentType: 'text/plain',
+    blobContentLanguage: 'en-us',
+    blobContentEncoding: properties.contentEncoding,
+    blobCacheControl: properties.cacheControl,
+    blobContentDisposition: properties.contentDisposition,
+    blobContentMD5: properties.contentMD5
+  },
 
-  console.log(`headers set successfully`);
+  await blobClient.setHTTPHeaders(blobHeaders);
 }
+// </snippet_setHTTPHeaders>
 
+// <snippet_getProperties>
 async function getProperties(blobClient) {
 
   const properties = await blobClient.getProperties();
-  console.log(blobClient.name + ' properties: ');
-
-  for (const property in properties) {
-
-    switch (property) {
-      // nested properties are stringified and returned as strings
-      case 'metadata':
-      case 'objectReplicationRules':
-        console.log(`    ${property}: ${JSON.stringify(properties[property])}`);
-        break;
-      default:
-        console.log(`    ${property}: ${properties[property]}`);
-        break;
-    }
-  }
+  
+  console.log(`blobType: ${propertiesResponse.blobType}`);
+  console.log(`contentType: ${propertiesResponse.contentType}`);
+  console.log(`contentLength: ${propertiesResponse.contentLength}`);
+  console.log(`lastModified: ${propertiesResponse.lastModified}`);
 }
+// </snippet_getProperties>
 
 // containerName: string
 // blobName: string, includes file extension if provided
@@ -89,22 +84,12 @@ async function main(blobServiceClient) {
   const blob = {
     name: `my-blob.txt`,
     text: `Hello from a string`,
-    // indexed for searching
-    properties: {
-      blobContentType: 'text/plain',
-      blobContentLanguage: 'en-us',
-      blobContentEncoding: 'utf-8',
-    },
-    metadata: {
-      reviewedBy: 'Bob',
-      releasedBy: 'Jill',
-    }
   }
 
   const blobClient = await createBlobFromString(containerClient, blob.name, blob.text);
 
-  await setBlobMetadata(blobClient, blob.metadata);
-  await setHTTPHeaders(blobClient, blob.properties);
+  await setBlobMetadata(blobClient);
+  await setHTTPHeaders(blobClient);
   await getProperties(blobClient);
 
 
