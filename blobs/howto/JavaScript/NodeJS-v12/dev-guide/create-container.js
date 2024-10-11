@@ -1,13 +1,13 @@
 // create-container.js
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // <snippet_create_container>
 async function createContainer(blobServiceClient, containerName){
@@ -17,23 +17,26 @@ async function createContainer(blobServiceClient, containerName){
 }
 // </snippet_create_container>
 
-async function main(blobServiceClient){
+async function main(){
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `create-container-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  // create containers
+  const containerName = 'sample-container';
+
+  // Create container
   await createContainer(blobServiceClient, containerName);
 
-  // only 1 $root per storage account
+  // Only one $root container per storage account
   const containerRootName = '$root';
 
-  // create root container
+  // Create root container
   await createContainer(blobServiceClient, containerRootName);
 
 }
-main(client)
+main()
 .then(() => console.log('done'))
 .catch((ex) => console.log(ex.message));

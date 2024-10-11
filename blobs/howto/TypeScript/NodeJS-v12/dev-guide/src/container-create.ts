@@ -35,9 +35,7 @@ async function createContainer(
 
 async function main(blobServiceClient): Promise<void> {
   // create container
-  const timestamp = Date.now();
-  const containerName = `create-container-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  const containerName = 'sample-container';
 
   // create containers
   const containerClient = await createContainer(
@@ -45,12 +43,10 @@ async function main(blobServiceClient): Promise<void> {
     containerName
   );
 
-  // Do something with containerClient
-
-  // only 1 $root per storage account
+  // Only one $root container per storage account
   const containerRootName = '$root';
 
-  // create root container
+  // Create root container
   await createContainer(blobServiceClient, containerRootName);
 }
 main(blobServiceClient)
