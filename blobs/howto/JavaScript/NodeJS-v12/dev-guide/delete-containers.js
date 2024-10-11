@@ -1,13 +1,13 @@
 // delete-containers.js
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config()
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
-
-// soft delete may take up to 30 seconds
-const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // delete container immediately on blobServiceClient
 // <snippet_delete_container_immediately>
@@ -73,55 +73,36 @@ async function undeleteContainer(blobServiceClient, containerName) {
   );
 }
 // </snippet_undeleteContainer>
-async function createContainer(blobServiceClient, containerName) {
 
-  // public access at container level
-  const options = {
-    access: 'container'
-  };
+async function main() {
 
-  // creating client also creates container
-  const { containerClient, containerCreateResponse } = await blobServiceClient.createContainer(containerName, options);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  // list container properties
-  const containerProperties = await containerClient.getProperties();
-  console.log(`${containerName} lastModified: ${containerProperties.lastModified}`);
-  
-}
-
-async function main(blobServiceClient) {
-
-  let containers = [];
-
-  const timestamp = Date.now();
-  const containerName = `create-container-${timestamp}`;
-
-  // create containers with Promise.all
-  for (let i = 1; i < 9; i++) {
-    containers.push(createContainer(blobServiceClient, `${containerName}-${i}`));
-  }
-  await Promise.all(containers);
+  const containerName = 'sample-container';
 
   // delete 1 container immediately with BlobServiceClient
-  await deleteContainer(blobServiceClient, `${containerName}-1`);
-
-  // soft deletes take 30 seconds - waiting now so that undelete won't throw error
-  await sleep(30000);
+  await deleteContainer(blobServiceClient, containerName);
 
   // soft delete container with ContainerClient
-  const containerClient = blobServiceClient.getContainerClient(`${containerName}-2`);
-  await deleteContainerSoft(containerClient);
+  //const containerClient = blobServiceClient.getContainerClient('sample-container');
+  //await deleteContainerSoft(containerClient);
 
   // delete with prefix and not already deleted
-  await deleteContainersWithPrefix(blobServiceClient, `${containerName}`);
+  await deleteContainersWithPrefix(blobServiceClient, 'sample-');
+
+  // sleep for 30 seconds
+  await new Promise((resolve) => setTimeout(resolve, 30000));
+  
 
   // undelete container
-  await undeleteContainer(
-    blobServiceClient,
-    `${containerName}-1`
-  );
+  await undeleteContainer(blobServiceClient, 'sample-container');
 }
-main(blobServiceClient)
+
+main()
   .then(() => console.log('done'))
   .catch((ex) => console.log(`error: ${ex.message}`));
 
