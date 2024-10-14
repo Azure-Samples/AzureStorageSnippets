@@ -1,11 +1,13 @@
 // index.js
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config()
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // return up to 5000 containers
 // <snippet_listContainers>
@@ -19,7 +21,7 @@ async function listContainers(blobServiceClient, containerNamePrefix) {
   }
 
   console.log("Containers (by page):");
-  for await (const response of blobServiceClient.listContainers().byPage({
+  for await (const response of blobServiceClient.listContainers(options).byPage({
     maxPageSize: 20,
   })) {
     console.log("- Page:");
@@ -77,11 +79,17 @@ async function listContainersWithPagingMarker(blobServiceClient) {
 // </snippet_listContainersWithPagingMarker>
 
 // assumes containers are already in storage
-async function main(blobServiceClient) {
-  await listContainers(blobServiceClient);
+async function main() {
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
+
+  await listContainers(blobServiceClient, 'sample-');
   await listContainersWithPagingMarker(blobServiceClient);
 }
 
-main(client)
+main()
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));

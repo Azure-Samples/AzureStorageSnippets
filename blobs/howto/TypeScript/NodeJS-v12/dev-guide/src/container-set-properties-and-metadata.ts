@@ -37,10 +37,10 @@ async function setContainerMetadata(
   containerClient: ContainerClient,
 ) {
   try {
-    const metadata = {
+    const metadata: Metadata = {
       // values must be strings
-      lastFileReview: "currentDate",
-      reviewer: "reviewerName"
+      docType: "textDocuments",
+      docCategory: "testing"
     };
     await containerClient.setMetadata(metadata);
   }
@@ -51,26 +51,7 @@ async function setContainerMetadata(
 // </snippet_setContainerMetadata>
 
 async function main(blobServiceClient: BlobServiceClient) {
-  // create container
-  const timestamp = Date.now();
-  const containerName = `container-set-properties-and-metadata-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-
-  const containerOptions: ContainerCreateOptions = {
-    access: 'container'
-  };
-  const {
-    containerClient,
-    containerCreateResponse
-  }: {
-    containerClient: ContainerClient;
-    containerCreateResponse: ContainerCreateResponse;
-  } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  if (containerCreateResponse.errorCode)
-    throw Error(containerCreateResponse.errorCode);
-
-  console.log('container creation succeeded');
+  const containerClient: ContainerClient = blobServiceClient.getContainerClient('sample-container');
 
   await setContainerMetadata(containerClient);
 

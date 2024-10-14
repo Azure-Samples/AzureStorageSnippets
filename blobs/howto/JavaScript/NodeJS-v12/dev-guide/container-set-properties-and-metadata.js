@@ -1,10 +1,12 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config()
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // <snippet_getContainerProperties>
 async function getContainerProperties(containerClient) {
@@ -24,9 +26,8 @@ async function getContainerProperties(containerClient) {
 // <snippet_setContainerMetadata>
 async function setContainerMetadata(containerClient) {
   const metadata = {
-    // values must be strings
-    lastFileReview: "currentDate",
-    reviewer: "reviewerName"
+    docType: "textDocuments",
+    docCategory: "testing",
   };
   
   await containerClient.setMetadata(metadata);
@@ -34,19 +35,15 @@ async function setContainerMetadata(containerClient) {
 }
 // </snippet_setContainerMetadata>
 
-async function main(blobServiceClient) {
+async function main() {
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `container-set-properties-and-metadata-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  const containerOptions = {
-    access: 'container'
-  };
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  console.log('container creation succeeded');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   await setContainerMetadata(containerClient);
 
@@ -56,6 +53,6 @@ async function main(blobServiceClient) {
 
 }
 
-main(blobServiceClient)
+main()
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));

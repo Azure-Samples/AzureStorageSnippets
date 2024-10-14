@@ -73,88 +73,20 @@ async function undeleteBlob(
 }
 // </snippet_undeleteBlob>
 
-// containerName: string
-// blobName: string, includes file extension if provided
-// fileContentsAsString: blob content
-async function createBlobFromString(
-  client: ContainerClient,
-  blobName,
-  fileContentsAsString,
-  uploadOptions: BlockBlobUploadOptions
-): Promise<void> {
-  // Create blob client from container client
-  const blockBlobClient: BlockBlobClient = await client.getBlockBlobClient(
-    blobName
-  );
-
-  console.log(`uploading blob ${blobName}`);
-
-  // Upload string
-  const uploadResults = await blockBlobClient.upload(
-    fileContentsAsString,
-    fileContentsAsString.length,
-    uploadOptions
-  );
-
-  // do something with blob
-  // ...
-  if (!uploadResults.errorCode) {
-    console.log(`Success: ${uploadResults.date}`);
-  }
-}
-
 async function main(blobServiceClient: BlobServiceClient): Promise<void> {
-  const length = 2;
-  const blobs = new Array(length);
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `delete-blob-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-
-  const containerOptions: ContainerCreateOptions = {
-    access: 'container'
-  };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
-
-  console.log('container creation succeeded');
-
-  // create 10 blobs with Promise.all
-  for (let i = 0; i < length; i++) {
-    const tags: Tags = {
-      tag1: 'value1'
-    };
-
-    const uploadOptions: BlockBlobUploadOptions = {
-      metadata: {
-        blobNumber: i.toString()
-      },
-      tags,
-      tier: 'Cool'
-    };
-
-    const pCreate = createBlobFromString(
-      containerClient,
-      `${containerName}-${i}.txt`,
-      `Hello from a string ${i}`,
-      uploadOptions
-    );
-
-    blobs.push(pCreate);
-  }
-  await Promise.all(blobs);
+  const containerClient: ContainerClient = blobServiceClient.getContainerClient('sample-container');
 
   // delete blob
-  await deleteBlob(containerClient, `${containerName}-0.txt`);
+  await deleteBlob(containerClient, 'sample-blob.txt');
 
   // delete blob if it exists
-  await deleteBlobIfItExists(containerClient, `${containerName}-1.txt`);
+  //await deleteBlobIfItExists(containerClient, 'sample-blob.txt');
 
+  // sleep for 30 seconds to allow the blob to be deleted
+  await new Promise(resolve => setTimeout(resolve, 30000));
   // restore deleted blob
-  await undeleteBlob(containerClient, `${containerName}-1.txt`);
+  await undeleteBlob(containerClient, 'sample-blob.txt');
 }
 main(blobServiceClient)
   .then(() => console.log('success'))

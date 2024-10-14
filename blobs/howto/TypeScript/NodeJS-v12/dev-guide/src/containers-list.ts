@@ -90,10 +90,10 @@ async function listContainersWithPagingMarker(
 
 // assumes containers are already in storage
 async function main(blobServiceClient: BlobServiceClient) {
-  const containerNamePrefix = '';
+  const containerNamePrefix = 'sample-';
 
   await listContainers(blobServiceClient, containerNamePrefix);
-  await listContainersWithPagingMarker(blobServiceClient);
+  //await listContainersWithPagingMarker(blobServiceClient);
 }
 
 main(blobServiceClient)
