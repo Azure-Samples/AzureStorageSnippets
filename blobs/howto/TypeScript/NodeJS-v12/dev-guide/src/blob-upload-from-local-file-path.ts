@@ -31,7 +31,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('path/to/file', 'sample-blob.txt');
 
   // create 10 blobs with Promise.all
   for (let i = 0; i < 10; i++) {

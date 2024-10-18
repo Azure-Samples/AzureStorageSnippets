@@ -37,7 +37,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
 
   const containerClient = blobServiceClient.getContainerClient('sample-container');
   const blobName = 'sample-blob.txt';
-  const filePath = path.join('filePath', 'fileName.txt');
+  const filePath = path.join('path/to/file', 'fileName.txt');
   const writableStream = fs.createWriteStream(filePath, {
     encoding: 'utf-8',
     autoClose: true

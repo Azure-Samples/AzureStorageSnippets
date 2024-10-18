@@ -2,15 +2,12 @@ const fs = require('fs');
 const path = require('path');
 
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // <Snippet_UploadBlob>
 // containerClient: ContainerClient object
@@ -24,17 +21,22 @@ async function uploadBlobFromReadStream(containerClient, blobName, readableStrea
   await blockBlobClient.uploadStream(readableStream);
 }
 // </Snippet_UploadBlob>
-async function main(blobServiceClient) {
+async function main() {
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
+
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('path/to/file', 'sample-blob.txt');
 
   const readableStream = fs.createReadStream(localFilePath);
 
   await uploadBlobFromReadStream(containerClient, 'sample-blob.txt', readableStream);
 
 }
-main(client)
+main()
   .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));

@@ -49,7 +49,7 @@ async function downloadBlobToFile(
 async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
   const blobName = 'sample-blob.txt';
-  const filePath = path.join('filePath', 'fileName.txt');
+  const filePath = path.join('path/to/file', 'fileName.txt');
 
   // download blob to string
   await downloadBlobToFile(containerClient, blobName, filePath);

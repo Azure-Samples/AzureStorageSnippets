@@ -48,7 +48,7 @@ async function main(blobServiceClient): Promise<void> {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath: string = path.join('file-path', 'sample-blob.txt');
+  const localFilePath: string = path.join('path/to/file', 'sample-blob.txt');
 
   const readStream: fs.ReadStream = fs.createReadStream(localFilePath);
 

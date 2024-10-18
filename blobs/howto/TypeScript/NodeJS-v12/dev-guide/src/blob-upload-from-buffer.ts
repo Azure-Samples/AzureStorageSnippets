@@ -32,7 +32,7 @@ async function main(blobServiceClient: BlobServiceClient) {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath: string = path.join('file-path', 'sample-blob.txt');
+  const localFilePath: string = path.join('path/to/file', 'sample-blob.txt');
 
   // because no type is passed, open file as buffer
   const buffer: Buffer = await fs.readFile(localFilePath);

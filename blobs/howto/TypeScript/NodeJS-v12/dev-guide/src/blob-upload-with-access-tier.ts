@@ -35,7 +35,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('path/to/file', 'sample-blob.txt');
 
   uploadBlobWithAccessTier(containerClient, `sample-blob.txt`, localFilePath)
 }

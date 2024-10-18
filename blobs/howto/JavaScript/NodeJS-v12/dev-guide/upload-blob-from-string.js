@@ -1,12 +1,9 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // <Snippet_UploadBlob>
 // containerClient: ContainerClient object
@@ -20,11 +17,15 @@ async function uploadBlobFromString(containerClient, blobName, fileContentsAsStr
 }
 // </Snippet_UploadBlob>
 
-async function main(blobServiceClient) {
+async function main() {
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   uploadBlobFromString(containerClient, 'sample-blob.txt', 'Hello string!');
 }
-main(client)
+main()
 .then(() => console.log('done'))
 .catch((ex) => console.log(ex.message));
