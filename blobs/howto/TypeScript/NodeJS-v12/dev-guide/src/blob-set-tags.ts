@@ -1,11 +1,17 @@
 import {
-  BlobGetTagsResponse,
+  BlobServiceClient,
   BlockBlobClient,
+  BlobGetTagsResponse,
   Tags
 } from '@azure/storage-blob';
 
+// Get BlobServiceClient
+import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-client';
+const blobServiceClient: BlobServiceClient =
+  getBlobServiceClientFromDefaultAzureCredential();
+
 // <Snippet_getTags>
-export async function getBlobTags(
+async function getBlobTags(
   blockBlobClient: BlockBlobClient
 ): Promise<Tags> {
   const getTagsResponse: BlobGetTagsResponse = await blockBlobClient.getTags();
@@ -24,14 +30,39 @@ export async function getBlobTags(
 }
 // </Snippet_getTags>
 // <Snippet_setTags>
-export async function setBlobTags(
-  blockBlobClient: BlockBlobClient,
-  tags: Tags
+async function setBlobTags(
+  blockBlobClient: BlockBlobClient
 ): Promise<void> {
+  // Set tags
+  const tags: Tags = {
+    'Sealed': 'false',
+    'Content': 'image',
+    'Date': '2022-07-18',
+  };
+
   // Set tags
   const result = await blockBlobClient.setTags(tags);
   if (result.errorCode) throw Error(result.errorCode);
-
-  console.log(`tags set for ${blockBlobClient.name}`);
 }
 // </Snippet_setTags>
+
+async function main(blobServiceClient): Promise<void> {
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
+
+  // Create blob client
+  const blockBlobClient = containerClient.getBlockBlobClient('sample-blob.txt');
+
+  // Set tags
+  await setBlobTags(blockBlobClient);
+
+  // Get tags
+  await getBlobTags(blockBlobClient);
+}
+
+main(blobServiceClient)
+  .then(() => console.log('success'))
+  .catch((err: unknown) => {
+    if (err instanceof Error) {
+      console.log(err.message);
+    }
+  });

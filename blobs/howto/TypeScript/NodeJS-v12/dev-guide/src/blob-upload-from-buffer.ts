@@ -6,7 +6,6 @@ import {
 import * as dotenv from 'dotenv';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { getBlobTags } from './blob-set-tags';
 dotenv.config();
 
 // Get BlobServiceClient
