@@ -3,7 +3,7 @@ const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config();
 
 // TODO: Replace with your actual storage account name
-const accountName = 'storageaccounttestfns';
+const accountName = '<storage-account-name>';
 
 //<Snippet_UploadAccessTier>
 async function uploadWithAccessTier(containerClient, blobName) {
@@ -40,7 +40,7 @@ async function main() {
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
   // upload blob to specific access tier
-  await uploadWithAccessTier(containerClient, 'sample-blob3');
+  await uploadWithAccessTier(containerClient, 'sample-blob.txt');
 }
 main()
   .then(() => console.log('done'))
