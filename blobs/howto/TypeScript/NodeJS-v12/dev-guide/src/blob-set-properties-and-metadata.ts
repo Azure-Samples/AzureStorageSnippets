@@ -65,66 +65,13 @@ async function getProperties(
 }
 // </snippet_getProperties>
 
-// containerName: string
-// blobName: string, includes file extension if provided
-// fileContentsAsString: blob content
-async function createBlobFromString(
-  client,
-  blobName,
-  fileContentsAsString,
-  uploadOptions: BlockBlobUploadOptions | undefined
-): Promise<BlockBlobClient> {
-  // Create blob client from container client
-  const blockBlobClient = await client.getBlockBlobClient(blobName);
-
-  console.log(`uploading blob ${blobName}`);
-
-  // Upload string
-  const uploadResult = await blockBlobClient.upload(
-    fileContentsAsString,
-    fileContentsAsString.length,
-    uploadOptions
-  );
-
-  if (uploadResult.errorCode) throw Error(uploadResult.errorCode);
-
-  // do something with blob
-  // ...
-  return blockBlobClient;
-}
 async function main(blobServiceClient: BlobServiceClient): Promise<void> {
-  // create container
-  const timestamp = Date.now();
-  const containerName = `blob-set-properties-and-metadata-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
-  const containerOptions: ContainerCreateOptions = {
-    access: 'container'
-  };
-  const { containerClient, containerCreateResponse } =
-    await blobServiceClient.createContainer(containerName, containerOptions);
+  const blobClient = containerClient.getBlobClient('sample-blob.txt');
 
-  if (containerCreateResponse.errorCode)
-    throw Error(containerCreateResponse.errorCode);
-
-  console.log('container creation succeeded');
-
-  // create blob
-  const blob = {
-    name: `my-blob.txt`,
-    text: `Hello from a string`,
-  };
-
-  const options: BlockBlobUploadOptions | undefined = undefined;
-
-  const blobClient = await createBlobFromString(
-    containerClient,
-    blob.name,
-    blob.text,
-    options
-  );
-
-  await setBlobMetadata(blobClient, blob.metadata);
+  await setBlobMetadata(blobClient);
   await setHTTPHeaders(blobClient);
   await getProperties(blobClient);
 }

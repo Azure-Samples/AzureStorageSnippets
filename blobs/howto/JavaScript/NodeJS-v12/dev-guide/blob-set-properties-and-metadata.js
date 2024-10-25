@@ -1,10 +1,9 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config()
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // <snippet_setBlobMetadata>
 async function setBlobMetadata(blobClient, metadata) {
@@ -42,60 +41,30 @@ async function getProperties(blobClient) {
 
   const properties = await blobClient.getProperties();
   
-  console.log(`blobType: ${propertiesResponse.blobType}`);
-  console.log(`contentType: ${propertiesResponse.contentType}`);
-  console.log(`contentLength: ${propertiesResponse.contentLength}`);
-  console.log(`lastModified: ${propertiesResponse.lastModified}`);
+  console.log(`blobType: ${properties.blobType}`);
+  console.log(`contentType: ${properties.contentType}`);
+  console.log(`contentLength: ${properties.contentLength}`);
+  console.log(`lastModified: ${properties.lastModified}`);
 }
 // </snippet_getProperties>
 
-// containerName: string
-// blobName: string, includes file extension if provided
-// fileContentsAsString: blob content
-async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions) {
+async function main() {
 
-  // Create blob client from container client
-  const blockBlobClient = await client.getBlockBlobClient(blobName);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  console.log(`uploading blob ${blobName}`);
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
-  // Upload string
-  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
-
-  // do something with blob
-  // ...
-  return blockBlobClient;
-}
-async function main(blobServiceClient) {
-
-  // create container
-  const timestamp = Date.now();
-  const containerName = `blob-set-properties-and-metadata-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-
-  const containerOptions = {
-    access: 'container'
-  };
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  console.log('container creation succeeded');
-
-  // create blob 
-  const blob = {
-    name: `my-blob.txt`,
-    text: `Hello from a string`,
-  }
-
-  const blobClient = await createBlobFromString(containerClient, blob.name, blob.text);
+  const blobClient = containerClient.getBlobClient('sample-blob.txt');
 
   await setBlobMetadata(blobClient);
   await setHTTPHeaders(blobClient);
   await getProperties(blobClient);
-
-
 }
 
-
-main(blobServiceClient)
+main()
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));
