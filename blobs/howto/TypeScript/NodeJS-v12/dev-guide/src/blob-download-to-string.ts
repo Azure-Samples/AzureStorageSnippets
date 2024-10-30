@@ -2,10 +2,7 @@ import {
   BlobClient,
   BlobDownloadResponseParsed,
   BlobServiceClient,
-  BlockBlobUploadOptions,
-  ContainerClient,
-  ContainerCreateOptions,
-  Tags
+  ContainerClient
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -15,28 +12,10 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-async function createBlobFromString(
-  client: ContainerClient,
-  blobName,
-  fileContentsAsString,
-  options: BlockBlobUploadOptions
-): Promise<void> {
-  const blockBlobClient = await client.getBlockBlobClient(blobName);
-
-  const uploadResult = await blockBlobClient.upload(
-    fileContentsAsString,
-    fileContentsAsString.length,
-    options
-  );
-  if (!uploadResult.errorCode) {
-    console.log(`created blob ${blobName} ${uploadResult.date}`);
-  }
-}
-
 // <snippet_downloadBlobToString>
 async function downloadBlobToString(
   containerClient: ContainerClient,
-  blobName
+  blobName: string
 ): Promise<void> {
   const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
 
@@ -52,6 +31,7 @@ async function downloadBlobToString(
     }
   }
 }
+
 async function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -69,34 +49,8 @@ async function streamToBuffer(readableStream) {
 // </snippet_downloadBlobToString>
 
 async function main(blobServiceClient: BlobServiceClient): Promise<void> {
-  // create container
-  const timestamp = Date.now();
-  const containerName = `download-blob-to-string-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-  const containerOptions: ContainerCreateOptions = {
-    access: 'container'
-  };
-  const { containerClient } = await blobServiceClient.createContainer(
-    containerName,
-    containerOptions
-  );
-
-  console.log('container creation success');
-
-  // create blob
-  const blobTags: Tags = {
-    createdBy: 'YOUR-NAME',
-    createdWith: `StorageSnippetsForDocs-${timestamp}`,
-    createdOn: new Date().toDateString()
-  };
-
-  const blobName = `${containerName}-from-string.txt`;
-  const blobContent = `Hello from a string`;
-
-  // create blob from string
-  await createBlobFromString(containerClient, blobName, blobContent, {
-    tags: blobTags
-  });
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
+  const blobName = 'sample-blob.txt';
 
   // download blob to string
   await downloadBlobToString(containerClient, blobName);

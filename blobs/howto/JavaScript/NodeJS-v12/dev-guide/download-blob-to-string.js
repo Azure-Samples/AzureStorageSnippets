@@ -1,21 +1,14 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
-
-async function createBlobFromString(client, blobName, fileContentsAsString) {
-
-    const blockBlobClient = await client.getBlockBlobClient(blobName);
-
-    await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length);
-    console.log(`created blob ${blobName}`);
-}
-
+// <snippet_downloadBlobToString>
 async function downloadBlobToString(containerClient, blobName) {
 
     const blobClient = await containerClient.getBlobClient(blobName);
@@ -38,37 +31,21 @@ async function streamToBuffer(readableStream) {
         readableStream.on('error', reject);
     });
 }
+// </snippet_downloadBlobToString>
 
-async function main(blobServiceClient) {
+async function main() {
 
-    // create container
-    const timestamp = Date.now();
-    const containerName = `download-blob-to-string-${timestamp}`;
-    console.log(`creating container ${containerName}`);
-    const containerOptions = {
-        access: 'container'
-    }; 
-    const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-    console.log('container creation success');
-
-    // create blob
-    const blobTags = {
-        createdBy: 'YOUR-NAME',
-        createdWith: `StorageSnippetsForDocs-${timestamp}`,
-        createdOn: (new Date()).toDateString()
-    }
-
-    const blobName = `${containerName}-from-string.txt`;
-    const blobContent = `Hello from a string`;
-
-    // create blob from string
-    await createBlobFromString(containerClient, blobName, blobContent, blobTags);
+    const blobServiceClient = new BlobServiceClient(
+        `https://${accountName}.blob.core.windows.net`,
+        new DefaultAzureCredential()
+    );
+    const containerClient = blobServiceClient.getContainerClient('sample-container');
+    const blobName = 'sample-blob.txt';
 
     // download blob to string
     await downloadBlobToString(containerClient, blobName)
 
 }
-main(client)
+main()
     .then(() => console.log('done'))
     .catch((ex) => console.log(ex.message));

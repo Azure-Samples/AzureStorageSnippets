@@ -1,48 +1,42 @@
 // create-container.js
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
-
+// <snippet_create_container>
 async function createContainer(blobServiceClient, containerName){
-
-  // public access at container level
-  const options = {
-    access: 'container'
-  };
-
-  // creating client also creates container
-  const containerClient = await blobServiceClient.createContainer(containerName, options);
-  console.log(`container ${containerName} created`);
-
-  // do something with container
-  // ...
+  const containerClient = await blobServiceClient.createContainer(containerName);
 
   return containerClient;
 }
+// </snippet_create_container>
 
-async function main(blobServiceClient){
+async function main(){
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `create-container-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  // create containers
+  const containerName = 'sample-container';
+
+  // Create container
   await createContainer(blobServiceClient, containerName);
 
-  // only 1 $root per blob storage resource
+  // Only one $root container per storage account
   const containerRootName = '$root';
 
-  // create root container
+  // Create root container
   await createContainer(blobServiceClient, containerRootName);
 
 }
-main(client)
+main()
 .then(() => console.log('done'))
 .catch((ex) => console.log(ex.message));

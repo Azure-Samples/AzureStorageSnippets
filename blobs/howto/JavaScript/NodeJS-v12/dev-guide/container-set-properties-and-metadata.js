@@ -1,66 +1,51 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config()
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(connString);
-
+// <snippet_getContainerProperties>
 async function getContainerProperties(containerClient) {
+  try {
+    const containerProperties = await containerClient.getProperties();
 
-  const properties = await containerClient.getProperties();
-  console.log(containerClient.containerName + ' properties: ');
-
-  for (const property in properties) {
-
-    switch (property) {
-      // nested properties are stringified
-      case 'metadata':
-      //case 'objectReplicationRules':
-        console.log(`    ${property}: ${JSON.stringify(properties[property])}`);
-        break;
-      default:
-        console.log(`    ${property}: ${properties[property]}`);
-        break;
-    }
+    console.log(`Public access type: ${containerProperties.blobPublicAccess}`);
+    console.log(`Lease status: ${containerProperties.leaseStatus}`);
+    console.log(`Lease state: ${containerProperties.leaseState}`);
+    console.log(`Has immutability policy: ${containerProperties.hasImmutabilityPolicy}`);
+  } catch (err) {
+    // Handle the error
   }
 }
+// </snippet_getContainerProperties>
 
-/*
-const metadata = {
-  // values must be strings
-  lastFileReview: currentDate.toString(),
-  reviewer: `johnh`
-}
-*/
-async function setContainerMetadata(containerClient, metadata) {
-
+// <snippet_setContainerMetadata>
+async function setContainerMetadata(containerClient) {
+  const metadata = {
+    docType: "textDocuments",
+    docCategory: "testing",
+  };
+  
   await containerClient.setMetadata(metadata);
 
 }
-async function main(blobServiceClient) {
+// </snippet_setContainerMetadata>
 
-  // create container
-  const timestamp = Date.now();
-  const containerName = `container-set-properties-and-metadata-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+async function main() {
 
-  const containerOptions = {
-    access: 'container'
-  };
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  console.log('container creation succeeded');
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
-  const currentDate = new Date().toLocaleDateString();
-
-  const containerMetadata = {
-    // values must be strings
-    lastFileReview: currentDate,
-    reviewer: `johnh`
-  }
-
-  await setContainerMetadata(containerClient, containerMetadata);
+  await setContainerMetadata(containerClient);
 
   // properties including metadata
   await getContainerProperties(containerClient);
@@ -68,7 +53,6 @@ async function main(blobServiceClient) {
 
 }
 
-
-main(blobServiceClient)
+main()
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));

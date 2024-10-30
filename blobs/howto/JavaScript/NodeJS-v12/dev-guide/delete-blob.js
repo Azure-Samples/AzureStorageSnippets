@@ -1,29 +1,29 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error("Azure Storage Connection string not found");
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
-
+// <snippet_deleteBlob>
 async function deleteBlob(containerClient, blobName){
 
-  // include: Delete the base blob and all of its snapshots.
-  // only: Delete only the blob's snapshots and not the blob itself.
+  // include: Delete the base blob and all of its snapshots
+  // only: Delete only the blob's snapshots and not the blob itself
   const options = {
-    deleteSnapshots: 'include' // or 'only'
+    deleteSnapshots: 'include'
   }
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.delete(options);
-
-  console.log(`deleted blob ${blobName}`);
-
 }
+// </snippet_deleteBlob>
+
 async function deleteBlobIfItExists(containerClient, blobName){
 
   // include: Delete the base blob and all of its snapshots.
@@ -40,65 +40,35 @@ async function deleteBlobIfItExists(containerClient, blobName){
   console.log(`deleted blob ${blobName}`);
 
 }
+
+// <snippet_undeleteBlob>
 async function undeleteBlob(containerClient, blobName){
 
   // Create blob client from container client
   const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.undelete();
-
-  console.log(`undeleted blob ${blobName}`);
-
 }
+// </snippet_undeleteBlob>
 
-// containerName: string
-// blobName: string, includes file extension if provided
-// fileContentsAsString: blob content
-async function createBlobFromString(client, blobName, fileContentsAsString, uploadOptions){
+async function main(){
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  // Create blob client from container client
-  const blockBlobClient = await client.getBlockBlobClient(blobName);
-
-  console.log(`uploading blob ${blobName}`);
-
-  // Upload string
-  await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);
-
-  // do something with blob
-  // ...
-}
-
-async function main(blobServiceClient){
- 
-    let blobs=[];
-
-  // create container
-  const timestamp = Date.now();
-  const containerName = `delete-string-${timestamp}`;
-  console.log(`creating container ${containerName}`);
-
-  const containerOptions = {
-    access: 'container'
-  };  
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-
-  console.log("container creation succeeded");
-
-  // create 10 blobs with Promise.all
-  for (let i=0; i<2; i++){
-    blobs.push(createBlobFromString(containerClient, `${containerName}-${i}.txt`, `Hello from a string ${i}`));
-  }
-  await Promise.all(blobs);
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // delete blob 
-  await deleteBlob(containerClient, `${containerName}-0.txt`);
+  await deleteBlob(containerClient, 'sample-blob.txt');
 
   // delete blob if it exists
-  await deleteBlobIfItExists(containerClient, `${containerName}-1.txt`);
+  //await deleteBlobIfItExists(containerClient, 'sample-blob.txt');
 
   // restore deleted blob
-  await undeleteBlob(containerClient, `${containerName}-1.txt`);
+  await undeleteBlob(containerClient, 'sample-blob.txt');
 }
-main(client)
+main()
 .then(() => console.log("done"))
 .catch((ex) => console.log(ex.message));

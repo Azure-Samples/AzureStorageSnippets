@@ -7,7 +7,6 @@ import {
   Tags
 } from '@azure/storage-blob';
 import * as dotenv from 'dotenv';
-import { getBlobTags } from './blob-set-tags';
 dotenv.config();
 
 // Get BlobServiceClient
@@ -77,9 +76,6 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const blockBlobClient: BlockBlobClient = await uploadWithAccessTier(
     containerClient
   );
-
-  // do something with blob
-  const tags: Tags = await getBlobTags(blockBlobClient);
 }
 main(blobServiceClient)
   .then(() => console.log('success'))

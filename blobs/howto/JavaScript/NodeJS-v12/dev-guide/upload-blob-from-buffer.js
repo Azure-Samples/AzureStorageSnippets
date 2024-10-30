@@ -2,14 +2,11 @@
 const path = require('path');
 const fs = require('fs').promises;
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = 'storage-account-name';
 
 // <Snippet_UploadBlob>
 // containerClient: ContainerClient object
@@ -25,26 +22,22 @@ async function uploadBlobFromBuffer(containerClient, blobName, buffer) {
 }
 // </Snippet_UploadBlob>
 
-async function main(blobServiceClient) {
+async function main() {
 
-  let blobs = [];
-
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('path/to/file', 'sample-blob.txt');
 
   // because no type is passed, open file as buffer
   const buffer = await fs.readFile(localFilePath);
 
-  // create blobs with Promise.all
-  // include the file extension
-  for (let i = 0; i < 10; i++) {
-    blobs.push(uploadBlobFromBuffer(containerClient, `sample-${i}.jpg`, buffer));
-  }
-  await Promise.all(blobs);
-
+ uploadBlobFromBuffer(containerClient, `sample-blob.txt`, buffer);
 }
-main(client)
+main()
   .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));

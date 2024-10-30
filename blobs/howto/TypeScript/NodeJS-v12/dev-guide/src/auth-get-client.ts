@@ -40,7 +40,7 @@ export function getBlobServiceClientFromDefaultAzureCredential(): BlobServiceCli
   // Connect without secrets to Azure
   // Learn more: https://www.npmjs.com/package/@azure/identity#DefaultAzureCredential
 
-  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME as string;
+  const accountName = '<storage-account-name>';
   if (!accountName) throw Error('Azure Storage accountName not found');
 
   const client: BlobServiceClient = new BlobServiceClient(

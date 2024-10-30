@@ -1,33 +1,19 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 //<Snippet_UploadAccessTier>
-async function uploadWithAccessTier(containerClient) {
-
-  // Create blob
-  const timestamp = Date.now();
-  const blobName = `myblob-${timestamp}`;
-  console.log(`creating blob ${blobName}`);
+async function uploadWithAccessTier(containerClient, blobName) {
 
   const fileContentsAsString = `Hello from a string`
 
   // upload blob to `Cool` access tier
   const uploadOptions = {
-
-    // access tier setting
-    // 'Hot', 'Cool', or 'Archive'
+    // 'Hot', 'Cool', 'Cold', or 'Archive'
     tier: 'Cool',
-
-    // other properties
-    metadata: undefined,
-    tags: undefined,
   }
 
   // Create blob client from container client
@@ -41,28 +27,21 @@ async function uploadWithAccessTier(containerClient) {
 }
 //</Snippet_UploadAccessTier>
 
-async function main(blobServiceClient) {
+async function main() {
 
-  // create container name
-  const timestamp = Date.now();
-  const containerName = `createblobfromstring-${timestamp}`;
-  console.log(`creating container ${containerName}`);
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
 
-  // create container
-  const containerOptions = {
-    access: 'container', // or 'blob'
-  };
-  const { containerClient } = await blobServiceClient.createContainer(containerName, containerOptions);
-  console.log('container creation succeeded');
+  // Create container client
+  const containerName = 'sample-container';
+  const containerClient = blobServiceClient.getContainerClient(containerName);
 
   // upload blob to specific access tier
-  const blockBlobClient = await uploadWithAccessTier(containerClient);
-
-  // do something with blob
-  const getTagsResponse = await blockBlobClient.getTags();
-  console.log(`tags for ${blobName} = ${JSON.stringify(getTagsResponse.tags)}`);
-
+  await uploadWithAccessTier(containerClient, 'sample-blob.txt');
 }
-main(client)
+main()
   .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));

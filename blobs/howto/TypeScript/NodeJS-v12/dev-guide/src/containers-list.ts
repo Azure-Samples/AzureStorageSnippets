@@ -25,20 +25,16 @@ async function listContainers(
     prefix: containerNamePrefix
   };
 
-  for await (const containerItem of blobServiceClient.listContainers(options)) {
-    // ContainerItem
-    console.log(`For-await list: ${containerItem.name}`);
-
-    // ContainerClient
-    const containerClient: ContainerClient =
-      blobServiceClient.getContainerClient(containerItem.name);
-
-    // ... do something with container
-    // containerClient.listBlobsFlat({    includeMetadata: true,
-    // includeSnapshots: false,
-    // includeTags: true,
-    // includeVersions: false,
-    // prefix: ''});
+  console.log("Containers (by page):");
+  for await (const response of blobServiceClient.listContainers().byPage({
+    maxPageSize: 20,
+  })) {
+    console.log("- Page:");
+    if (response.containerItems) {
+      for (const container of response.containerItems) {
+        console.log(`  - ${container.name}`);
+      }
+    }
   }
 }
 // </snippet_listContainers>
@@ -94,10 +90,10 @@ async function listContainersWithPagingMarker(
 
 // assumes containers are already in storage
 async function main(blobServiceClient: BlobServiceClient) {
-  const containerNamePrefix = '';
+  const containerNamePrefix = 'sample-';
 
   await listContainers(blobServiceClient, containerNamePrefix);
-  await listContainersWithPagingMarker(blobServiceClient);
+  //await listContainersWithPagingMarker(blobServiceClient);
 }
 
 main(blobServiceClient)

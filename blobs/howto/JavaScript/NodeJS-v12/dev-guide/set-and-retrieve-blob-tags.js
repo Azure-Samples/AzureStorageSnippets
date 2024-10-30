@@ -1,12 +1,38 @@
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// <Snippet_setTags>
+async function setBlobTags(containerClient, blobName) {
+  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+
+  const tags = {
+    'Sealed': 'false',
+    'Content': 'image',
+    'Date': '2022-07-18',
+  }
+
+  // Set tags
+  await blockBlobClient.setTags(tags);
+}
+// </Snippet_setTags>
+
+// <Snippet_getTags>
+async function getBlobTags(containerClient, blobName) {
+  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+
+  // Get tags
+  const result = await blockBlobClient.getTags();
+
+  for (const tag in result.tags) {
+
+      console.log(`TAG: ${tag}: ${result.tags[tag]}`);
+  }
+}
+// </Snippet_getTags>
 
 // Sets tags on the underlying blob. A blob can have up to 10 tags. 
 // Tag keys must be between 1 and 128 characters. Tag values must 
@@ -44,6 +70,7 @@ async function getTags(containerClient, blobName) {
   }
 }
 
+// <Snippet_findBlobsByQuery>
 async function findBlobsByQuery(blobServiceClient, tagOdataQuery) {
 
   // page size
@@ -88,6 +115,7 @@ async function findBlobsByQuery(blobServiceClient, tagOdataQuery) {
     }
   }
 }
+// </Snippet_findBlobsByQuery>
 
 // containerName: string
 // blobName: string, includes file extension if provided
@@ -106,7 +134,23 @@ async function createBlobFromString(client, blobName, fileContentsAsString, uplo
   // ...
 }
 
-async function main(blobServiceClient) {
+async function main() {
+
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
+  // const containerClient = blobServiceClient.getContainerClient('sample-container');
+
+  // // set tags
+  // const blobName = 'sample-blob.txt';
+  // await setBlobTags(containerClient, blobName);
+
+  // // get tags
+  // await getBlobTags(containerClient, blobName);
+
+
+
 
   // create container
   const timestamp = Date.now();
@@ -198,6 +242,6 @@ async function main(blobServiceClient) {
   await findBlobsByQuery(blobServiceClient, odataTagQuery4);  
 
 }
-main(client)
+main()
   .then(() => console.log('done'))
   .catch((ex) => console.log(ex.message));

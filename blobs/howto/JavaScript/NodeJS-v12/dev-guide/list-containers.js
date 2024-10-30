@@ -1,13 +1,16 @@
 // index.js
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+// Azure authentication for credential dependency
+const { DefaultAzureCredential } = require('@azure/identity');
+
 require('dotenv').config()
 
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // return up to 5000 containers
+// <snippet_listContainers>
 async function listContainers(blobServiceClient, containerNamePrefix) {
 
   const options = {
@@ -17,26 +20,28 @@ async function listContainers(blobServiceClient, containerNamePrefix) {
     prefix: containerNamePrefix
   }
 
-  for await (const containerItem of blobServiceClient.listContainers(options)) {
-
-    // ContainerItem
-    console.log(`For-await list: ${containerItem.name}`);
-
-    // ContainerClient
-    const containerClient = blobServiceClient.getContainerClient(containerItem.name);
-
-    // ... do something with container 
+  console.log("Containers (by page):");
+  for await (const response of blobServiceClient.listContainers(options).byPage({
+    maxPageSize: 20,
+  })) {
+    console.log("- Page:");
+    if (response.containerItems) {
+      for (const container of response.containerItems) {
+        console.log(`  - ${container.name}`);
+      }
+    }
   }
 }
+// </snippet_listContainers>
 
-
+// <snippet_listContainersWithPagingMarker>
 async function listContainersWithPagingMarker(blobServiceClient) {
 
-  // add prefix to filter list
+  // Specify a prefix to filter list
   const containerNamePrefix = '';
 
-  // page size
-  const maxPageSize = 2;
+  // Specify the maximum number of containers to return per paged request
+  const maxPageSize = 20;
 
   const options = {
     includeDeleted: false,
@@ -71,13 +76,20 @@ async function listContainersWithPagingMarker(blobServiceClient) {
     }
   }
 }
+// </snippet_listContainersWithPagingMarker>
 
 // assumes containers are already in storage
-async function main(blobServiceClient) {
-  await listContainers(blobServiceClient);
+async function main() {
+  // Create service client from DefaultAzureCredential
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
+
+  await listContainers(blobServiceClient, 'sample-');
   await listContainersWithPagingMarker(blobServiceClient);
 }
 
-main(client)
+main()
   .then(() => console.log(`done`))
   .catch((ex) => console.log(ex.message));

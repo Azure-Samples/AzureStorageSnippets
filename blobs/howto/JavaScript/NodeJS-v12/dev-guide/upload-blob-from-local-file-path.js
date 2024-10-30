@@ -1,14 +1,11 @@
 
 const path = require('path');
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { DefaultAzureCredential } = require('@azure/identity');
 require('dotenv').config();
 
-// Connection string
-const connString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-if (!connString) throw Error('Azure Storage Connection string not found');
-
-// Client
-const client = BlobServiceClient.fromConnectionString(connString);
+// TODO: Replace with your actual storage account name
+const accountName = '<storage-account-name>';
 
 // <Snippet_UploadBlob>
 // containerClient: ContainerClient object
@@ -22,22 +19,19 @@ async function uploadBlobFromLocalPath(containerClient, blobName, localFilePath)
 }
 // </Snippet_UploadBlob>
 
-async function main(blobServiceClient){
- 
-  let blobs=[];
+async function main(){
 
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    new DefaultAzureCredential()
+  );
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('path/to/file', 'sample-blob.txt');
 
-  // Create 10 blobs with Promise.all
-  for (let i=0; i<10; i++){
-    blobs.push(uploadBlobFromLocalPath(containerClient, `sample-${i}.txt`, localFilePath));
-  }
-  await Promise.all(blobs);
-
+  uploadBlobFromLocalPath(containerClient, `sample-blob.txt`, localFilePath);
 }
-main(client)
+main()
 .then(() => console.log('done'))
 .catch((ex) => console.log(ex.message));

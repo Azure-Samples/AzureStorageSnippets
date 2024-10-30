@@ -18,27 +18,11 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-async function createBlobFromString(
-  containerClient: ContainerClient,
-  blobName,
-  fileContentsAsString,
-  options: BlockBlobUploadOptions
-) {
-  const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
-
-  await blockBlobClient.upload(
-    fileContentsAsString,
-    fileContentsAsString.length,
-    options
-  );
-  console.log(`created blob ${blobName}`);
-}
 // <snippet_downloadBlobAsStream>
 async function downloadBlobAsStream(
   containerClient: ContainerClient,
-  blobName,
-  writableStream
+  blobName: string,
+  writableStream: fs.WriteStream
 ) {
   const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
 
@@ -46,45 +30,17 @@ async function downloadBlobAsStream(
 
   if (!downloadResponse.errorCode && downloadResponse?.readableStreamBody) {
     downloadResponse.readableStreamBody.pipe(writableStream);
-    console.log(`download of ${blobName} succeeded`);
   }
 }
 // </snippet_downloadBlobAsStream>
 async function main(blobServiceClient: BlobServiceClient): Promise<void> {
-  // create container
-  const timestamp = Date.now();
-  const containerName = `download-blob-to-string-${timestamp}`;
-  console.log(`creating container ${containerName}`);
 
-  const containerOptions: ContainerCreateOptions = {
-    access: 'container'
-  };
-  const { containerClient, containerCreateResponse } =
-    await blobServiceClient.createContainer(containerName, containerOptions);
-
-  if (containerCreateResponse.errorCode)
-    throw Error(containerCreateResponse.errorCode);
-
-  console.log('container creation success');
-
-  // create blob
-  const blobTags: Tags = {
-    createdBy: 'YOUR-NAME',
-    createdWith: `StorageSnippetsForDocs-${timestamp}`,
-    createdOn: new Date().toDateString()
-  };
-
-  const blobName = `${containerName}-from-string.txt`;
-  const blobContent = `Hello from a string`;
-  const localFileNameWithPath = path.join(__dirname, blobName);
-  const writableStream = fs.createWriteStream(localFileNameWithPath, {
+  const containerClient = blobServiceClient.getContainerClient('sample-container');
+  const blobName = 'sample-blob.txt';
+  const filePath = path.join('path/to/file', 'fileName.txt');
+  const writableStream = fs.createWriteStream(filePath, {
     encoding: 'utf-8',
     autoClose: true
-  });
-
-  // create blob from string
-  await createBlobFromString(containerClient, blobName, blobContent, {
-    tags: blobTags
   });
 
   // download blob to string

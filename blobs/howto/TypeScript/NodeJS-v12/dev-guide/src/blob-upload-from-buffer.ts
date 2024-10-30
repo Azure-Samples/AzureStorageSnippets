@@ -6,7 +6,6 @@ import {
 import * as dotenv from 'dotenv';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { getBlobTags } from './blob-set-tags';
 dotenv.config();
 
 // Get BlobServiceClient
@@ -32,7 +31,7 @@ async function main(blobServiceClient: BlobServiceClient) {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath: string = path.join('file-path', 'sample-blob.txt');
+  const localFilePath: string = path.join('path/to/file', 'sample-blob.txt');
 
   // because no type is passed, open file as buffer
   const buffer: Buffer = await fs.readFile(localFilePath);

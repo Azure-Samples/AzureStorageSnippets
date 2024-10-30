@@ -24,7 +24,7 @@ async function uploadBlobWithIndexTags(
     tags: {
       'Sealed': 'false',
       'Content': 'image',
-      'Date': '2023-06-01',
+      'Date': '2022-07-18',
     }
   };
 
@@ -39,7 +39,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
   const containerClient = blobServiceClient.getContainerClient('sample-container');
 
   // Get fully qualified path of file
-  const localFilePath = path.join('file-path', 'sample-blob.txt');
+  const localFilePath = path.join('path/to/file', 'sample-blob.txt');
 
   uploadBlobWithIndexTags(containerClient, `sample-blob.txt`, localFilePath)
 }
