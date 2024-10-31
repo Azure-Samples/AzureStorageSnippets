@@ -11,6 +11,7 @@ const accountName = '<storage-account-name>';
 // blobName: string, includes file extension if provided
 // localFilePath: fully qualified path and file name
 async function uploadWithTransferOptions(containerClient, blobName, localFilePath) {
+  
   // Specify data transfer options
   const uploadOptions = {
     blockSize: 4 * 1024 * 1024, // 4 MiB max block size

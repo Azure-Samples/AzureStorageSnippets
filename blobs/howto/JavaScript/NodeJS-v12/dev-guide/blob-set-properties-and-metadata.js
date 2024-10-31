@@ -7,6 +7,7 @@ const accountName = '<storage-account-name>';
 
 // <snippet_setBlobMetadata>
 async function setBlobMetadata(blobClient, metadata) {
+  
   metadata = {
     docType: 'text',
     category: 'reference'
@@ -18,6 +19,7 @@ async function setBlobMetadata(blobClient, metadata) {
 
 // <snippet_setHTTPHeaders>
 async function setHTTPHeaders(blobClient, headers) {
+  
   // Get existing properties
   const properties = await blobClient.getProperties();
 

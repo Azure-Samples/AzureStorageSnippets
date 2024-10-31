@@ -10,6 +10,7 @@ const accountName = '<storage-account-name>';
 
 // <snippet_getContainerProperties>
 async function getContainerProperties(containerClient) {
+  
   try {
     const containerProperties = await containerClient.getProperties();
 
@@ -25,6 +26,7 @@ async function getContainerProperties(containerClient) {
 
 // <snippet_setContainerMetadata>
 async function setContainerMetadata(containerClient) {
+  
   const metadata = {
     docType: "textDocuments",
     docCategory: "testing",

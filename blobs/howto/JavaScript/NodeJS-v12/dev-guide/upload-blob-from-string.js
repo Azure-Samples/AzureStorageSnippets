@@ -10,6 +10,7 @@ const accountName = '<storage-account-name>';
 // blobName: string, includes file extension if provided
 // fileContentsAsString: blob content
 async function uploadBlobFromString(containerClient, blobName, fileContentsAsString){
+  
   // Create blob client from container client
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 

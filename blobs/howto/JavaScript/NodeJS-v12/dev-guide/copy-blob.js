@@ -49,6 +49,7 @@ async function main() {
 
 // <Snippet_copy_from_azure_async>
 async function copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobServiceClient) {
+  
   // Lease the source blob to prevent changes during the copy operation
   const sourceBlobLease = new BlobLeaseClient(sourceBlob);
 
@@ -71,6 +72,7 @@ async function copyAcrossStorageAccountsAsync(sourceBlob, destinationBlob, blobS
 }
 
 async function generateUserDelegationSAS(sourceBlob, blobServiceClient) {
+  
   // Get a user delegation key for the Blob service that's valid for 1 hour, as an example
   const delegationKeyStart = new Date();
   const delegationKeyExpiry = new Date(Date.now() + 3600000);
@@ -105,6 +107,7 @@ async function generateUserDelegationSAS(sourceBlob, blobServiceClient) {
 
 // <Snippet_copy_blob_external_source_async>
 async function copyFromExternalSource(sourceURL, destinationBlob) {
+  
   const copyPoller = await destinationBlob.beginCopyFromURL(sourceURL);
   await copyPoller.pollUntilDone();
 }
@@ -112,6 +115,7 @@ async function copyFromExternalSource(sourceURL, destinationBlob) {
 
 // <Snippet_check_copy_status_async>
 async function checkCopyStatus(destinationBlob) {
+  
   const properties = await destinationBlob.getProperties();
   console.log(properties.copyStatus);
 }
@@ -119,6 +123,7 @@ async function checkCopyStatus(destinationBlob) {
 
 // <Snippet_abort_copy_async>
 async function abortCopy(destinationBlob) {
+  
   const properties = await destinationBlob.getProperties();
 
   // Check the copy status and abort if pending

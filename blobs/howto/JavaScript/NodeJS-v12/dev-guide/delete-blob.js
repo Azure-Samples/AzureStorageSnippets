@@ -18,7 +18,7 @@ async function deleteBlob(containerClient, blobName){
   }
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.delete(options);
 }
@@ -33,7 +33,7 @@ async function deleteBlobIfItExists(containerClient, blobName){
   }
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.deleteIfExists(options);
 
@@ -45,7 +45,7 @@ async function deleteBlobIfItExists(containerClient, blobName){
 async function undeleteBlob(containerClient, blobName){
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.undelete();
 }

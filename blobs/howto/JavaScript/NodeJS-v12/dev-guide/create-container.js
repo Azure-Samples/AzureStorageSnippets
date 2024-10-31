@@ -11,6 +11,7 @@ const accountName = '<storage-account-name>';
 
 // <snippet_create_container>
 async function createContainer(blobServiceClient, containerName){
+  
   const containerClient = await blobServiceClient.createContainer(containerName);
 
   return containerClient;

@@ -11,7 +11,7 @@ const accountName = '<storage-account-name>';
 // <snippet_downloadBlobToString>
 async function downloadBlobToString(containerClient, blobName) {
 
-    const blobClient = await containerClient.getBlobClient(blobName);
+    const blobClient = containerClient.getBlobClient(blobName);
 
     const downloadResponse = await blobClient.download();
 
@@ -19,7 +19,7 @@ async function downloadBlobToString(containerClient, blobName) {
     console.log('Downloaded blob content:', downloaded.toString());
 }
 
-async function streamToBuffer(readableStream) {
+function streamToBuffer(readableStream) {
     return new Promise((resolve, reject) => {
         const chunks = [];
         readableStream.on('data', (data) => {
@@ -40,7 +40,7 @@ async function main() {
         new DefaultAzureCredential()
     );
     const containerClient = blobServiceClient.getContainerClient('sample-container');
-    const blobName = 'sample-blob.txt';
+    const blobName = 'sample-blob';
 
     // download blob to string
     await downloadBlobToString(containerClient, blobName)

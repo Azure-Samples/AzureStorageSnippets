@@ -30,10 +30,10 @@ const containerClient = new ContainerClient(
 async function copyBlobWithDifferentAccessTier(containerClient) {
 
   // create blob clients
-  const sourceBlobClient = await containerClient.getBlobClient(originalBlob);
-  const destinationBlobClient = await containerClient.getBlobClient(copyBlob);
+  const sourceBlobClient = containerClient.getBlobClient(originalBlob);
+  const destinationBlobClient = containerClient.getBlobClient(copyBlob);
 
-  // start copy, access tiers include `Hot`, `Cool`, `Archive`
+  // start copy, access tiers include `Hot`, `Cool`, `Cold`, `Archive`
   const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url, { tier: 'Hot' });
   console.log('start copy from original to copy');
 

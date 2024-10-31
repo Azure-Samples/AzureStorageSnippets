@@ -19,8 +19,10 @@ async function uploadBlobWithAccessTier(
   blobName: string,
   localFilePath: string
 ): Promise<void> {
+
   // Upload blob to 'Cool' access tier
   const uploadOptions: BlockBlobParallelUploadOptions = {
+    // 'Hot', 'Cool', 'Cold', or 'Archive'
     tier: 'Cool'
   };
 

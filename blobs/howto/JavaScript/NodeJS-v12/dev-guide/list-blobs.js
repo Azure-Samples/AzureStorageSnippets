@@ -8,6 +8,7 @@ const accountName = '<storage-account-name>';
 
 // <snippet_listBlobsFlatWithPageMarker>
 async function listBlobsFlat(containerClient) {
+
   const maxPageSize = 2;
 
   // Some options for filtering results
@@ -34,6 +35,7 @@ async function listBlobsFlat(containerClient) {
 // <snippet_listBlobsHierarchicalWithPageMarker>
 // Recursively list virtual folders and blobs
 async function listBlobHierarchical(containerClient, delimiter='/') {
+  
   const maxPageSize = 20;
 
   // Some options for filtering list

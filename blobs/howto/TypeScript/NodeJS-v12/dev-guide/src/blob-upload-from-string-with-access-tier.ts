@@ -11,36 +11,26 @@ dotenv.config();
 
 // Get BlobServiceClient
 import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-client';
+import { blob } from 'stream/consumers';
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
 //<Snippet_UploadAccessTier>
 async function uploadWithAccessTier(
-  containerClient: ContainerClient
+  containerClient: ContainerClient,
+  blobName: string
 ): Promise<BlockBlobClient> {
-  // Create blob
-  const timestamp = Date.now();
-  const blobName = `myblob-${timestamp}`;
-  console.log(`creating blob ${blobName}`);
 
   const fileContentsAsString = `Hello from a string`;
 
-  const tags: Tags = {};
-
   // Upload blob to cool tier
   const uploadOptions: BlockBlobUploadOptions = {
-    // access tier setting
-    // 'Hot', 'Cool', or 'Archive'
+    // 'Hot', 'Cool', 'Cold', or 'Archive'
     tier: 'Cool',
-
-    // other properties
-    metadata: undefined,
-    tags
   };
 
   // Create blob client from container client
-  const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient =  containerClient.getBlockBlobClient(blobName);
 
   // Upload string
   const uploadResult = await blockBlobClient.upload(
@@ -74,7 +64,7 @@ async function main(blobServiceClient: BlobServiceClient): Promise<void> {
 
   // upload blob to specified access tier
   const blockBlobClient: BlockBlobClient = await uploadWithAccessTier(
-    containerClient
+    containerClient, 'sample-blob.txt'
   );
 }
 main(blobServiceClient)

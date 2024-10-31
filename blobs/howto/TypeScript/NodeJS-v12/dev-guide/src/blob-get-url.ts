@@ -21,6 +21,7 @@ const blobServiceClient: BlobServiceClient =
 
 // <Snippet_GetUrl>
 async function getUrls(blobServiceClient: BlobServiceClient): Promise<void> {
+  
   // create container
   const containerName = `con1-${Date.now()}`;
   const {

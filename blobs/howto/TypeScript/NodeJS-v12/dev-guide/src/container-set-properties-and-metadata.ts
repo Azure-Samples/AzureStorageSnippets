@@ -18,6 +18,7 @@ const blobServiceClient: BlobServiceClient =
 async function getContainerProperties(
   containerClient: ContainerClient
 ): Promise<void> {
+
   try {
     const containerProperties: ContainerGetPropertiesResponse =
       await containerClient.getProperties();
@@ -36,6 +37,7 @@ async function getContainerProperties(
 async function setContainerMetadata(
   containerClient: ContainerClient,
 ) {
+  
   try {
     const metadata: Metadata = {
       // values must be strings

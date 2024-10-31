@@ -24,9 +24,9 @@ async function deleteBlob(
   containerClient: ContainerClient,
   blobName
 ): Promise<void> {
+
   // Create blob client from container client
-  const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // include: Delete the base blob and all of its snapshots
   // only: Delete only the blob's snapshots and not the blob itself
@@ -42,8 +42,9 @@ async function deleteBlobIfItExists(
   containerClient: ContainerClient,
   blobName
 ): Promise<void> {
+
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // include: Delete the base blob and all of its snapshots.
   // only: Delete only the blob's snapshots and not the blob itself.
@@ -63,9 +64,9 @@ async function undeleteBlob(
   containerClient: ContainerClient,
   blobName
 ): Promise<void> {
+
   // Create blob client from container client
-  const blockBlobClient: BlockBlobClient =
-    await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   const options: BlobUndeleteOptions = {};
   const blobUndeleteResponse: BlobUndeleteResponse =

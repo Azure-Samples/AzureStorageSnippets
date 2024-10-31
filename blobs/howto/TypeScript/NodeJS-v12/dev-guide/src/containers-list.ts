@@ -18,6 +18,7 @@ async function listContainers(
   blobServiceClient: BlobServiceClient,
   containerNamePrefix: string
 ): Promise<void> {
+  
   const options: ServiceListContainersOptions = {
     includeDeleted: false,
     includeMetadata: true,

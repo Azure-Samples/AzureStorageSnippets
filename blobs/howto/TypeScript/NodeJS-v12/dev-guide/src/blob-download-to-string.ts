@@ -17,7 +17,8 @@ async function downloadBlobToString(
   containerClient: ContainerClient,
   blobName: string
 ): Promise<void> {
-  const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
+
+  const blobClient: BlobClient = containerClient.getBlobClient(blobName);
 
   const downloadResponse: BlobDownloadResponseParsed =
     await blobClient.download();
@@ -32,7 +33,7 @@ async function downloadBlobToString(
   }
 }
 
-async function streamToBuffer(readableStream) {
+function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
 

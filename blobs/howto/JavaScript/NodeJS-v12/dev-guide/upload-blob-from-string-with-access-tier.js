@@ -17,7 +17,7 @@ async function uploadWithAccessTier(containerClient, blobName) {
   }
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   // Upload string
   await blockBlobClient.upload(fileContentsAsString, fileContentsAsString.length, uploadOptions);

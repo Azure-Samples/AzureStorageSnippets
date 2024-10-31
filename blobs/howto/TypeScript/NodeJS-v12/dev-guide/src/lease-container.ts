@@ -42,6 +42,7 @@ async function main(): Promise<void> {
 
 // <Snippet_AcquireContainerLease>
 async function acquireContainerLeaseAsync(blobContainerClient: ContainerClient) {
+  
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient();
   await leaseClient.acquireLease(30);
   return leaseClient;
@@ -50,6 +51,7 @@ async function acquireContainerLeaseAsync(blobContainerClient: ContainerClient) 
 
 // <Snippet_RenewContainerLease>
 async function renewContainerLeaseAsync(blobContainerClient: ContainerClient, leaseID: string) {
+  
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient(leaseID);
   await leaseClient.renewLease();
 }
@@ -57,6 +59,7 @@ async function renewContainerLeaseAsync(blobContainerClient: ContainerClient, le
 
 // <Snippet_ReleaseContainerLease>
 async function releaseContainerLeaseAsync(blobContainerClient: ContainerClient, leaseID: string) {
+  
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient(leaseID);
   await leaseClient.releaseLease();
 }
@@ -64,6 +67,7 @@ async function releaseContainerLeaseAsync(blobContainerClient: ContainerClient, 
 
 // <Snippet_BreakContainerLease>
 async function breakContainerLeaseAsync(blobContainerClient: ContainerClient, breakPeriod: number) {
+  
   const leaseClient: BlobLeaseClient = blobContainerClient.getBlobLeaseClient();
   await leaseClient.breakLease(breakPeriod);
 }

@@ -28,6 +28,7 @@ async function deleteContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
 ): Promise<ContainerDeleteResponse> {
+
   return await blobServiceClient.deleteContainer(containerName);
 }
 // </snippet_delete_container_immediately>
@@ -37,6 +38,7 @@ async function deleteContainer(
 async function deleteContainerSoft(
   containerClient: ContainerClient
 ): Promise<ContainerDeleteResponse> {
+
   return await containerClient.delete();
 }
 // </snippet_delete_container_soft_delete>
@@ -46,6 +48,7 @@ async function deleteContainersWithPrefix(
   blobServiceClient: BlobServiceClient,
   prefix: string
 ): Promise<void> {
+
   const containerOptions: ServiceListContainersOptions = {
     includeDeleted: false,
     includeMetadata: false,
@@ -82,6 +85,7 @@ async function undeleteContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
 ): Promise<void> {
+  
   // version to undelete
   let containerVersion: string | undefined;
 

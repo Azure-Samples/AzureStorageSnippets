@@ -24,7 +24,8 @@ async function downloadBlobAsStream(
   blobName: string,
   writableStream: fs.WriteStream
 ) {
-  const blobClient: BlobClient = await containerClient.getBlobClient(blobName);
+  
+  const blobClient: BlobClient = containerClient.getBlobClient(blobName);
 
   const downloadResponse = await blobClient.download();
 

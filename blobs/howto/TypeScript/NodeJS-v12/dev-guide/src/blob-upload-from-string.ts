@@ -17,6 +17,7 @@ async function uploadBlobFromString(
   blobName: string,
   fileContents: string
 ): Promise<void> {
+  
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 

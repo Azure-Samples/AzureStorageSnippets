@@ -18,6 +18,7 @@ async function createContainer(
   blobServiceClient: BlobServiceClient,
   containerName: string
 ): Promise<ContainerClient> {
+  
   const {
     containerClient,
     containerCreateResponse

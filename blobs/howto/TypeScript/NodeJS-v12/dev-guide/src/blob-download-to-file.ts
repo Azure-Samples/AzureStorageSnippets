@@ -16,31 +16,14 @@ import { getBlobServiceClientFromDefaultAzureCredential } from './auth-get-clien
 const blobServiceClient: BlobServiceClient =
   getBlobServiceClientFromDefaultAzureCredential();
 
-async function createBlobFromString(
-  containerClient: ContainerClient,
-  blobName,
-  fileContentsAsString,
-  options: BlockBlobUploadOptions
-): Promise<void> {
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
-
-  const uploadResult = await blockBlobClient.upload(
-    fileContentsAsString,
-    fileContentsAsString.length,
-    options
-  );
-  if (!uploadResult.errorCode) {
-    console.log(`created blob ${blobName} ${uploadResult.date}`);
-  }
-}
-
 // <snippet_downloadBlobToFile>
 async function downloadBlobToFile(
   containerClient: ContainerClient,
   blobName: string,
   filePath: string
 ): Promise<void> {
-  const blobClient = await containerClient.getBlobClient(blobName);
+
+  const blobClient = containerClient.getBlobClient(blobName);
 
   await blobClient.downloadToFile(filePath);
 }
