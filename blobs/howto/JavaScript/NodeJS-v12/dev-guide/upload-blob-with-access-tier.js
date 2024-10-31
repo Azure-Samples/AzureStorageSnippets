@@ -11,8 +11,10 @@ const accountName = '<storage-account-name>';
 // blobName: string, includes file extension if provided
 // localFilePath: fully qualified path and file name
 async function uploadWithAccessTier(containerClient, blobName, localFilePath) {
+  
   // Specify access tier
   const uploadOptions = {
+    // 'Hot', 'Cool', 'Cold', or 'Archive'
     tier: 'Cool',
   }
 

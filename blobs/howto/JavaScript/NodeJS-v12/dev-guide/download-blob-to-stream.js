@@ -13,7 +13,7 @@ const accountName = '<storage-account-name>';
 // <snippet_downloadBlobAsStream>
 async function downloadBlobAsStream(containerClient, blobName, writableStream) {
 
-    const blobClient = await containerClient.getBlobClient(blobName);
+    const blobClient = containerClient.getBlobClient(blobName);
 
     const downloadResponse = await blobClient.download();
 

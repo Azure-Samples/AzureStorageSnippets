@@ -14,6 +14,7 @@ const accountName = '<storage-account-name>';
 // blobName: string, includes file extension if provided
 // readableStream: Readable stream, for example, a stream returned from fs.createReadStream()
 async function uploadBlobFromReadStream(containerClient, blobName, readableStream) {
+  
   // Create blob client from container client
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 

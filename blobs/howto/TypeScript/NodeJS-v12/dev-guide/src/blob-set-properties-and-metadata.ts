@@ -20,6 +20,7 @@ const blobServiceClient: BlobServiceClient =
 async function setBlobMetadata(
   blobClient: BlobClient
 ): Promise<void> {
+
   const metadata: Metadata = {
     docType: 'text',
     category: 'reference'
@@ -33,6 +34,7 @@ async function setBlobMetadata(
 async function setHTTPHeaders(
   blobClient: BlobClient
 ): Promise<void> {
+
   // Get existing properties
   const properties = await blobClient.getProperties();
 
@@ -55,6 +57,7 @@ async function setHTTPHeaders(
 async function getProperties(
   blobClient: BlobClient
 ): Promise<void> {
+  
   const propertiesResponse: BlobGetPropertiesResponse =
     await blobClient.getProperties();
 

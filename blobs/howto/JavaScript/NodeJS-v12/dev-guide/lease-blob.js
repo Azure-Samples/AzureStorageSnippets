@@ -40,6 +40,7 @@ async function main() {
 
 // <Snippet_AcquireBlobLease>
 async function acquireBlobLeaseAsync(blobClient) {
+  
   const leaseClient = blobClient.getBlobLeaseClient();
   await leaseClient.acquireLease(30);
   return leaseClient;
@@ -48,6 +49,7 @@ async function acquireBlobLeaseAsync(blobClient) {
 
 // <Snippet_RenewBlobLease>
 async function renewBlobLeaseAsync(blobClient, leaseID) {
+  
   const leaseClient = blobClient.getBlobLeaseClient(leaseID);
   await leaseClient.renewLease();
 }
@@ -55,6 +57,7 @@ async function renewBlobLeaseAsync(blobClient, leaseID) {
 
 // <Snippet_ReleaseBlobLease>
 async function releaseBlobLeaseAsync(blobClient, leaseID) {
+  
   const leaseClient = blobClient.getBlobLeaseClient(leaseID);
   await leaseClient.releaseLease();
 }
@@ -62,6 +65,7 @@ async function releaseBlobLeaseAsync(blobClient, leaseID) {
 
 // <Snippet_BreakBlobLease>
 async function breakBlobLeaseAsync(blobClient) {
+  
   const leaseClient = blobClient.getBlobLeaseClient();
   await leaseClient.breakLease();
 }

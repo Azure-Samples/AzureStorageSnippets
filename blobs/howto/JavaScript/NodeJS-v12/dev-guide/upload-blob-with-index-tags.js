@@ -11,6 +11,7 @@ const accountName = '<storage-account-name>';
 // blobName: string, includes file extension if provided
 // localFilePath: fully qualified path and file name
 async function uploadWithIndexTags(containerClient, blobName, localFilePath) {
+  
   // Specify index tags for blob
   const uploadOptions = {
     tags: {

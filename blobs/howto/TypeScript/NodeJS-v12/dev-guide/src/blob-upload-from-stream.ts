@@ -36,6 +36,7 @@ async function uploadBlobFromReadStream(
   blobName: string,
   readStream: fs.ReadStream
 ): Promise<void> {
+  
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 

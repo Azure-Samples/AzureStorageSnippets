@@ -19,6 +19,7 @@ async function uploadWithTransferOptions(
   blobName: string,
   localFilePath: string
 ): Promise<void> {
+  
   // Specify data transfer options
   const uploadOptions: BlockBlobParallelUploadOptions = {
     blockSize: 4 * 1024 * 1024, // 4 MiB max block size

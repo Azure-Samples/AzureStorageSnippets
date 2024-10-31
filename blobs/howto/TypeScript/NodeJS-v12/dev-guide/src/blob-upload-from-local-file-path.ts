@@ -18,6 +18,7 @@ async function uploadBlobFromLocalPath(
   blobName: string,
   localFilePath: string
 ): Promise<void> {
+  
   // Create blob client from container client
   const blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
 

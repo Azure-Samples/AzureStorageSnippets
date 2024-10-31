@@ -52,6 +52,7 @@ async function deleteContainersWithPrefix(blobServiceClient, prefix) {
 // Undelete specific container - last version
 // <snippet_undeleteContainer>
 async function undeleteContainer(blobServiceClient, containerName) {
+  
   // Version to restore
   let containerVersion;
 

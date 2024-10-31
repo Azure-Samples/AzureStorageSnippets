@@ -12,6 +12,7 @@ const accountName = '<storage-account-name>';
 // blobName: string, includes file extension if provided
 // localFilePath: fully qualified path and file name
 async function uploadBlobFromLocalPath(containerClient, blobName, localFilePath){
+  
   // Create blob client from container client
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 

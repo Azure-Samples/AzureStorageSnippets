@@ -39,6 +39,7 @@ async function copyBlob(
   destinationBlobContainer: string,
   destinationBlobName: string
 ) {
+
   // create container clients
   const sourceContainerClient: ContainerClient =
     blobServiceClient.getContainerClient(sourceBlobContainer);
@@ -46,10 +47,10 @@ async function copyBlob(
     blobServiceClient.getContainerClient(destinationBlobContainer);
 
   // create blob clients
-  const sourceBlobClient = await sourceContainerClient.getBlobClient(
+  const sourceBlobClient = sourceContainerClient.getBlobClient(
     sourceBlobName
   );
-  const destinationBlobClient = await destinationContainerClient.getBlobClient(
+  const destinationBlobClient = destinationContainerClient.getBlobClient(
     destinationBlobName
   );
 
@@ -71,6 +72,7 @@ async function copyThenAbortBlob(
   destinationBlobContainer: string,
   destinationBlobName: string
 ) {
+
   // create container clients
   const sourceContainerClient: ContainerClient =
     blobServiceClient.getContainerClient(sourceBlobContainer);
@@ -79,9 +81,9 @@ async function copyThenAbortBlob(
 
   // create blob clients
   const sourceBlobClient: BlobClient =
-    await sourceContainerClient.getBlobClient(sourceBlobName);
+   sourceContainerClient.getBlobClient(sourceBlobName);
   const destinationBlobClient: BlobClient =
-    await destinationContainerClient.getBlobClient(destinationBlobName);
+   destinationContainerClient.getBlobClient(destinationBlobName);
 
   // start copy
   const copyPoller = await destinationBlobClient.beginCopyFromURL(

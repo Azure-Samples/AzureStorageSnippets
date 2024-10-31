@@ -19,6 +19,7 @@ async function uploadBlobWithIndexTags(
   blobName: string,
   localFilePath: string
 ): Promise<void> {
+  
   // Specify index tags for blob
   const uploadOptions: BlockBlobParallelUploadOptions = {
     tags: {

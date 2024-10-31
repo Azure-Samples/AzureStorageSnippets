@@ -16,6 +16,7 @@ const blobServiceClient: BlobServiceClient =
 async function listBlobsFlat(
   containerClient: ContainerClient
 ): Promise<void> {
+  
   const maxPageSize = 2;
 
   // Some options for filtering results
@@ -45,6 +46,7 @@ async function listBlobHierarchical(
   containerClient: ContainerClient,
   delimiter = '/'
 ): Promise<void> {
+
   const maxPageSize = 20;
 
   // Some options for filtering results
