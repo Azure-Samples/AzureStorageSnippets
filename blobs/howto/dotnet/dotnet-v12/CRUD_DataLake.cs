@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace dotnet_v12
@@ -253,7 +254,16 @@ namespace dotnet_v12
 
             FileStream fileStream = File.OpenRead(localPath);
 
-            await fileClient.UploadAsync(content: fileStream, overwrite: true);
+            DataLakeFileUploadOptions uploadOptions = new()
+            {
+                // If change notifications are enabled, set Close to true
+                // This value indicates the final close of the file stream
+                // And emits a change notification event upon successful flush
+
+                // Close = true
+            };
+
+            await fileClient.UploadAsync(content: fileStream, options: uploadOptions);
         }
         // </Snippet_UploadFile>
 
@@ -278,7 +288,16 @@ namespace dotnet_v12
 
             await fileClient.AppendAsync(stream, offset: fileSize);
 
-            await fileClient.FlushAsync(position: fileSize + stream.Length);
+            DataLakeFileFlushOptions flushOptions = new()
+            {
+                // If change notifications are enabled, set Close to true
+                // This value indicates the final close of the file stream
+                // And emits a change notification event upon successful flush
+
+                // Close = true
+            };
+
+            await fileClient.FlushAsync(position: fileSize + stream.Length, options: flushOptions);
         }
         // </Snippet_AppendDataToFile>
 
