@@ -316,7 +316,7 @@ namespace dotnet_v12
 
             DataLakeFileClient fileClient = directoryClient.GetFileClient("my-image.png");
 
-            Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
+            Response<DataLakeFileReadStreamingResult> downloadResponse = await fileClient.ReadStreamingAsync();
 
             StreamReader reader = new StreamReader(downloadResponse.Value.Content);
 
@@ -351,7 +351,7 @@ namespace dotnet_v12
             DataLakeFileClient fileClient =
                 directoryClient.GetFileClient(fileName);
 
-            Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
+            Response<DataLakeFileReadStreamingResult> downloadResponse = await fileClient.ReadStreamingAsync();
 
             BinaryReader reader = new BinaryReader(downloadResponse.Value.Content);
 
