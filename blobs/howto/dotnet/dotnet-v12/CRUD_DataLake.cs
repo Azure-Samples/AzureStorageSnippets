@@ -253,7 +253,16 @@ namespace dotnet_v12
 
             FileStream fileStream = File.OpenRead(localPath);
 
-            await fileClient.UploadAsync(content: fileStream, overwrite: true);
+            DataLakeFileUploadOptions uploadOptions = new()
+            {
+                // If change notifications are enabled, set Close to true
+                // This value indicates the final close of the file stream
+                // And emits a change notification event upon successful flush
+
+                // Close = true
+            };
+
+            await fileClient.UploadAsync(content: fileStream, options: uploadOptions);
         }
         // </Snippet_UploadFile>
 
@@ -278,7 +287,16 @@ namespace dotnet_v12
 
             await fileClient.AppendAsync(stream, offset: fileSize);
 
-            await fileClient.FlushAsync(position: fileSize + stream.Length);
+            DataLakeFileFlushOptions flushOptions = new()
+            {
+                // If change notifications are enabled, set Close to true
+                // This value indicates the final close of the file stream
+                // And emits a change notification event upon successful flush
+
+                // Close = true
+            };
+
+            await fileClient.FlushAsync(position: fileSize + stream.Length, options: flushOptions);
         }
         // </Snippet_AppendDataToFile>
 
@@ -298,7 +316,7 @@ namespace dotnet_v12
 
             DataLakeFileClient fileClient = directoryClient.GetFileClient("my-image.png");
 
-            Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
+            Response<DataLakeFileReadStreamingResult> downloadResponse = await fileClient.ReadStreamingAsync();
 
             StreamReader reader = new StreamReader(downloadResponse.Value.Content);
 
@@ -333,7 +351,7 @@ namespace dotnet_v12
             DataLakeFileClient fileClient =
                 directoryClient.GetFileClient(fileName);
 
-            Response<FileDownloadInfo> downloadResponse = await fileClient.ReadAsync();
+            Response<DataLakeFileReadStreamingResult> downloadResponse = await fileClient.ReadStreamingAsync();
 
             BinaryReader reader = new BinaryReader(downloadResponse.Value.Content);
 
